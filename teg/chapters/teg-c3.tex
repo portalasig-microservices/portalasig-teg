@@ -1,0 +1,126 @@
+\chapter{Front-End de Aplicaciones Web}
+\pagestyle{fancy}
+
+Una \textbf{Aplicación Web} es un Software de aplicación que corre en un servidor y es accedido por usuarios a través de un navegador de Internet. Se puede definir como un sistema que consiste en un Servidor, una Red para la comunicación y un cliente, normalmente un navegador en la Web, donde la entrada del usuario (al navegar o realizar alguna acción de entrada) afecta el estado del negocio. 
+
+Estas interacciones, que ocurren a través del navegador Web, ocurren en la capa gráfica y visual de la aplicación, que facilita las interacciones con el usuario, conocido también como \textbf{Front-End} o \textbf{Capa de Interacción}. Otra de las capas fundamentales, encargada de manejar la lógica de negocio y de entregar la respuesta a las solicitudes del usuario, se conoce como \textbf{Capa de Aplicación}. Esta capa, a su vez, es la encargada de realizar búsquedas con la data que maneja el negocio, almacenada en una base de datos, que se conoce como \textbf{Capa de Almacenamiento}. Tanto la Capa de Aplicación como la de Almacenamiento pertenecen al \textbf{Back-End}. En este sistema, la Capa de Presentación es responsable de transmitir la data del usuario a la Capa de Aplicación, que a su vez procesa esta data y realiza múltiples tareas, incluyendo consultas, actualizaciones e inserciones en la Capa de Almacenamiento. 
+
+Este paradigma de capas de interacción siguen la Arquitectura Cliente-Servidor, donde el nivel uno o de Cliente representa al \textbf{Front-End} y los niveles dos en adelante son el \textbf{Back-End}. Además de estas dos abstracciones existe una tercera, que involucra a la metodología y procesos que permiten la \textbf{Comunicación entre Front-End y Back-End}.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=9cm]{graphics/teg-c3/aplicacion_Web.png}
+\caption{Arquitectura de aplicación Web}
+\label{fig:app_Web_arch}
+\end{figure}
+
+En general, las Aplicaciones Web difieren de las tradicionales en la confiabilidad, usabilidad, seguridad, ingeniería, facilidad para mercadear, tiempos de vida de productos más cortos y mantenimiento continuo.\cite{Web_app_def_1}. 
+
+Las Aplicaciones Web no necesitan ser descargadas para funcionar, ya que se accede a ellas a través de un navegador Web (ver Fig. \ref{fig:app_Web_arch}).
+
+El Front-End constituye todo lo asociado con la interfaz de usuario y sus interacciones. Incluye desde el diseño y estructura hasta el contenido. Es la primera impresión de un negocio para los usuarios.\cite{front_end_1}
+
+Se enfoca en la parte de la Aplicación Web que está expuesta directamente a los usuarios. El Front-End debe asegurar que un visitante pueda interactuar y navegar fácilmente entre las páginas, permitiéndole realizar todas las funcionalidades que el negocio en cuestión permita.
+
+Desde el logotipo hasta la barra de búsqueda, botones, estructura general e interacciones involucran al Front-End. Además, asegura que la aplicación sea posible visitarla desde múltiples dispositivos: computadores de escritorio, laptops, tabletas y teléfonos celulares, entre otros.\cite{front_end_2} A continuación se presentan algunas de las tecnologías de Front-End mas relevantes.
+    
+    \section[HTML]{Hypertext Markup Language, HTML}
+        Lenguaje de Marcas de Hipertexto (HTML, por sus siglas en inglés). Es el lenguaje estándar para implementar el contenido y estructura general de un sitio Web. 
+        
+        Se encarga de mostrar el contenido de una página Web como botones, enlaces, títulos, párrafos, listas y la estructura en general. Este lenguaje esta hecho de elementos que pueden ser aplicados a fragmentos de texto para darles distintos significados en un documento (párrafos, listas, tablas, etc), estructura a un documento a través de secciones lógicas (Cabecera, contenido en múltiples columnas, menús de navegación, etc) y embeber contenido multimedia como imágenes y vídeos dentro de una página.
+        
+        HTML no debe usarse para dar estilos a una página Web. En cambio, existe \textbf{CSS} para tal fin.\cite{html} 
+            
+    \section{Cascade Style Sheets, CSS}
+        Hojas de Estilo en Cascada (CSS, por sus siglas en inglés). Permite crear documentos HTML con estilos visuales llamativos que se adapten a la identidad gráfica de un negocio. CSS es un lenguaje para especificar cómo los documentos HTML son presentados a los usuarios. 
+        
+        CSS puede ser usado tanto para dar estilos muy básicos al texto de un documento como para crear estructuras complejas que se comporten de forma específica dependiendo de la interacción del usuario (mover el cursor, clicar un elemento, etc). 
+        
+        Es un lenguaje basado en reglas, es decir, se definen reglas para grupos específicos de estilos que se aplican a elementos o grupos de elementos HTML que cumplan con la condición de las propiedades que se definan. Una propiedad CSS puede tener distintos valores de personalización a la vez.\cite{css}
+
+    \section{JavaScript} 
+        JavaScript (JS) es un lenguaje de programación ligero, interpretado, o compilado justo-a-tiempo. Si bien es más conocido como un lenguaje de Scripting (secuencias de comandos) para páginas Web, y es usado en muchos entornos fuera del navegador, es un lenguaje de programación basado en prototipos, multi-paradigma, de un solo hilo, dinámico, con soporte para programación orientada a objetos, imperativa y declarativa (por ejemplo programación funcional)\cite{js_1}. 
+        
+        JavaScript fue creado inicialmente para \textit{darle vida a los sitios Web}. Los programas que se desarrollan en este lenguaje se conocen como \textbf{Scripts}. Pueden ser escritos en el HTML de una página Web y ejecutarse automáticamente cuando esta cargue. Los Scripts se proveen y ejecutan como texto plano, no necesitan ninguna preparación especial para correr. Actualmente, Javascript puede ser ejecutado no sólo en los navegadores, sino también en un servidor. De hecho, en cualquier dispositivo que tenga un \textbf{motor de Javascript}.
+        
+        Los navegadores poseen un motor embebido, también conocido como \textbf{Máquina Virtual de JavaScript}\cite{js_2}. Entre los más populares están:
+        
+        \begin{itemize}
+            \item \textbf{V8} en Google Chrome, Opera y Microsoft Edge
+            \item \textbf{SpiderMonkey} en Mozilla Firefox
+            \item \textbf{SquirrelFish} para Safari
+        \end{itemize}
+        
+El HTML se encarga de \textbf{estructurar} la información y elementos que se muestran en un sitio Web, permitiendo crear interfaces con sentido para los usuarios. En el CSS recae la forma en la que esa estructura es \textbf{presentada}. Desde diseño y colores hasta animaciones pueden ser configuradas con CSS para ofrecer la mejor experiencia de usuario a los clientes. Finalmente, en JavaScript se programan los \textbf{comportamientos} ante la interacción del cliente en un sitio Web para satisfacer los objetivos del negocio mientras el usuario disfruta, verdaderamente, de su experiencia. (ver Fig. \ref{fig:html_js_css})
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=9cm]{graphics/teg-c3/html_css_js.png}
+\caption{Capas elementales en el Front-End de un sitio Web}
+\label{fig:html_js_css}
+\end{figure}
+
+%\subsection{Frameworks de Front-End}
+\section{Frameworks de Front-End}
+
+%% ARREGLAR OVERLAPPING DE HEADER CON LATEX CODE. REMOVER NOMBRE DE SECCION DEL CAPITULO%%
+
+    Con la llegada de la Web 2.0, nuevas y mejoradas versiones de HTML, CSS y JavaScript surgieron. \textbf{HTML5} añadió más etiquetas para desarrollar mejores interfaces y permitió el uso de Interfaces de Programación de Aplicaciones \textbf{APIs}, por sus siglas en inglés), que, sin duda, redefinieron el concepto de las aplicaciones Web. Aunque HTML5 trajo muchas ventajas, aún existían muchas limitaciones y problemas de eficiencia cuando se querían implementar funciones dinámicas y reactivas a la interacción de los usuarios en la Web. 
+    
+    Motivados por este problema, Google lanza en el año 2008 \textbf{Chrome V8}, un motor de JavaScript extraordinariamente rápido y que logró que JavaScript en los navegadores alcanzara velocidades y rendimiento similares a Java o C++, permitiendo extender el uso de tecnologías basadas en este lenguaje para realizar proyectos más grandes y complejos para que un computador promedio de un usuario pudiera soportarlo. Es con este gran salto tecnológico gracias a Google que surgen los \textbf{Frameworks de Front-End}, basados en JavaScript, cuya meta principal es, justamente, permitir el desarrollo de aplicaciones Web complejas en el navegador sin hacer inviable el uso de los recursos y los tiempos de carga para proveer una experiencia satisfactoria a los internautas.
+    
+    Existen numerosos Frameworks de Front-End y librerías basadas en JavaScript debido a la innovación del Motor V8 de Google. Se ha utilizado la data recolectada por Sacha Greif, contribuyentes de código abierto y consultores para la Web \href{https://2021.stateofjs.com/en-US/about}{2021 State Of JS}, que realizó encuestas desde el 13 de enero hasta el 2 de febrero de 2022, recolectando 16.085 respuestas para las estadísticas de la figura \ref{fig:front_end_stats}, que muestran a los Frameworks \textbf{React}, \textbf{Angular} y \textbf{Vue.js} en el podio de los más usados en primer, segundo y tercer lugar, respectivamente.
+    
+    Entendamos las ideas fundamentales detrás de cada uno de estos Frameworks:
+
+     \subsection{React.js y React Native}
+    
+        Para mejorar la experiencia de usuario de Facebook e Instagram, Facebook desarrolla la librería de JavaScript \textbf{React} y, debido a lo poderosa que resultó, fue liberada como una librería de código abierto. Además de React, también crean \textbf{React Native} para el desarrollo móvil de aplicaciones con React en IOS y Android.
+        
+        \begin{figure}[!htbp]
+        \centering
+        \includegraphics[width=9cm]{graphics/teg-c3/mounting_components_react.png}
+        \caption{Montaje de componentes y re-renderizado de componentes en React \cite{front_end_frameworks}}
+        \label{fig:mounting_comp_react}
+        \end{figure}
+        
+        La Fig. \ref{fig:mounting_comp_react} muestra cómo es el proceso de renderizado de una página Web con la tecnología de React. React monta el contenido de un sitio Web como distintos componentes en el Modelo de Objeto de Documento (DOM, por sus siglas en inglés). El navegador hará el renderizado de los componentes con JavaScript; además de forma rápida y eficiente gracias al motor V8. 
+        
+        Otro concepto fundamental de React es el DOM virtual. En los sitios HTML tradicionales, la página se renderiza entera cuando el usuario refresca la data o visita otras sub-páginas. Este proceso de re-renderizado consume más recursos del navegador y afecta negativamente la velocidad del sitio Web. React, en cambio, resuelve estos problemas de otra forma: a través del DOM virtual. Cuando el usuario salta a otra sub-página, React crea un DOM virtual actualizado y compara con el que está viendo el usuario actualmente. Después de terminada la comparación de cada componente, React re-renderizará sólo lo que cambió. Esto es una gran solución para que los sitios Web sean muy rápidos comparados con los tradicionales. 
+        
+        React no sólo cambió el desarrollo de Front-End gracias a su \textbf{DOM virtual}, entre otras características importantes, sino que también estableció un nuevo estándar de desarrollo y diseño de interfaces de usuario, sobre todo por su innovador concepto de \textbf{componentes}. \cite{front_end_frameworks}
+        
+    \subsection{Angular 2}
+        Angular es un famoso Framework JavaScript de código abierto desarrollado por Google en 2010. Su primera versión fue concebida, inicialmente, para asistir a los diseñadores Web en crear formularios persistentes de forma más eficiente que la tradicional. Por ello, con el paso de los años fue quedando atrás porque su paradigma era muy limitado. Sin embargo, motivados por las nuevas tendencias tecnológicas, Google libera en el año 2016 \textbf{Angular 2}, una versión completamente moderna y reescrita de Angular 1 para TypeScript, que es una sobrecarga sintáctica estricta de JavaScript. 
+        
+        \begin{figure}[!htbp]
+        \centering
+        \includegraphics[width=9cm]{graphics/teg-c3/angular_one_way_binding.png}
+        \caption{Unión unidireccional de Angular (conocido comúnmente como \textit{One-Way Binding} en inglés)}
+        \label{fig:angular_one_way_binding}
+        \end{figure}
+        
+        La Fig. \ref{fig:angular_one_way_binding} muestra la forma de comunicación esencial entre los componentes de Angular y la vista en HTML. La \textbf{unión de datos} o \textit{Data Binding} es una forma de sincronizar la data entre los modelos y los componentes de forma automática. La vista es una proyección de los componentes. En el \textit{One-Way Binding} el flujo de la data es unidireccional, lo que quiere decir que sólo va desde el modelo hacia la vista y esta data reacciona de forma automática gracias a las \textbf{uniones de eventos} o \textit{Event-Bindings}, que se encarga de disparar un evento en el código como respuesta a una interacción del usuario con el sitio Web.
+        
+        Angular fue re-escrito en su segunda versión para ser fácilmente utilizado en el desarrollo móvil de aplicaciones. Al optimizar e integrar distintas características, Angular 2 es más pequeño y más rápido que su predecesor, lo cual lo hace ideal para el desarrollo móvil. \cite{front_end_frameworks}
+    
+    \subsection{Vue.js}
+        Es un Framework JavaScript de código abierto muy popular desarrollado por Evan You en el 2014. La intención inicial de este Framework era lograr una unión adaptativa entre la data y los componentes de la interfaz de usuario con un uso fácil de APIs.  Aunque Vue se supone que sólo funciona en aplicaciones de una sola página (SPA, por sus siglas en inglés), la comunidad lo ha provisto con librerías y paquetes de terceros que permiten romper esta limitación.
+        
+        \begin{figure}[!htbp]
+        \centering
+        \includegraphics[width=9cm]{graphics/teg-c3/vue_data_driven_concept.png}
+        \caption{Concepto basado en data de Vue.js}
+        \label{fig:vue_data_driven_concept}
+        \end{figure}
+        
+        La Fig. \ref{fig:vue_data_driven_concept} ilustra las 3 secciones básicas para procesar el concepto basado en data (comúnmente conocido como \textit{Data-Driven Concept en inglés}: La Vista, la Vista-Modelo y el Modelo. La sección de Vista es un DOM para mostrar el contenido del sitio Web. La Vista-Modelo contiene oyentes (comúnmente conocidos como \textit{Listeners} en inglés) y las uniones de data. Esta se convierte en una Proxy entre la vista y el modelo. Cuando un usuario dispara un procesamiento de data en la vista, Vue usará los \textit{Listeners} para monitorear y actualizar la sección de data del Modelo. Cuando esto ocurre, Vue usará la unión de DOMs para actualizar el contenido (similar al funcionamiento de React). En resumen, Vue utiliza \textit{One-Way Binding} con \textit{Listeners} DOM para la comunicación entre la vista y el modelo.\cite{front_end_frameworks}
+    
+
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=12cm]{graphics/teg-c3/front_end_frameworks_statistics.png}
+\caption{Los 10 Frameworks más usados desde 2016 hasta 2021. Gráfica de \href{https://2021.stateofjs.com/en-US/libraries/Front-End-frameworks}{2021 State of JS}}
+\label{fig:front_end_stats}
+\end{figure}

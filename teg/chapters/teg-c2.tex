@@ -1,0 +1,88 @@
+\chapter{Arquitectura Cliente-Servidor}
+\pagestyle{fancy}
+
+Un sistema \textbf{Cliente-Servidor} se describe como un modelo de computación distribuida en donde la aplicación del Cliente solicita servicios de un proceso del Servidor. Esta arquitectura permite dividir la carga entre múltiples categorías dependiendo de las necesidades del negocio y de la solicitud que se reciba desde el lado del Cliente. Un computador personal, por ejemplo, corre un sistema operativo que, a su vez, corre Software de muchos tipos que, si usan conexión a Internet, se comunican frecuentemente con servidores para realizar múltiples peticiones. En este proceso un mensaje es enviado a un Servidor, que responde con información preparada como sea necesaria para finalmente mostrarla al Cliente. .\cite{client_server_arch_1}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=9cm]{graphics/teg-c2/sistema_cliente_servidor.png}
+\caption{Sistema Cliente-Servidor}
+\label{fig:figure6}
+\end{figure}
+
+El \textbf{Cliente} es quien hace la solicitud de información mientras el \textbf{Servidor} es el proveedor del servicio. En la mayoría de ambientes con arquitectura Cliente-Servidor, el procesamiento de la data la maneja el servidor y los resultados son enviados al cliente, que está diseñado para maximizar el rendimiento al momento de entregar la información al consumidor final o solicitante de la información.
+
+En el mundo actual, esta arquitectura se ha hecho muy popular debido a que es utilizada todos los días por aplicaciones alrededor del mundo. Algunos de los protocolos más comunes que se utilizan para la comunicación entre el cliente y el servidor son: \textbf{Protocolo de Transferencia de Archivos} (FTP, por sus siglas en inglés), \textbf{Protocolo de Transferencia de Correo Simple} (SMTP) y \textbf{Protocolo de Transferencia de Hipertexto} (HTTP). 
+
+Un sistema con arquitectura Cliente-Servidor es, en definitiva, una arquitectura hecha de un Cliente y un Servidor, donde el Cliente siempre realiza solicitudes mientras que el Servidor responde a ellas. Esta arquitectura provee una comunicación entre procesos, ya que involucra el intercambio de data entre el Cliente y el Servidor, donde cada uno de ellos realiza diferentes funciones.\cite{client_server_arch_2}
+
+\section{Cliente}
+     El Cliente inicia la comunicación. Es utilizado para correr programas y acceder a la data que está almacenada en el Servidor. Típicamente es más sencillo de desarrollar que los servidores, ya que no necesitan privilegios específicos para proveer soluciones para las que fue diseñado.\cite{client_server_arch_3}
+ 
+     El Cliente o \textit{estación de trabajo}, opera las aplicaciones que poseen las interfaces gráficas que ve el consumidor, normalmente conocidas como \textbf{Front-End}. Usando una pantalla, teclado y un ratón como medio de interacción con el usuario, un Cliente también puede referirse a un proceso que opera de forma automática desde la computadora de un consumidor u otro Servidor.
+ 
+     Un Cliente sólo puede hacer solicitudes a un Servidor y mostrar la data que recibe como respuesta, ya que no posee acceso directo a ella. Como el Cliente no procesa peticiones o almacena data de ningún servidor, los requerimientos técnicos de memoria, almacenamiento en disco y capacidad de procesamiento son menos exigentes que los de un Servidor. Esto permite a un Cliente operar una Aplicación Web sin necesidad de un gran consumo de recursos.\cite{client_server_arch_4}
+
+\section{Servidor}
+ 
+     El Servidor resuelve las peticiones de un Cliente. En algunas ocasiones requiere privilegios de sistema, debido a que puede necesitar acceso a almacenamiento en disco y a Base de Datos, locales o remotas.\cite{client_server_arch_3}
+     
+     Un Servidor, usualmente conocido como \textbf{Back-End}, es una máquina o conjunto de máquinas que administran los privilegios y roles para el acceso a la data de forma concurrente. Un Servidor también puede referirse a un proceso o conjunto de procesos que operan en un computador. Independiente de su sistema operativo, un Servidor recibe y procesa solicitudes de un Cliente.
+     
+     Al tener más memoria, discos de almacenamiento más grandes y procesadores más rápidos, un Servidor es capaz de atender múltiples solicitudes, algunas incluso de forma simultánea, de un Cliente. Adoptando múltiples roles en una arquitectura Cliente-Servidor, un Servidor puede ser una Base de Datos, un servicio de correo o de archivos de forma simultánea.
+     Es importante para un Servidor poder funcionar como una entidad consolidada para almacenar archivos, programas, bases de datos y reglas de negocio.\cite{client_server_arch_4}
+     
+\section{Red}
+    La Red permite la recuperación y envío de data de forma remota vía transacciones Cliente-Servidor y Servidor-Servidor. Aplicaciones, Servidores y Bases de Datos pueden estar en distintas máquinas con distintos sistemas operativos. Cada Cliente y Servidor están conectados a través de Internet para asegurar que la recepción y respuesta de las peticiones del Cliente sean atendidas.\cite{client_server_arch_3}. 
+    
+    \subsection{Protocolo HTTP}
+        Es el protocolo que se utiliza para establecer comunicación entre el Cliente y el Servidor. Permite recuperar recursos como un documento HTML, CSS o Javascript. Es la fundación de cualquier intercambio de data en la Web y es un procotolo de Cliente-Servidor, lo que quiere decir que las peticiones son iniciadas por el Cliente, normalmente un Navegador de Internet. Una página web entera es reconstruido por los distintos tipos de documentos recuperados, por ejemplo, texto, descripción de estructura de los elementos, imágenes, vídeos, Scripts, entre otros.
+        
+        Clientes y Servidores se comunican al intercambiar mensajes individuales. Los mensajes enviados por el Cliente, son llamados \textbf{Peticiones} y los mensajes enviados por el servidor, como consecuencia de una petición de un Cliente, son llamados \textbf{Respuestas}.\cite{http_protocol_white_paper}
+    
+    \subsection{Tipos de peticiones HTTP}
+        El protocolo HTTP define un conjunto de tipos de peticiones para indicar la acción que se desea que el servidor ejecute para un recurso o conjunto de recursos. Aunque cada uno de ellos implementa diferente semántica, hay características compartidas entre un grupo de ellos. A continuación los métodos de peticiones más comunes para una comunicación Cliente-Servidor\cite{http_methods_white_paper}:
+         \begin{itemize}
+             \item \textbf{GET}: Las peticiones de tipo GET u OBTENER solicitan una representación del recurso que se ha pedido. Estas peticiones sólo deben recuperar data.
+             \item \textbf{POST}: POST o ENVIAR es un método que envía una entidad con recursos específicos, normalmente produciendo un cambio de estado o efecto en el Servidor.
+             \item \textbf{PUT}: PUT o COLOCAR reemplaza todas las representaciones del recurso objetivo con la carga de datos enviada en la petición.
+             \item \textbf{DELETE}: DELETE o Eliminar borra el recurso especificado, lo que sea que eso implique del lado del Servidor.
+         \end{itemize}  
+    
+\section{Arquitectura de dos niveles}
+    En este tipo de arquitectura, la carga de trabajo es dividida entre el Servidor (Anfitrión del sistema) y el Cliente (Anfitrión de la interfaz de usuario). En el mundo real estas partes están en distintos computadores pero realmente no existe un requerimiento sobre ello. Aunque las capas estén separadas técnicamente es posible que ambas puedan estar en un mismo computador. \cite{client_server_arch_3}
+
+    En una arquitectura de dos niveles, el Cliente está en el primer nivel. El servidor de base de datos y de aplicación reside en la máquina de Servidor, que es el segundo nivel. Este segundo nivel sirve la data y ejecuta la lógica de negocio para la Aplicación Web. Las organizaciones a favor de esta arquitectura típicamente lo prefieren así para consolidar tanto la lógica de negocio como la base de datos en un mismo nivel. El segundo nivel es responsable, en definitiva, de la disponibilidad, escalabilidad y rendimiento del entorno Web de una organización.
+        \begin{figure}[!htbp]
+        \centering
+        \includegraphics[width=9cm]{graphics/teg-c2/arquitectura_2_niveles.png}
+        \caption{Arquitectura de dos niveles}
+        \label{fig:figure5}
+        \end{figure}
+    
+\section{Arquitectura de tres niveles}
+    
+    En una arquitectura de tres niveles, el cliente y el servidor interactúan entre ellos a través de un software que está en el medio de los dos. Este software se conoce como software de aplicación, intermedio o \textbf{Middleware} y su función es, principalmente, separar los procesos de verificación de credenciales, acceso a la información, almacenamiento de data e interfaces de usuario para que puedan ser mantenidas de forma independiente y como módulos aislados.
+    
+    La solicitud del cliente es recuperada y autenticada por el Middleware antes de que el servidor la reciba. Es entonces cuando el servidor procesa la petición y envía la respuesta al cliente, también a través del Middleware.\cite{client_server_arch_3}         
+    
+    \begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=9cm]{graphics/teg-c2/arquitectura_3_niveles.png}
+    \caption{Arquitectura de tres niveles}
+    \label{fig:figure4}
+    \end{figure}
+    
+\section{Arquitectura de n-niveles} 
+
+En una arquitectura de n-niveles, los objetos de una aplicación están distribuidos a lo largo de distintos niveles lógicos, normalmente tres o cuatro. El servidor de base de datos no comparte la misma máquina que el servidor que contiene la lógica de negocio, también conocido como \textbf{servidor de aplicación}. El servidor de aplicación es el segundo nivel y maneja toda la lógica de negocio que no requiere las funcionalidades de la base de datos. Un buen ejemplo de una aplicación de n-niveles es un sistema de intercambio de acciones, como la \textbf{Blockchain}.\cite{client_server_arch_3}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=10cm]{graphics/teg-c2/arquitectura_n_niveles.png}
+\caption{Arquitectura de n-niveles}
+\label{fig:figure3}
+\end{figure}
+
+ 
+ 

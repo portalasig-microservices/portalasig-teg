@@ -1,0 +1,35 @@
+\chapter{Planteamiento del problema}
+\pagestyle{fancy}
+
+La evolución de las aplicaciones web desde arquitecturas monolíticas hacia sistemas distribuidos ha incrementado la complejidad de los entornos operativos, donde la escalabilidad, la resiliencia y la adaptabilidad se han convertido en requisitos fundamentales. Este contexto, asociado a la transición de la Web~2.0 a la Web~3.0, demanda plataformas capaces de integrar múltiples servicios y responder dinámicamente a las necesidades de los usuarios \cite{web2_0,paper_web10_to_web40}.
+
+PortalAsig, plataforma académica de la Facultad de Ciencias de la Universidad Central de Venezuela, fue propuesta en 2013 como un sistema centralizado para facilitar la comunicación entre docentes y estudiantes \cite{portalasig_1}. En 2016 se desarrolló una nueva versión, PortalAsig2, que separó el backend y el frontend para exponer los servicios mediante una interfaz de programación de aplicaciones y modernizar la experiencia de usuario en una arquitectura cliente-servidor \cite{portalasig_2}.
+
+El trabajo posterior de Vásquez Balza incorporó prácticas de ingeniería orientadas a la mantenibilidad y un rediseño completo de la capa frontal, pero el backend continuó basado en la solución monolítica original, con limitaciones estructurales que aumentaron su complejidad y dificultaron su evolución \cite{portalasig_3}. La falta de un plan de mantenimiento integral permitió que la deuda técnica persistiera, atendiendo solo correcciones puntuales y sin consolidar una estrategia sostenible para el sistema en su conjunto.
+
+El presente Trabajo Especial de Grado plantea la migración conceptual del backend hacia una arquitectura de microservicios como respuesta a esas limitaciones. Aunque el sistema en producción continúa operando sobre el monolito de PortalAsig2, la propuesta busca establecer los lineamientos necesarios para una futura transición y definir cómo deberían articularse los servicios, la observabilidad y los procesos de mantenimiento. Si bien esta arquitectura favorece la modularidad y la escalabilidad, también introduce desafíos asociados a la coordinación, la observabilidad y la gestión de fallas en sistemas distribuidos \cite{dragoni2017microservices,taibi2021microservices}.
+
+La ausencia de un equipo de ingeniería dedicado obliga a depender de contribuciones esporádicas de docentes, pasantes y tesistas. El mantenimiento se concentra en jornadas preventivas semestrales y en correcciones bajo demanda cuando los usuarios reportan fallas, apoyándose casi exclusivamente en el conocimiento institucional de quienes colaboran con el proyecto. El portal tampoco cuenta con un stack formal de observabilidad —centralización de registros, métricas o trazas— que respalde la operación diaria. Esta dinámica empírica, reactiva y basada en disponibilidad voluntaria limita la capacidad de evolución del sistema y deja expuesta la continuidad operativa del servicio.
+
+Al no disponerse de mecanismos formales de monitoreo ni de procedimientos sistemáticos para diagnosticar y priorizar incidentes, resulta difícil anticipar degradaciones, planificar mejoras o comprender el comportamiento interno del sistema. Paralelamente, los avances en inteligencia artificial ofrecen enfoques capaces de automatizar tareas de análisis, diagnóstico y toma de decisiones en entornos operativos complejos, alineados con la visión de la Web~3.0 y con los sistemas auto-adaptativos \cite{kephart2003autonomic,weyns2017selfadaptive,notaro2021mlselfadaptive}.
+
+En consecuencia, se plantea la necesidad de diseñar un modelo que combine la evolución propuesta hacia microservicios con un esquema de monitoreo estructurado y el uso de componentes de inteligencia artificial para asistir el mantenimiento. Este modelo se concibe bajo el ciclo MAPE-K (Monitor, Analyze, Plan, Execute, soportado en una base de conocimiento), lo que permite estructurar el proceso desde la observación del sistema hasta la ejecución de acciones de mejora \cite{kephart2003autonomic}. Aunque PortalAsig aún no constituye un sistema propio de la Web~3.0, la propuesta busca sentar las bases para avanzar hacia ese paradigma. El objetivo es transformar el proceso actual, eminentemente empírico y reactivo, en un esquema asistido que permita detectar oportunamente anomalías, apoyar la resolución de fallas y facilitar una evolución sostenida del portal.
+
+\section{Justificación}
+El mantenimiento de plataformas distribuidas requiere prácticas sistemáticas que reduzcan la dependencia de intervenciones manuales y permitan preservar la calidad del servicio frente a la evolución constante de los requerimientos. En PortalAsig esta necesidad es particularmente crítica: no existe un equipo profesional dedicado y la continuidad del sistema depende del esfuerzo voluntario de colaboradores académicos, lo que dificulta sostener estrategias proactivas de mejora y compromete la experiencia de los usuarios.
+
+La incorporación de mecanismos de observabilidad y de análisis asistido por inteligencia artificial ofrece la posibilidad de automatizar tareas de detección, diagnóstico y priorización de fallas, reduciendo los tiempos de respuesta y apoyando a quienes asumen el mantenimiento de manera temporal. Estas capacidades se alinean con la visión de la Web~3.0, en la que los sistemas aprenden de su operación y se adaptan dinámicamente a las condiciones del entorno, aun cuando los recursos humanos sean limitados \cite{notaro2021mlselfadaptive,aiops2024survey}.
+
+El diseño de un modelo específico para PortalAsig permitiría capitalizar estas tendencias y proveer un marco replicable para otras iniciativas académicas con restricciones similares. De esta manera, la propuesta apunta a garantizar la continuidad del portal, mejorar la mantenibilidad de su backend y fortalecer la capacidad institucional de evolucionar hacia servicios más inteligentes y resilientes sin depender exclusivamente de la disponibilidad de personal especializado.
+
+\section{Objetivo General}
+Diseñar e implementar un modelo de mantenimiento asistido por inteligencia artificial en una arquitectura de microservicios para el sistema PortalAsig.
+
+\section{Objetivos Específicos}
+\begin{enumerate}
+    \item Analizar el sistema actual y sus problemas de mantenimiento.
+    \item Definir un modelo de mantenimiento basado en el ciclo MAPE-K apoyado en inteligencia artificial.
+    \item Integrar fuentes de observabilidad del sistema para soportar el proceso de mantenimiento asistido.
+    \item Implementar un prototipo funcional del modelo propuesto.
+    \item Evaluar el impacto del modelo mediante métricas de operación y mantenibilidad.
+\end{enumerate}

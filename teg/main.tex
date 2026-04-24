@@ -1,0 +1,37 @@
+\documentclass[spanish]{report}
+\usepackage{babel}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{titling}
+\usepackage{indentfirst}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage{xurl}
+\usepackage{cite}
+
+\graphicspath{ {Graphics/} }
+\setlength{\headheight}{13.07225pt}
+\addtolength{\topmargin}{-1.07225pt}
+
+\pagestyle{fancy}
+\fancyhead[L]{}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={Seminario TEG Br Frank Ponte}
+}
+
+\begin{document}
+    \include{chapters/teg-intro}
+    \include{chapters/teg-c1}
+
+    \renewcommand\bibname{Referencias}
+    \bibliographystyle{ieeetr}
+    \bibliography{references/ref-c1}
+
+\end{document}

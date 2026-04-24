@@ -1,0 +1,72 @@
+\chapter{Planteamiento y justificación del problema}
+
+    \textit{PortalAsig} (Portal generador de sitios web de la Facultad de Ciencias de la Universidad Central de Venezuela) es un portal web destinado a la creación de sitios web para la Facultad de Ciencias de la Universidad Central de Venezuela, que innova la comunicación entre docentes y estudiantes a través de un sitio virtual. Está en producción desde el año 2013 en el Centro de Computación de dicha facultad. 
+
+    El sistema cuenta con un módulo para la administración de las asignaturas, docentes y estudiantes de la Facultad de Ciencias, un módulo para que los docentes creen el sitio Web de su asignatura y un módulo para que los estudiantes puedan participar en él. Cada sitio generado por el portal, cuenta con funcionalidades para manejar el contenido de la asignatura clasificado en las siguientes secciones: información general, objetivos, bibliografía, contenido temático, grupo docente, horarios, estudiantes, evaluaciones, entregas, planificación, calificaciones, noticias, foros, descargas, enviar correo, semestres anteriores y registro de actividades. Es un sistema completo para la gestión de un semestre, sus materias, y los estudiantes que se inscriben en ellas.
+
+    Este sistema llegó como una propuesta al sistema anterior, \textit{GenAsig}, que era utilizado por los docentes de la Facultad de Ciencias de la Universidad Central de Venezuela y que les permitía publicar información referente a una asignatura. Sin embargo, este sistema tenía muchas limitantes, por lo que se decidió renovarlo completamente, siendo sustituido por \textit{PortalAsig}. \cite{portalasig_1}
+
+    En el año 2016, el Trabajo Especial de Grado del Licenciado Juan Sánchez implementa un rediseño integral de la aplicación Monolítica de \textit{PortalAsig}, con la finalidad de actualizar tecnológicamente la plataforma que ya comenzaba a quedar rezagada
+
+    Para solventar estas dificultades y además refrescar el \textit{Stack} tecnológico de \textit{PortalAsig}, la propuesta de este Trabajo de Grado presentó un conjunto de cambios que solucionaban fallas en su versión anterior, siendo las características más resaltantes el cambio de Arquitectura de la aplicación: de una aplicación Monolítica a una Arquitectura Cliente-Servidor de tres niveles. Es decir, una aplicación de Back-End que exponga una API Rest y de Front-End de una única página (SPA). Para este gran cambio el Stack tecnológico fue el siguiente:
+    \begin{itemize}
+        \item \textbf{Node.js}: La plataforma asíncrona que permite la ejecución de Javascript fuera del navegador.
+        \item\textbf{Express.js}: Módulo y framework que corre sobre Node.js. Provee soluciones y abstracciones con objetos basados en la Petición y Respuesta HTTP, como también la creación de rutas para la implementación de una API Web.
+        \item \textbf{Bookshelf.js}: Módulo y ORM de Node.js. Se integra muy fácilmente a Express.js. Provee compatibilidad con sistemas manejadores de base de datos como MySQL y PostgreSQL.
+        \item \textbf{PostgreSQL}: Sistema de manejador de base de datos relacional.
+        \item \textbf{Angular.js}: Framework de desarrollo de Front-End, escrito en Javascript y es usado para crear aplicaciones de una sola página (SPA).
+        \item \textbf{Bootstrap}: Framework de desarrollo de frontend, es una combinación de archivos en Javascript y CSS, y es usado para realizar diseños y estructuras de una página web de manera rápida y sencilla.
+    \end{itemize}
+
+    Es decir, el código de Front-End fue descartado completamente y reemplazado por esta nueva versión, que fue bautizada \textit{PortalAsig2}.  \cite{portalasig_2}
+
+    Sin embargo, en este Trabajo de Grado no se tomó en cuenta el mantenimiento de PortalAsig, considerando la ausencia de personal que lo mantenga y que no existía una metodología de mantenimiento del Sitio Web.
+    Es por eso que el Licenciado Rafael Vásquez, en su Trabajo Especial de Grado, propone la Implementación de una Metodología de Mantenimiento de Software para la Solución y Prevención de Fallas del Sistema \textit{PortalAsig2}.
+
+    Este Trabajo de Grado tenía como objetivo implementar una metodología de mantenimiento de Software para la solución y prevención de fallas del sistema PortalAsig2, que incluye la implementación de nuevas funcionalidades, así como mejoras en el sistema. La característica más resaltante del nuevo sistema fue un rediseño total del Front-End de la aplicación, descartando el código antiguo escrito en \textit{Angular.js}, y siendo reemplazado por un nuevo Front-End escrito en \textit{Vue.js}. Esta decisión fue tomada debido a que Google dejó de dar soporte al Framework Angular.js. 
+
+    A pesar de que el Front-End fue recientemente rediseñado, siguiendo metodologías para un fácil mantenimiento de la aplicación, el Back-End quedó con su versión del año 2016, que, aunque fue ajustada para adaptarla a esta última versión, \textit{PortalAsig3}, no posee ninguna metodología que facilite su escalabilidad y mantenimiento, así como actualizaciones en las tecnologías que se implementan en el año 2023 para sistemas de Back-End.\cite{portalasig_3}
+    
+    Debido a esto se busca el rediseño completo del Back-End del Portal de Asignaturas.
+
+    \section{Objetivo General}
+
+    Rediseñar el Back-End del Portal de Asignaturas bajo una arquitectura de Micro-Servicio, utilizando un conjunto de prácticas que permita la resolución de problemas, despliegue, escalabilidad y monitoreo del Back-End.
+
+    \section{Objetivos Específicos}
+        
+    \begin{itemize}
+        \item Realizar re-ingeniería de Software a la lógica del Back-End actual a una arquitectura de Micro-Servicios: Autenticación y Autorización de usuarios, Dashboard, semestres y portales.
+        \item Migrar datos y modelo de datos del Back-End actual a las múltiples bases de datos de cada Micro-servicio.
+        \item Desplegar una aplicación de monitoreo de código abierto que permita llevar control de los logs de los Micro-Servicios, configurar alertas críticas automáticas y permitir visualizar el uso de recursos de todas las APIs.
+        \item Implementar una solución a través de containerización que permita el despliegue rápido de cada Micro-Servicio.
+    \end{itemize}
+        
+    \section{Metodología de desarrollo}
+
+    Se utilizará la metodología Scrum para el rediseño del Back-End, en una versión modificada para sólo dos miembros en el equipo de trabajo: Tesis y Tutor.
+
+    Para un equipo de sólo dos miembros, la Metodología Scrum puede ser adaptada para las necesidades de los integrantes. Es posible seguir los procesos estándar como crear un \textit{Backlog}, planificar Sprints, reuniones frecuentes (no necesariamente diarias) para mostrar progreso y retrospectivos, con un acercamiento más simplificado. El \textit{Backlog de Producto} se mantiene pequeño y enfocado, incluyendo solamente las tareas de más alta prioridad, y la duración de los Sprints sugeridas es de una o dos semanas.
+
+    Además, es importante la comunicación y la transparencia entre los miembros para un desarrollo efectivo y constante. Las reuniones diarias pueden ser informales, con la finalidad de discutir progreso y cualquier bloqueo. Las revisiones al final de cada Sprint se pueden realizar para mostrar el trabajo hecho durante ese lapso de tiempo, así como obtener comentarios de parte del Dueño del Producto.
+
+    \section{Tecnologías}
+
+    Para la propuesta de este Trabajo Especial de Grado, se utilizarán un conjunto de tecnologías que permitan desarrollar el Back-End utilizando una arquitectura de Micro-Servicios con características como el fácil despliegue de cada servicio gracias a contenedores, un \textit{APM} (Aplicación de administración de rendimiento, por sus siglas en inglés) de código abierto para permitir el monitoreo de cada aplicación y un sistema de gestión de Base de Datos.
+
+    \begin{itemize}
+        \item \textbf{Spring Boot}: Mencionado anteriormente, es uno de los Frameworks más populares del lenguaje Java, y posee muchas características que lo hacen ideal para el desarrollo de un ambiente de Micro-Servicios, como lo son su amplia gama de dependencias, servidores embebidos, auto-configuraciones, código minimalista, acoplamiento débil, abundante código abierto y una comunidad activa y muy amplia que facilita la investigación en todo el proceso de planificación y desarrollo.
+        \item \textbf{Docker}: Es una plataforma de código abierto que permite a los desarrolladores construir, desplegar, ejecutar, actualizar y administrar \textit{contenedores}, que son componentes estandarizados y ejecutables que combinan el código fuente de una aplicación con las librerías y dependencias mínimas requeridas de un Sistema Operativo para ejecutar una aplicación en ambientes virtualizados y aislados el uno del otro. Los contenedores simplifican el desarrollo y despliegue de aplicaciones distribuidas.\cite{docker}
+        \item \textbf{SigNoz}: Es una APM de código abierto que permite monitorear las aplicaciones de un negocio para identificar y analizar problemas. Con SigNoz son posibles las siguientes características:
+        \begin{itemize}
+            \item Monitoreo de las métricas de una aplicación como latencia, peticiones por segundo, tasa de errores.
+            \item Monitoreo de métricas de infraestructura tales como uso de CPU y de memoria.
+            \item Trazar peticiones de usuarios entre servicios.
+            \item Establecer alertas para ciertos valores de las métricas.
+            \item Ver gráficos detallados para cada recurso o registro que es monitoreado.\cite{signoz}
+        \end{itemize}
+        \item \textbf{MySQL}: Es uno de los manejadores de Base de Datos más populares en el mercado. Es un Software o Servicio encargado de crear y administrar Bases de Datos basadas en un modelo relacional. Suele ser una opción favorita entre desarrolladores por su flexibilidad y facilidad de uso, seguridad, su alto rendimiento y por, básicamente, ser un estándar en la industria de la Ingeniería y Desarrollo de Software.\cite{mysql}
+    \end{itemize}
+    
+    %% TERMINAR INTRO, RESUMEN, Y CAP 7. NEXT REVISION - CON DOCUMENTO LISTO %%
+\pagestyle{fancy}
