@@ -1,0 +1,60 @@
+\chapter*{Introducción}
+\addcontentsline{toc}{chapter}{Introducción}
+
+En los últimos años, el avance de la inteligencia artificial ha impulsado una transformación
+significativa en la forma en que se conciben y desarrollan las aplicaciones web. Este fenómeno ha
+favorecido la transición desde el paradigma de la Web~2.0, centrado en la interacción y la generación
+de contenido por parte de los usuarios, hacia un modelo más dinámico y adaptativo, directamente
+asociado con la Web~3.0. En este nuevo contexto, las aplicaciones no solo procesan información,
+sino que incorporan mecanismos que les permiten analizar su entorno, adaptarse a condiciones
+cambiantes y evolucionar de manera continua.
+
+En este nuevo escenario, la integración de mecanismos basados en inteligencia artificial surge como
+una consecuencia natural de esta evolución, permitiendo incorporar capacidades de análisis,
+automatización y apoyo a la toma de decisiones dentro del sistema.
+
+Para ello, es necesario establecer bases arquitectónicas que faciliten la incorporación progresiva
+de estos mecanismos sin comprometer la estabilidad del software. Esto implica diseñar aplicaciones
+que puedan escalar, mantenerse y evolucionar de forma controlada. Sin embargo, la efectividad de
+esta integración depende en gran medida del estilo arquitectónico, ya que estructuras altamente
+acopladas pueden limitar la incorporación de nuevos componentes, especialmente en sistemas de
+mayor complejidad.
+
+Como respuesta a esta limitación, han surgido enfoques arquitectónicos orientados a la
+modularidad, entre los cuales destacan las arquitecturas basadas en microservicios. Este tipo de
+arquitectura permite descomponer un sistema complejo en componentes simples e independientes,
+facilitando el desarrollo incremental, el despliegue continuo y la evolución controlada de sus
+funcionalidades. Sin embargo, la adopción de estos enfoques también introduce nuevos desafíos,
+especialmente en lo relacionado con la gestión de la complejidad operativa, la observabilidad del
+sistema y el mantenimiento en entornos distribuidos.
+
+El sistema PortalAsig, desarrollado para la gestión académica en la Facultad de Ciencias de la
+Universidad Central de Venezuela, constituye un caso representativo de estas problemáticas. Desde
+su creación en 2013, el sistema fue concebido con una arquitectura centralizada, acompañada de una
+interfaz de usuario desarrollada en Angular. Posteriormente, el trabajo de grado de Vásquez Balza \cite{teg_rafael}
+introdujo un rediseño del frontend  en Vue bajo un enfoque orientado a la mantenibilidad, incorporando
+prácticas de organización y mejora de la calidad del código.
+
+No obstante, el backend ha permanecido basado en una arquitectura monolítica con limitaciones
+estructurales significativas, lo que ha incrementado su complejidad y dificultado su evolución.
+El rediseño del backend hacia una arquitectura de microservicios se plantea como una necesidad
+para soportar una nueva forma de gestionar el mantenimiento del sistema.
+
+En la actualidad, el mantenimiento del sistema se realiza principalmente de forma reactiva, donde
+el personal a cargo atiende fallas bajo demanda ante la aparición de errores visibles o durante
+períodos específicos, como el inicio o cierre de un semestre. Las acciones correctivas son
+manuales y no responden a un proceso sistemático de diagnóstico o análisis de causa raíz, lo que
+dificulta la evolución controlada del sistema y la implementación de mejoras.
+
+La integración de mecanismos asistidos por inteligencia artificial
+representa una oportunidad para transformar el proceso actual de mantenimiento del software. Estas
+capacidades permiten complementar el trabajo humano mediante la automatización de tareas de
+análisis, diagnóstico y apoyo en la toma de decisiones, lo cual resulta especialmente relevante en
+contextos donde los recursos humanos son limitados.
+
+En consecuencia, el presente Trabajo Especial de Grado propone el diseño e implementación de un
+modelo de mantenimiento asistido por inteligencia artificial para una arquitectura de
+microservicios en el sistema PortalAsig. Este modelo busca integrar principios de sistemas
+auto-adaptativos, mecanismos de observabilidad y técnicas de inteligencia artificial, con el
+objetivo de transformar el mantenimiento del software en un proceso semi-asistido, sistemático,
+eficiente y alineado con las tendencias de la cada vez más presente Web~3.0.
