@@ -1,126 +1,39 @@
-\chapter{Back-End}
+\chapter{Pruebas y Resultados}
 \pagestyle{fancy}
 
-Mientras que el Front-End es como un usuario percibe un sitio Web, tanto en lo visual como en sus interacciones, el Back-End existe detrás de la escena de un sitio o aplicación Web; es lo que el Usuario no puede ver. El Back-End puede coleccionar datos de servidores y aplicaciones externas, filtrar y procesar esta información para entregar una respuesta tras la petición de un usuario. Por ejemplo, si estás reservando un vuelo, introduces información en el sitio Web, que será almacenada en una base de datos creada en un servidor y procesada por el Back-End del sitio para reservar tu vuelo. Este ejemplo, aunque breve, es suficiente para mostrar todas las etapas esenciales del Back-End: Manejo de la petición del usuario proveniente del Front-End, procesamiento de dicha petición, normalmente involucrando consultas en Base de Datos, y retorno de una respuesta que satisfaga la acción del usuario. \cite{be_def_1}
+Para validar la confiabilidad tanto del nuevo ecosistema de microservicios como de las capacidades autonómicas del servicio de auto-mantenimiento, se definió una estrategia rigurosa de aseguramiento de calidad. Este capítulo expone las herramientas utilizadas, los escenarios de simulación de caos ejecutados y los resultados obtenidos en el sistema.
 
-El Back-End, normalmente, consiste en la \textbf{Aplicación}, el \textbf{Servidor} y la \textbf{Base de Datos}. La arquitectura de estos tres elementos representan un componente clave para el desarrollo de las Aplicaciones Web. Sin embargo, debido al constante desarrollo de nuevos servicios y técnicas, la arquitectura de Back-End varía con mucha frecuencia. Mientras que en el Front-End son tres los Frameworks que se han mantenido como los más populares a lo largo de los años (React, Vue.js y Angular.js), la cantidad de Frameworks de Back-End es abrumadora. Además, existen también distintas opciones tanto para el servidor como para la base de datos.
+\section{Pruebas de Integración y Cobertura de Código}
+En el backend, se priorizó la ejecución de pruebas de integración reales en lugar de pruebas aisladas. Para ello, se emplearon contenedores efímeros mediante la librería \textit{Testcontainers}, lo que permitió instanciar bases de datos relacionales y servicios de agregación de bitácoras durante la fase de prueba. Esto garantizó que el sistema se evaluara sobre un entorno idéntico al de producción. 
 
-A pesar de las distintas opciones, el punto clave que diferencia a una buena arquitectura de Back-End, es permitir que sea \textbf{mantenible} a pesar de que el equipo de desarrolladores crezca y se expanda, así como también los requerimientos del proyecto. Una buena arquitectura debe ser flexible y soportar las modificaciones futuras. Aunque el Back-End es, en realidad, un sistema complejo que combina distintas tecnologías y conceptos, sus partes principales no cambian: La \textbf{metodología de desarrollo}, el \textbf{lenguaje de Back-End} para la creación de la aplicación y el servidor, la escogencia de una \textbf{Base de Datos} y la \textbf{API}, que permite5 establecer canales de comunicación entre el Back-End de una aplicación con su Front-End y otros servidores.
+Para cuantificar el nivel de fiabilidad, la cobertura de código se validó mediante el uso de \textit{JaCoCo} (Java Code Coverage). Se obtuvieron métricas de cobertura general que demostraron que las rutas críticas, especialmente las asociadas a la orquestación del ciclo de auto-mantenimiento, se encontraban robustamente cubiertas.
+\begin{center}
+    \textit{[Placeholder: Captura del reporte HTML de JaCoCo mostrando la cobertura del servicio de auto-mantenimiento]}
+\end{center}
 
-\section[API]{Interfaz de Programación de Aplicaciones}
+\section{Automatización End-to-End (E2E)}
+Para la validación del sistema desde la perspectiva del usuario final, se evaluaron diversas herramientas de automatización de pruebas de interfaz (Frontend). Si bien herramientas consolidadas basadas en controladores externos (\textit{WebDrivers}) son un estándar, suelen introducir inestabilidad (\textit{flakiness}) y tiempos de ejecución prolongados.
 
-    Una \textbf{Interfaz de Programación de Aplicaciones}, comúnmente conocida como \textbf{API} por sus siglas en inglés, es un protocolo que se utiliza para acceder indirectamente a datos, software de servidor u otras aplicaciones. Es un software intermediario que permite a dos aplicaciones comunicarse entre ellas. Una API es muy versátil y puede utilizarse para servicios Web, sistemas operativos, sistemas de base de datos, Hardware de computador, entre otros.
-    
-    Una \textbf{API} se comunica a través de un conjunto de reglas que definen cómo un computador, aplicación o incluso otras APIs se comunican entre ellas. la API actúa como un Proxy entre dos partes que desean conectarse entre ellas para realizar una tarea o conjunto de tareas en específico. \cite{api_def_1}
-    
-    Una \textbf{API Web} es aquella que puede ser accedida usando el protocolo HTTP. La API define un conjunto de puntos de salida, o \textit{Endpoints}, valida la petición y entrega una respuesta en un formato previamente definido. Las características de las APIs Web varían dependiendo de los niveles de privacidad y seguridad, estableciendo así distintos tipos basados en estos criterios.
-    
-    \subsection{API abierta}
-    Una API abierta, también conocida como API pública o externa, está disponible para los desarrolladores y otros usuarios con mínimas restricciones de seguridad. Pueden requerir algún tipo de registro, una llave de API o ser completamente abierta. Este tipo de APIs están diseñadas para usuarios externos (como desarrolladores de compañías o software de terceros) para acceder a data o servicios.
-    
-    \subsection{API Interna}
-    En contraste con una API abierta, una API interna está diseñada para estar oculta de los usuarios externos. Normalmente su función es la de compartir recursos dentro de una misma compañía. Permite a distintos equipos de un negocio consumir herramientas, data y programas entre ellos mismos, es decir, ofrece interactividad entre distintas partes de un negocio. El uso de APIs internas ofrece múltiples beneficios, como seguridad, control de acceso, auditorías en los accesos y cambios realizados, así como también un estándar para conectar múltiples servicios de un mismo negocio.
-    
-    \subsection{API para socios}
-    Aunque es técnicamente similar a una API abierta, estas tienen un acceso restringido, normalmente controlado por una API de terceros que sirve como intermediaria. Son desarrolladas para propósitos específicos y en el mundo real es muy común su implementación en los ecosistemas que ofrecen Software como servicio.
-    
-    \subsection{API compuesta}
-    Permite a los desarrolladores acceder a distintos Endpoints en una sola llamada. Estos pueden ser distintos Endpoints de una misma API, o pueden ser múltiples servicios o fuentes de data diferentes. Una API compuesta es especialmente útil en arquitectura de \textbf{micro-servicios}, donde un usuario puede necesitar información de distintos servicios para realizar una tarea. El uso de una API compuesta puede reducir la carga en los servidores y mejorar el rendimiento de una aplicación, ya que una llamada retorna todo lo que el usuario necesita, aunque el origen de los recursos solicitados provengan de distintas fuentes. \cite{api_def_1}
-        
-    \subsection{Arquitecturas de API Web}
-        Un protocolo para una API define reglas para las llamadas de una API: Especifica tipo de datos y comandos aceptados. Distintos tipos de arquitecturas de API especifican distintos protocolos de restricciones.
-            \subsubsection{API REST}
-            Una \textbf{Transferencia Representacional de Estado} (REST, por sus siglas en inglés), es una arquitectura de API que provee una comunicación Cliente-Servidor para aplicaciones Web sobre el protocolo HTTP, permitiendo implementarla fácilmente ya que no está ligada a ningún protocolo de transferencia. Los tres principios fundamentales de REST son \textbf{direccionalidad}, \textbf{uniformidad de interfaces} y \textbf{no mantener estados}. REST maneja la aceptabilidad al definir Endpoints en una estructura tipo directorios, a través de distintas URI para extraer la data. Una API REST trabaja los principios CRUD (Crear, Leer, Actualizar y Eliminar, por sus siglas en inglés) que corresponden a las funciones más populares \textbf{INSERTAR}, \textbf{SELECCIONAR}, \textbf{ACTUALIZAR} y \textbf{ELIMINAR}, en almacenamientos de data persistentes como SQL. 
-            Llamar a un servicio REST sobre el protocolo HTTP puede ser realizado en distintos lenguajes de programación. Una respuesta común de un Endpoint de una API bajo esta arquitectura es en la forma de data JSON (\textit{Notación de Objeto JavaScript}, por sus siglas en inglés). Una respuesta típica de un JSON luce como la que es posible observar en la Fig. \ref{fig:json_response} \cite{api_rest_def}
-            
-            \begin{figure}[!htbp]
-            \centering
-            \includegraphics[width=8cm]{graphics/teg-c4/json_response.png}
-            \caption{Ejemplo de respuesta JSON}
-            \label{fig:json_response}
-            \end{figure}
-            
-            Los principios fundamentales de que una API REST debe cumplir son los siguientes:
-            \begin{enumerate}
-                \item \textbf{Paradigma Cliente-Servidor}: El cliente maneja el proceso de Front-End mientras el servidor el Back-End. Cualquiera puede ser reemplazado ya que son independientes el uno del otro.
-                \item \textbf{Interfaz Uniforme}: Define una interfaz entre el Cliente y el Servidor para simplificar la arquitectura y permitir que ambos lados puedan desarrollarse independientemente.
-                \item \textbf{Sin estados}: Cada petición es independiente y contiene toda la información necesario para que el Back-End pueda procesarla.
-                \item \textbf{Cacheable}: Mantener respuestas cacheadas entre el Cliente y el Servidor para evitar procesamientos innecesarios.
-                \item \textbf{Sistema por capas}: Las capas con organizadas jerárquicamente para que cada una sólo "vea" la capa con la que debe interactuar.
-            \end{enumerate}
-        
-            Si una API REST cumple todos estos principios entonces se dice que esa API es RESTful. \cite{api_def_1}
-            
-            \subsubsection{API JSON-RPC y XML-RPC}
-            Un RPC es una Llamada Procedimental Remota, por sus siglas en inglés. \textbf{XML-RPC} utiliza XML para codificar sus llamadas, mientras que \textbf{JSON-RPC} utiliza JSON para el codificado. Una llamada puede contener múltiples parámetros, y espera un único resultado. Ambas arquitecturas poseen características claves que las diferencian de una API REST:
-            
-                \begin{itemize}
-                \item Están diseñadas para llamar métodos, mientras una API REST involucra la transferencia de documentos. Una API REST trabaja con recursos, mientras una API RPC es todo sobre acciones.
-                \item La URI identifica al servidor, pero no contiene información en sus parámetros. \cite{api_def_2}
-            \end{itemize}
-            La Fig.\ref{fig:json_rpc_response} muestra un ejemplo sencillo de una petición y respuesta para una API JSON-RPC. En este caso se pide ejecutar la función \textit{jsonrpc2Examples.concat}, cuya función es concatenar cadenas de caracteres, y se envía un arreglo con dichas cadenas. El resultado: la concatenación de ellas.
-            
-          \begin{figure}[!htbp]
-            \centering
-            \includegraphics[width=8cm]{graphics/teg-c4/json-rpc.png}
-            \caption{Ejemplo de petición y respuesta de una API JSON-RPC \cite{rpc_fig}.}
-            \label{fig:json_rpc_response}
-            \end{figure}
+Se seleccionó \textit{Cypress} como herramienta definitiva debido a que se ejecuta en el mismo ciclo de vida del navegador y del marco de trabajo del Frontend, lo que incrementa notablemente la velocidad y estabilidad de las pruebas. Dado que el ecosistema descentralizado abstrae la validación de identidad en un servicio especializado (UAA), las pruebas se diseñaron para realizar peticiones directas de inicio de sesión e inyectar de forma transparente los tokens resultantes, mitigando así la complejidad de navegar múltiples dominios durante la prueba.
+\begin{center}
+    \textit{[Placeholder: Captura de la ejecución exitosa de pruebas Cypress en consola o en su interfaz gráfica]}
+\end{center}
 
-\section{Arquitecturas de Back-End}
+\section{Simulación de Caos y Recuperación Asistida}
+Para comprobar la resiliencia del ecosistema y el funcionamiento del modelo de auto-mantenimiento, se diseñó un escenario de prueba basado en ingeniería del caos. Se detuvo intencionalmente la ejecución del componente encargado de la lógica académica (el servicio de sitios), emulando una caída catastrófica en un entorno de producción.
 
-    Escoger una arquitectura de Back-End involucra al proceso de crear la estructura y lógica del Back-End de un sitio Web, que incluye todos los componentes de un sitio que no son visibles a los usuarios. La idea principal al escoger una determinada arquitectura de Back-End es el desarrollo de software que permita la mejor experiencia funcional para los usuarios mientras los separa de la lógica detrás de sus interacciones. Existen tres tipos de arquitecturas de Back-End: Orientado a Servidor, Sin servidor (comúnmente conocido en inglés como \textit{Serverless}) y Descentralizado.
-    
-    \subsection{Back-End Orientado a servidor}
-    
-        Esta arquitectura, también conocida comúnmente como \textbf{Arquitectura Monolítica}, es la más convencional y su uso está muy extendido en los sitios Web de internet.
-        
-        Los servidores de Back-End están en un único lugar, como una computadora, o en la nube. El beneficio más importante de esta arquitectura es la simplificación de su sistema: el envío, procesamiento y almacenamiento de la data ocurre todo en un único lugar. Además, la interacción con otros sistemas externos no suele existir. Como esta arquitectura es \textbf{centralizada}, normalmente ofrece un único punto de acceso a través de internet. Todo existe en único lugar, por lo que si algo sale mal con este servidor, el Back-End entero de un sitio Web se verá afectado. Junto al Front-End conforman una arquitectura Cliente-Servidor de \textbf{dos niveles}, como se puede observar en la Fig. \ref{fig:monolithic_be_arch}
-        
-            \begin{figure}[!htbp]
-            \centering
-            \includegraphics[width=4cm]{graphics/teg-c4/monolithic_arch_diagram.png}
-            \caption{Arquitectura de Back-End monolítica}
-            \label{fig:monolithic_be_arch}
-            \end{figure}
-        
-        Para realizar cualquier cambio en el sistema, se debe actualizar completo, lo que lo hace muy poco robusto ante errores. Es un sistema fuertemente acoplado.\cite{be_arch_1}
-    
-    \subsection{Back-End \textit{Serverless}}
-    
-        Un Back-End sin servidor, es una tecnología revolucionaria que permite al desarrollador construir y correr código sin tener que preocuparse por la implementación del servidor. En este tipo de implementaciones, no es necesario poseer ninguna infraestructura de sistemas. En el caso de una clásica arquitectura cliente-servidor de tres niveles, la capa de presentación se maneja del lado del cliente (con el uso de, Por ejemplo, Frameworks especializados en el Front-End como \textit{React.js}), la lógica de negocio funciona a través de un conjunto de funciones débilmente acopladas que sólo se ejecutan y consumen recursos del tercero que los provee cuando son necesarios y, finalmente, la capa de almacenamiento es reemplazada con el Almacenamiento Como Servicio (SaaS, por sus siglas en inglés), que consume recursos de base de datos sólo cuando es necesario y que también es provistos por terceros.
-        
-        En una arquitectura \textit{Serverless}, la mayor parte de una aplicación corre en contenedores efímeros y sin estado provistos por proveedores de nubes. Estos contenedores se activan con eventos y mueren luego de su ejecución. Este paradigma se conoce como Funciones Como Servicio (FaaS, por sus siglas en inglés).
-        
-        El paradigma FaaS permite ejecutar código sin preparar, mantener ni administrar servidores. Algunas de las características más relevantes son descritas a continuación:
-        \begin{itemize}
-            \item Se pueden escribir funciones en distintos lenguajes de programación
-            \item El desarrollador sólo se preocupa por escribir y subir código a la nube, nada más. No es necesario administrar ningún servidor.
-            \item Los recursos escalan automáticamente basado en la demanda.
-            \item Existe una alta disponibilidad, ya que los proveedores de estos servicios implementan soluciones que son robustas contra posibles caídas de los nodos de un servidor.\cite{serverless_be_1}
-        \end{itemize}
-        Aunque hay ventajas importantes, los defectos de esta arquitectura incluyen problemas de seguridad, como el hecho de que la data del negocio es administrada y almacenada por un tercero, cuyas medidas de seguridad para proteger dicha data son, en su mayoría, desconocidas y definitivamente no son mantenidas por el negocio en sí. También es importante destacar que la data no es estrictamente privada, ya que son almacenadas en ambientes de nube que compartes con otros negocios, por lo que si manejas data confidencial existe siempre el riesgo de que pueda ser filtrada si la compañía que aloja los datos tiene debilidades de seguridad. Otros problemas están relacionados con la complejidad que representa encontrar errores en este tipo de arquitecturas, ya que el código está disperso en distintos espacios y depurar cada uno de ellos en busca de errores es mucho más laborioso comparado con un servidor tradicional.\cite{serverless_be_2}. 
-        
-        La fig. \ref{fig:serverless_be_arch} muestra un ejemplo de una arquitectura de Back-End \textit{Serverless} en una dirección, donde el Front-End consulta la API que expone las características del Back-End, y luego este se comunica con las distintas funciones o conjunto de funciones bajo el paradigma FaaS para procesar la petición del cliente.
-        
-            \begin{figure}[!htbp]
-            \centering
-            \includegraphics[width=10cm]{graphics/teg-c4/serverless_be_arch.png}
-            \caption{Ejemplo de una arquitectura típica de Back-End \textit{Serverless}. Gráfica de \ \href{https://www.kofi-group.com/serverless-architecture-explained-in-10-minutes/}{\textit{kofi-group}} }
-            \label{fig:serverless_be_arch}
-            \end{figure}
-        
-    
-    \subsection{Back-End Descentralizado}
-        
-        La Arquitectura de un Back-End Descentralizado supone diferencias importantes comparado con una monolítica, por ejemplo. Esta arquitectura consiste en una red de servidores que son independientes el uno del otro y están en diferentes lugares (normalmente físicos, pero también es posible virtualmente). El ejemplo más común de arquitecturas descentralizadas es la \textit{Blockchain}, que es la plataforma que permite todas las interacciones relacionadas con criptomonedas.
-        
-        Un Back-End descentralizado es una implementación de software distribuido, una arquitectura cliente-servidor de \textit{n niveles} donde cada componente débilmente acoplado existe en servidores distintos y existe una intercomunicación entre ellos. Esta arquitectura es la más popular en ser promovida como nuevo estándar para la Web 3.0, ya que remueve la centralización de la data y de la lógica del negocio. La \textit{Blockchain} es un gran ejemplo de esta propuesta ya que cada usuario de internet puede realizar contribuciones a esta red de forma anónima y a través de nodos que no los posee nadie en particular: es colectivamente mantenida por todos los usuarios de la red.
-        
-        Además del modelo de \textit{Blockchain}, existe otra implementación muy común en esta arquitectura: Micro-servicios, que será descrita en detalle en el siguiente capítulo.
+El comportamiento registrado fue el siguiente:
+\begin{enumerate}
+    \item \textbf{Detección y Aislamiento:} En su siguiente ciclo de monitorización, el orquestador autonómico detectó la caída del servicio y los errores subsecuentes reportados por el sistema de recolección de métricas. Gracias a que el Frontend fue rediseñado de manera tolerante a fallos, la aplicación web absorbió el error de red y continuó operando de forma parcial, aislando la caída.
+    \item \textbf{Alerta y Notificación:} El servicio autonómico analizó la situación, categorizando la eventualidad como un incidente de máxima prioridad (P1). Inmediatamente, delegó al servicio de notificaciones la tarea de despachar un correo de advertencia con formato institucional.
+    \item \textbf{Asistencia y Decisión:} El administrador fue capaz de ingresar al portal, dirigirse al módulo de incidentes y visualizar el evento. La interfaz, además de presentar las evidencias recopiladas, ofreció un chat inteligente que permitió al administrador solicitar a la IA la descripción detallada del error y confirmar la acción de auto-reparación.
+\end{enumerate}
 
-
-               
-
-
+Las siguientes figuras ilustran la recepción efectiva de la alerta y la interfaz provista al operador para gestionar la resolución del problema:
+\begin{center}
+    \textit{[Placeholder: Captura del correo de alerta (P1) generado por el servicio de notificaciones, visible en la bandeja de entrada]}
+\end{center}
+\begin{center}
+    \textit{[Placeholder: Captura de la alerta P1 generada en el Frontend evidenciando la caída del servicio, acompañada del chat de asistencia]}
+\end{center}
 

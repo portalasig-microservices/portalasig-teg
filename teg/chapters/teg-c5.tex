@@ -1,120 +1,21 @@
-\chapter{Micro-Servicios}
+\chapter{Conclusiones y Recomendaciones}
 \pagestyle{fancy}
 
-Netflix, Amazon y otras grandes compañías han evolucionado sus aplicaciones hacia una Arquitectura de Micro-Servicios (MSA, por sus siglas en inglés). Lewis y Fowler definen la Arquitectura de Micro-Servicios como un acercamiento para desarrollar una aplicación como un conjunto de pequeños servicios, cada uno corriendo sus propios procesos y comunicándose entre ellos con mecanismos ligeros, normalmente a través de APIs REST. \cite{microservices_def_1}
+\section{Conclusiones}
+La evolución del sistema de gestión académica hacia una arquitectura orientada a microservicios permitió resolver satisfactoriamente las carencias de escalabilidad, acoplamiento y despliegue que afectaban al monolito original. La segregación de responsabilidades en dominios independientes —tales como identidad, lógica académica y notificaciones— simplificó la comprensión del sistema, redujo el riesgo de fallas en cascada y permitió adoptar tecnologías modernas adaptadas a las necesidades específicas de cada módulo.
 
-MSA es una arquitectura en el cual aplicaciones complejas de Software están compuestas por uno o más servicios. Los Micro-Servicios pueden ser desplegados de forma independiente el uno del otro, están débilmente acoplados y cada uno de ellos se enfoca en completar una tarea específica. \cite{microservices_def_2}
+En paralelo, la incorporación de un modelo de auto-mantenimiento demostró ser una solución pragmática e innovadora frente a la escasez de recursos humanos dedicados a la administración operativa. El sistema desarrollado no solo logró consolidar las métricas de rendimiento y los registros de error dispersos, sino que fue capaz de inferir proactivamente soluciones mediante la integración de capacidades de Inteligencia Artificial (LLMs). Las pruebas de caos demostraron que el sistema es capaz de detectar la caída de servicios, alertar inmediatamente a las partes interesadas mediante notificaciones institucionalizadas y proveer al operador un entorno de diagnóstico asistido e inmediato.
 
-Los Micro-Servicios, en definitiva, son servicios pequeños y autónomos que trabajan juntos, siendo estos dos adjetivos las palabras clave de esta arquitectura: \textbf{pequeños} y \textbf{autónomos}. 
+En definitiva, se comprobó empíricamente que la observabilidad distribuida, combinada con algoritmos generativos orientados a infraestructura (AIOps), acelera drásticamente el diagnóstico de fallas (Root Cause Analysis), reduciendo los tiempos de recuperación (MTTR) e incrementando la disponibilidad del sistema.
 
-Un Micro-Servicio es una unidad de trabajo independiente, la cual es lo suficientemente pequeña para valerse por sí misma en términos de funciones. Debe existir cero coordinación para el despliegue con otros Micro-Servicios. 
+\section{Trabajo Futuro y Recomendaciones}
+Para potenciar el alcance y la autonomía del modelo implementado, se sugieren las siguientes vías de desarrollo futuro. La visión a largo plazo es dotar a PAWARE de un contexto mucho más profundo y herramientas de acción avanzadas, evolucionándolo de un asistente de diagnóstico a un agente de ingeniería de software completamente autónomo:
 
-Los Micro-Servicios necesitan ser construidos usando el lenguaje de programación que tenga más sentido para el resultado esperado. Cada servicio trabaja con los demás para formar una aplicación compleja y no tienen por qué estar todos escritos en el mismo lenguaje. En algunos casos, Java puede ser el lenguaje correcto, mientras que para otros pudiera ser Python, por ejemplo. 
-
-A continuación, los \textbf{principios fundamentales} que debe cumplir una arquitectura de Back-End de Micro-servicios.
-
-\section{Código pequeño y enfocado}
-    Un Micro-Servicio debe enfocarse en \textbf{una unidad de trabajo}, por lo tanto son pequeños. Aunque el enfoque se refiere a mantener las interfaces pequeñas, lo que implica una implementación también pequeña, este no necesariamente siempre es el caso comparado con el contexto de la aplicación de la que forman parte. 
-    
-    Aunque la granularidad es determinada basada en las necesidades del negocio, es importante tener cuidado de no excederse con ella, ya que tener demasiada dependencia con otros Micro-Servicios puede introducir latencia.
-
-    Un Micro-Servicio necesita ser tratado, en sí mismo, como una aplicación o un producto. Debe tener su propio repositorio de manejo de código fuente, su propio flujo de compilación y despliegue. Una de las motivaciones principales de los líderes de producto de cada Micro-Servicio son las optimizaciones localizadas, que permiten mejoras en módulos de la aplicación de forma rápida para satisfacer de forma eficaz las necesidades de los clientes.
-    
-\section{Acoplamiento débil}
-    El acoplamiento débil es una características esencial en los Micro-Servicios. Un equipo desarrollador debe ser capaz de desplegar un Micro-Servicio de forma independiente, y debe existir cero coordinación necesaria para ello con otros. El acoplamiento débil permite despliegues \textbf{rápidos} y \textbf{frecuentes}.
-\section{Neutralidad de lenguaje}
-    Usar la herramienta correcta para el trabajo requerido es importante. Es por ello que los Micro-Servicios, como se mencionó previamente, deben desarrollarse en los lenguajes que hagan más sentido para las tareas por las que están siendo construidos.
-    
-    La comunicación entre Micro-Servicios es a través de una API de lenguaje neutro, típicamente de tipo REST. La clave es estandarizar la integración y no las plataformas usadas por los Micro-Servicios. La neutralidad del lenguaje hace más fácil usar habilidades del equipo desarrollador para mejorar los tiempos de desarrollo o usar el lenguaje más óptimo para la tarea requerida.
-\section{Contextos no-enlazados}
-    Contextos no-enlazados en el mundo de los Micro-Servicios se refiere al hecho de que, entre ellos, no conocen nada de la implementación de los demás a su alrededor. Si por alguna razón un Micro-Servicio necesita saber acerca de la implementación de otro (por ejemplo, qué hace o cómo necesita ser llamado) entonces este principio no se cumple.
-
-Es notoria la diferencia entre una Arquitectura de Back-End Monolítica y una de Micro-Servicios si se toman en consideración los principios previamente descritos, que además permiten una clara comparación entre ellas, como podemos observar en la Fig. \ref{fig:msa_vs_monolithic}. \cite{ibm_msa_redbook}
-
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=12cm]{graphics/teg-c5/table_msa_vs_monolithic.png}
-\caption{Comparando Arquitecturas Monolíticas y de Micro-Servicios \cite{ibm_msa_redbook}}
-\label{fig:msa_vs_monolithic}
-\end{figure}
-    
-A continuación, las características claves que describen un sistema bajo arquitectura de Micro-Servicios:
-
-\section{Orientado al negocio}
-    Mientras un sistema se separa en servicios que lo constituyen, existe el riesgo de que esta descomposición se haga sobre límites ya existentes dentro de una compañía. Esto quiere decir que el sistema pueda ser potencialmente más frágil, porque existen más partes independientes que administrar, y, esas partes no se integran bien aunque los servicios resultantes se comuniquen entre ellos.
-    
-    Más aún, si los servicios no se han diseñado correctamente hacia el objetivo por el que fueron concebidos en primer lugar, no podrán ser reutilizados. Los costos de desarrollo y mantenimiento pueden aumentar si los servicios se diseñan en los límites tecnológicos o de una organización. Estar en el límite implica trabajar con tecnologías no idóneas para el objetivo de un servicio, o diseñar un sistema sin generalizar correctamente sus funcionalidades, lo que lo hace demasiado específico.
-    
-    Es crítico diseñar Micro-Servicios con el objetivo principal del negocio en mente. Esto requiere que los equipos de una organización trabajen juntos y diseñen los servicios de forma conjunta.
-    
-    Más importante que la arquitectura de un sistema es el hecho de que los servicios no deben imitar los límites tecnológicos, organizacionales o de comunicación. Si esto ocurre entonces un sistema podrá soportar cambios en la organización (como nuevos productos o servicios) e incluso cambios de personal. Adicionalmente, los servicios deben estar aislados en función de una característica del negocio. \cite{ibm_msa_redbook_business_oriented}
-\section{Diseñado para el fallo}
-    Los ingenieros de Software se inspiran en los principios de la Ingeniería Civil, donde los ingenieros luchan con el diseño, construcción y mantenimiento del ambiente físico, tales como caminos, puentes, canales, edificios, etc. Un ingeniero civil diseña sistemas esperando el fallo de componentes individuales, y construye múltiples capas de redundancia para asegurar construcciones seguras y estables.
-    
-    Este mismo pensamiento puede ser aplicado para la ingeniería de Software. Esta corriente de pensamiento asume y acepta el hecho de que los errores aislados son inevitables, pero la meta del diseño no es prevenir que no falle sino que, en caso de falla, un sistema se mantenga funcionando por el mayor tiempo posible. Prácticas de ingeniería, como la inyección de modelado y de fallas, deberían ser incluidas como parte del proceso de desarrollo continuo para diseñar sistemas más confiables.
-\section{Administración descentralizada de data}
-    En una aplicación Monolítica, es fácil lidiar con transacciones porque todos los componentes forman parte del monolito. Cuando se trabaja con MSA que es distribuida, se deben lidiar con transacciones esparcidas a través de múltiples servicios.  En una Arquitectura de Micro-Servicios la preferencia debe ser por BASE (siglas en inglés para \textbf{Disponibilidad}, \textbf{Estados ligeros} y \textbf{eventual consistencia}) sobre ACID (siglas en inglés para \textbf{Atomicidad}, \textbf{Consistencia}, \textbf{Aislamiento} y \textbf{Durabilidad}).
-    
-    Idealmente, cada Micro-Servicio debería administrar su propia base de datos. Sin embargo, si por alguna razón más de un Micro-Servicio comparte la misma base de datos, se debe ser cuidadoso, ya que viola algunos de los principios de una MSA. Por ejemplo, el contexto estaría enlazado, ya que dos servicios que comparten una Base de Datos deben saber el uno sobre el otro, y cualquier cambio a nivel de datos debe ser coordinado entre los dos.
-    
-    En general, el nivel de acoplamiento entre Micro-Servicios debe ser limitado tanto como sea posible para que siempre estén débilmente acoplados.
-\section{Detectabilidad}
-    Como se ha descrito anteriormente, una MSA necesita que los servicios sean confiables y tolerantes al fallo. Esto implica la construcción de Micro-Servicios de una forma tal que, si la infraestructura subyacente es creada y luego destruida, los demás servicios puedan ser reconfigurados con la ubicación de otros servicios a los que están conectados.
-    
-    Con el uso de computación en la nube y contenedores para el despliegue de Micro-Servicios, estos necesitan ser reconfigurados dinámicamente. Cuando la instancia de un nuevo servicio es creada, el resto de la red puede encontrarlo rápidamente y empezar a comunicarse con él.
-    
-    La mayoría de los modelos de detectabilidad de servicios dependen de un servicio de registro a los que todos los servicios \textbf{explícitamente} se registran y hacen llamadas para comunicarse, a través de él, con los otros servicios de los cuales dependen.
-\section{Diseño de comunicación entre servicios}
-    Cuando los Micro-Servicios están esparcidos y desplegados en distintas ubicaciones (servidores, máquinas virtuales o contenedores), deben existir técnicas que permitan la inter-comunicación.
-    
-    Para comunicaciones \textit{One-Way}, o de una vía, una cola de mensajes por lo general es suficiente, pero para comunicaciones \textit{Two-Way}, o de dos vías, esto no funcionaría.
-    
-    La alternativa ideal es utilizar es una \textbf{Entrada de API} (también conocida como \textit{API Gateway}), que se coloca entre el cliente y los Micro-Servicios, y provee APIs que están diseñadas específicamente para el cliente. Su función principal es esconder la complejidad de la aplicación. 
-    
-    Una API Gateway provee una interfaz simplificada para el cliente, haciendo que los servicios sean más fácil de usar, entender y probar, como podemos observar en la Fig. \ref{fig:api_gateway_facade}
-    
-    \begin{figure}[!htbp]
-        \centering
-        \includegraphics[width=12cm]{graphics/teg-c5/msa_api_gateway.png}
-        \caption{Uso de una API Gateway como fachada para los servicios en una MSA}
-        \label{fig:api_gateway_facade}
-    \end{figure}
-    
-    Existen dos acercamientos para la comunicación inter-servicios:
-    \begin{itemize}
-        \item \textbf{Mecanismos Síncronos} basados en HTTP, como REST o Websockets, que dan un canal de comunicación entre el navegador y el servidor.
-        \item \textbf{Mecanismos Asíncronos} a través de un \textit{Message Broker}, que separa la comunicación en dos roles: consumidor y productor de mensajes. El \textit{Message Broker} implementa una cola con los mensajes de los productores hasta que los consumidores sean capaz de procesarlos.
-    \end{itemize}
-\section{Manejo de la complejidad}
-    Una Arquitectura de Micro-Servicios crea recursos adicionales para ser usados en múltiples operaciones. Hay un claro incremento de partes involucradas, por lo tanto, de complejidad. Racionalizar el comportamiento individual de cada componente puede ser más sencillo que hacerlo para el sistema entero.
-    
-    Mantener una MSA consiste en administrar, operar y monitorear una infraestructura de tal vez docenas de procesos, balanceadores de carga y capas de mensajes. Existe un conjunto de consideraciones para manejar la complejidad que introducen los Micro-Servicios:
-    \begin{itemize}
-        \item \textbf{Pruebas}: Probar un sistema complejo requiere de una suite de pruebas unitarias y de integración, junto con un Framework de pruebas que simule componentes fallando, degradación de servicios, pruebas de estrés, y someta a prueba el comportamiento general de los sistemas en un día cotidiano.
-        \item \textbf{Monitoreo}: Servicios bien diseñados proveen, además de los sistemas de monitoreo tradicionales, chequeos de la salud de los servicios publicando o suscribiéndose a una cola de mensajes de un \textit{Message Broker} para pruebas.
-
-        Estos indicadores pueden encenderse arbitrariamente para hacer prueba de rendimiento, obtener información de errores, entre otras funciones. Toda esta información puede recopilarse y mostrarse en un Panel de control de monitoreo, para mayor efectividad.
-        \item \textbf{Metodología \textit{DevOps}}: Es un conjunto de prácticas, herramientas y una filosofía que automatiza e integra procesos entre los desarrolladores de Software y el equipo de tecnología de la información.
-    
-        El reto de mantener los Micro-Servicios andando de forma ideal implica que los equipos deben estar enfocados en sus partes de la operación y atentos al ambiente de producción del sistema. Para asegurar la mejor efectividad normalmente se manejan tres ambientes clásicos:
-        \begin{itemize}
-            \item \textbf{Integración Continua} (CI, por sus siglas en inglés): Es el ambiente ideal para el despliegue de las nuevas características de un sistema. El cuarto de juego de los desarrolladores para someter a prueba su código y verificar el impacto de los nuevos cambios.
-            \item \textbf{Asegurado de Calidad} (QA, por sus siglas en inglés): Es el ambiente donde el equipo que asegura la calidad del Software realiza todas sus pruebas, una nueva característica a la vez, así como pruebas de regresión, que aseguran que la aplicación, con todos los cambios nuevos, permanece estable.
-            \item \textbf{Producción}: Es el ambiente final, el que se muestre al cliente y el que es utilizado por los consumidores. 
-        \end{itemize}
-    \end{itemize}
-        
-\section{Programación Políglota}
-    Usar distintos lenguajes de programación en una MSA hace que el sistema sea \textbf{políglota}, que representa un reto único al tener que mantener servicios escritos en distintos lenguajes. 
-    
-    Mantener un flujo de desarrolladores con experiencia para cada lenguaje, así como también investigadores y desarrolladores con mucha experiencia que provea conocimiento general, para que la plataforma puede mantenerse y mejorar con el tiempo. Normalmente los negocios tienen una lista corta de lenguajes de programación que utilizan, ajustada tanto por las necesidades del negocio como por la lista de expertos en sus filas.
-\section{Diseño evolutivo}
-    Una MSA permite un diseño evolutivo. La idea principal es que permite introducir nuevas características en la aplicación al cambiar un sólo Micro-Servicio. Sólo es necesario el despliegue y liberación técnica de el Micro-Servicio con los nuevos cambios. Estos cambios sólo afectan al consumidor de ese Micro-Servicio y, si la interfaz de la API no fue modificada, todos los consumidores pueden continuar trabajando regularmente sin cambios.
-    
-    Debido a que los Micro-Servicios están débilmente acoplados, son pequeños y enfocados y tienen contextos no-enlazados, cambios en ellos pueden ser liberados a producción rápida y frecuentemente con riesgos mínimos, lo que permite la mejora y evolución constante de ellos.
-    
-
-
-
-
+\begin{itemize}
+    \item \textbf{Integración Profunda con el Código Fuente (Control de Versiones):} Ampliar las capacidades de la IA para que pueda conectarse a los repositorios del proyecto (ej. GitHub/GitLab). Esto le permitiría, ante una alerta, clonar el código, auditar la lógica, encontrar el segmento defectuoso y sugerir —o incluso generar automáticamente— \textit{Pull Requests} con la refactorización o corrección (auto-mejora del código).
+    \item \textbf{Interacción Activa con Servicios y Datos:} Evolucionar a PAWARE para que no solo consuma métricas pasivas de observabilidad, sino que pueda ejecutar consultas a través de las APIs internas o inspeccionar el estado de las bases de datos de forma segura. Si un operador consulta: \textit{``¿Cómo podemos mejorar el rendimiento del módulo de asignaturas?''}, la IA podría contrastar la telemetría con los volúmenes de datos reales y emitir recomendaciones de índices de base de datos o rediseño de queries.
+    \item \textbf{Tareas Programadas y Auditorías Predictivas:} Habilitar a PAWARE para ejecutar ciclos de revisión preventiva programados (cron jobs de auditoría). En lugar de reaccionar a incidentes, la IA simularía flujos de carga internamente, evaluaría la deuda técnica o los cuellos de botella latentes, y emitiría informes periódicos de mejora continua antes de que los usuarios experimenten lentitud.
+    \item \textbf{Ejecución Autónoma en Orquestadores:} Avanzar del estado de "recomendación" a la acción directa sobre la infraestructura (Kubernetes o Docker Swarm), otorgando permisos controlados a la IA para reiniciar, apagar o escalar instancias horizontalmente sin confirmación humana explícita, completando la visión de un sistema auto-reparable (Self-healing).
+    \item \textbf{Modelos Específicos y Soberanía Tecnológica (SLMs):} Recopilar progresivamente las resoluciones aprobadas en la base de datos de conocimiento para entrenar modelos de lenguaje de menor escala (Small Language Models). Esto lograría que el asistente capture la terminología exclusiva de la Universidad Central de Venezuela y opere localmente, reduciendo costos y dependencia de APIs de terceros.
+\end{itemize}
 

@@ -1,88 +1,105 @@
-\chapter{Arquitectura Cliente-Servidor}
+\chapter{Marco Teórico}
 \pagestyle{fancy}
 
-Un sistema \textbf{Cliente-Servidor} se describe como un modelo de computación distribuida en donde la aplicación del Cliente solicita servicios de un proceso del Servidor. Esta arquitectura permite dividir la carga entre múltiples categorías dependiendo de las necesidades del negocio y de la solicitud que se reciba desde el lado del Cliente. Un computador personal, por ejemplo, corre un sistema operativo que, a su vez, corre Software de muchos tipos que, si usan conexión a Internet, se comunican frecuentemente con servidores para realizar múltiples peticiones. En este proceso un mensaje es enviado a un Servidor, que responde con información preparada como sea necesaria para finalmente mostrarla al Cliente. .\cite{client_server_arch_1}
+\section{Arquitecturas de Software}
 
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=9cm]{graphics/teg-c2/sistema_cliente_servidor.png}
-\caption{Sistema Cliente-Servidor}
-\label{fig:figure6}
-\end{figure}
+\subsection{Arquitecturas Monolíticas}
+El desarrollo de software tradicional frecuentemente se orienta hacia la construcción de aplicaciones monolíticas. En este tipo de arquitectura, todos los componentes del sistema (interfaz de usuario, lógica de negocio y acceso a datos) se empaquetan y despliegan como una única unidad lógica y ejecutable \cite{richardson2018microservices}. Si bien este enfoque simplifica el desarrollo inicial, las pruebas y el despliegue a pequeña escala, tiende a presentar problemas significativos de escalabilidad y mantenimiento a medida que la base de código crece. Un fallo en un componente puede derivar en la caída de toda la aplicación, y actualizar una funcionalidad requiere el redespliegue del sistema entero.
 
-El \textbf{Cliente} es quien hace la solicitud de información mientras el \textbf{Servidor} es el proveedor del servicio. En la mayoría de ambientes con arquitectura Cliente-Servidor, el procesamiento de la data la maneja el servidor y los resultados son enviados al cliente, que está diseñado para maximizar el rendimiento al momento de entregar la información al consumidor final o solicitante de la información.
+\subsection{Arquitecturas Basadas en Microservicios}
+Para mitigar las deficiencias de los monolitos, la industria evolucionó hacia la arquitectura basada en microservicios. Según Fowler y Lewis (2014) \cite{fowler2014microservices}, los microservicios son un enfoque de desarrollo en el que una aplicación única se construye como una suite de pequeños servicios, donde cada uno ejecuta su propio proceso y se comunica mediante mecanismos ligeros (usualmente APIs HTTP/REST). Estos servicios están construidos alrededor de capacidades de negocio, son desplegables de manera independiente y pueden ser escritos en diferentes lenguajes de programación o utilizar diferentes tecnologías de almacenamiento de datos.
 
-En el mundo actual, esta arquitectura se ha hecho muy popular debido a que es utilizada todos los días por aplicaciones alrededor del mundo. Algunos de los protocolos más comunes que se utilizan para la comunicación entre el cliente y el servidor son: \textbf{Protocolo de Transferencia de Archivos} (FTP, por sus siglas en inglés), \textbf{Protocolo de Transferencia de Correo Simple} (SMTP) y \textbf{Protocolo de Transferencia de Hipertexto} (HTTP). 
+\subsection{Comparación entre Arquitecturas Monolíticas y Microservicios}
+La principal diferencia radica en el acoplamiento y la unidad de despliegue. Las arquitecturas monolíticas ofrecen simplicidad operativa en etapas tempranas pero sufren de alto acoplamiento. Por el contrario, los microservicios brindan alta cohesión, escalabilidad independiente por servicio, y resiliencia ante fallos aislados. No obstante, introducen una gran complejidad operativa inherente a los sistemas distribuidos, tales como la latencia de red, la tolerancia a fallos, el monitoreo distribuido y la orquestación de despliegues \cite{richardson2018microservices}.
 
-Un sistema con arquitectura Cliente-Servidor es, en definitiva, una arquitectura hecha de un Cliente y un Servidor, donde el Cliente siempre realiza solicitudes mientras que el Servidor responde a ellas. Esta arquitectura provee una comunicación entre procesos, ya que involucra el intercambio de data entre el Cliente y el Servidor, donde cada uno de ellos realiza diferentes funciones.\cite{client_server_arch_2}
+\section{Computación Autonómica}
 
-\section{Cliente}
-     El Cliente inicia la comunicación. Es utilizado para correr programas y acceder a la data que está almacenada en el Servidor. Típicamente es más sencillo de desarrollar que los servidores, ya que no necesitan privilegios específicos para proveer soluciones para las que fue diseñado.\cite{client_server_arch_3}
- 
-     El Cliente o \textit{estación de trabajo}, opera las aplicaciones que poseen las interfaces gráficas que ve el consumidor, normalmente conocidas como \textbf{Front-End}. Usando una pantalla, teclado y un ratón como medio de interacción con el usuario, un Cliente también puede referirse a un proceso que opera de forma automática desde la computadora de un consumidor u otro Servidor.
- 
-     Un Cliente sólo puede hacer solicitudes a un Servidor y mostrar la data que recibe como respuesta, ya que no posee acceso directo a ella. Como el Cliente no procesa peticiones o almacena data de ningún servidor, los requerimientos técnicos de memoria, almacenamiento en disco y capacidad de procesamiento son menos exigentes que los de un Servidor. Esto permite a un Cliente operar una Aplicación Web sin necesidad de un gran consumo de recursos.\cite{client_server_arch_4}
+\subsection{Concepto de Computación Autonómica}
+Inspirada en el funcionamiento del sistema nervioso autónomo del cuerpo humano, la Computación Autonómica fue propuesta por IBM en 2001 para lidiar con la creciente e inmanejable complejidad de la gestión de sistemas informáticos \cite{kephart2003vision}. El concepto define sistemas informáticos capaces de autogestionarse en base a políticas de alto nivel establecidas por administradores humanos, ocultando la complejidad subyacente de las operaciones técnicas.
 
-\section{Servidor}
- 
-     El Servidor resuelve las peticiones de un Cliente. En algunas ocasiones requiere privilegios de sistema, debido a que puede necesitar acceso a almacenamiento en disco y a Base de Datos, locales o remotas.\cite{client_server_arch_3}
-     
-     Un Servidor, usualmente conocido como \textbf{Back-End}, es una máquina o conjunto de máquinas que administran los privilegios y roles para el acceso a la data de forma concurrente. Un Servidor también puede referirse a un proceso o conjunto de procesos que operan en un computador. Independiente de su sistema operativo, un Servidor recibe y procesa solicitudes de un Cliente.
-     
-     Al tener más memoria, discos de almacenamiento más grandes y procesadores más rápidos, un Servidor es capaz de atender múltiples solicitudes, algunas incluso de forma simultánea, de un Cliente. Adoptando múltiples roles en una arquitectura Cliente-Servidor, un Servidor puede ser una Base de Datos, un servicio de correo o de archivos de forma simultánea.
-     Es importante para un Servidor poder funcionar como una entidad consolidada para almacenar archivos, programas, bases de datos y reglas de negocio.\cite{client_server_arch_4}
-     
-\section{Red}
-    La Red permite la recuperación y envío de data de forma remota vía transacciones Cliente-Servidor y Servidor-Servidor. Aplicaciones, Servidores y Bases de Datos pueden estar en distintas máquinas con distintos sistemas operativos. Cada Cliente y Servidor están conectados a través de Internet para asegurar que la recepción y respuesta de las peticiones del Cliente sean atendidas.\cite{client_server_arch_3}. 
-    
-    \subsection{Protocolo HTTP}
-        Es el protocolo que se utiliza para establecer comunicación entre el Cliente y el Servidor. Permite recuperar recursos como un documento HTML, CSS o Javascript. Es la fundación de cualquier intercambio de data en la Web y es un procotolo de Cliente-Servidor, lo que quiere decir que las peticiones son iniciadas por el Cliente, normalmente un Navegador de Internet. Una página web entera es reconstruido por los distintos tipos de documentos recuperados, por ejemplo, texto, descripción de estructura de los elementos, imágenes, vídeos, Scripts, entre otros.
-        
-        Clientes y Servidores se comunican al intercambiar mensajes individuales. Los mensajes enviados por el Cliente, son llamados \textbf{Peticiones} y los mensajes enviados por el servidor, como consecuencia de una petición de un Cliente, son llamados \textbf{Respuestas}.\cite{http_protocol_white_paper}
-    
-    \subsection{Tipos de peticiones HTTP}
-        El protocolo HTTP define un conjunto de tipos de peticiones para indicar la acción que se desea que el servidor ejecute para un recurso o conjunto de recursos. Aunque cada uno de ellos implementa diferente semántica, hay características compartidas entre un grupo de ellos. A continuación los métodos de peticiones más comunes para una comunicación Cliente-Servidor\cite{http_methods_white_paper}:
-         \begin{itemize}
-             \item \textbf{GET}: Las peticiones de tipo GET u OBTENER solicitan una representación del recurso que se ha pedido. Estas peticiones sólo deben recuperar data.
-             \item \textbf{POST}: POST o ENVIAR es un método que envía una entidad con recursos específicos, normalmente produciendo un cambio de estado o efecto en el Servidor.
-             \item \textbf{PUT}: PUT o COLOCAR reemplaza todas las representaciones del recurso objetivo con la carga de datos enviada en la petición.
-             \item \textbf{DELETE}: DELETE o Eliminar borra el recurso especificado, lo que sea que eso implique del lado del Servidor.
-         \end{itemize}  
-    
-\section{Arquitectura de dos niveles}
-    En este tipo de arquitectura, la carga de trabajo es dividida entre el Servidor (Anfitrión del sistema) y el Cliente (Anfitrión de la interfaz de usuario). En el mundo real estas partes están en distintos computadores pero realmente no existe un requerimiento sobre ello. Aunque las capas estén separadas técnicamente es posible que ambas puedan estar en un mismo computador. \cite{client_server_arch_3}
+\subsection{Propiedades de los Sistemas Autonómicos}
+Un sistema autonómico se rige típicamente por cuatro propiedades fundamentales (conocidas como las propiedades "Self-CHOP") \cite{mendonca2012architecture}:
+\begin{itemize}
+    \item \textbf{Auto-configuración (Self-configuration):} Capacidad de instalar y adaptar componentes de software automáticamente sin intervención externa.
+    \item \textbf{Auto-recuperación (Self-healing):} Habilidad para detectar, diagnosticar y reparar problemas operativos, interrupciones y fallos en el software o hardware.
+    \item \textbf{Auto-optimización (Self-optimization):} Monitorización proactiva y ajuste continuo de los recursos para garantizar un rendimiento óptimo.
+    \item \textbf{Auto-protección (Self-protection):} Capacidad de anticipar, detectar e identificar ataques maliciosos o fallos en cascada, tomando acciones para salvaguardar el sistema.
+\end{itemize}
 
-    En una arquitectura de dos niveles, el Cliente está en el primer nivel. El servidor de base de datos y de aplicación reside en la máquina de Servidor, que es el segundo nivel. Este segundo nivel sirve la data y ejecuta la lógica de negocio para la Aplicación Web. Las organizaciones a favor de esta arquitectura típicamente lo prefieren así para consolidar tanto la lógica de negocio como la base de datos en un mismo nivel. El segundo nivel es responsable, en definitiva, de la disponibilidad, escalabilidad y rendimiento del entorno Web de una organización.
-        \begin{figure}[!htbp]
-        \centering
-        \includegraphics[width=9cm]{graphics/teg-c2/arquitectura_2_niveles.png}
-        \caption{Arquitectura de dos niveles}
-        \label{fig:figure5}
-        \end{figure}
-    
-\section{Arquitectura de tres niveles}
-    
-    En una arquitectura de tres niveles, el cliente y el servidor interactúan entre ellos a través de un software que está en el medio de los dos. Este software se conoce como software de aplicación, intermedio o \textbf{Middleware} y su función es, principalmente, separar los procesos de verificación de credenciales, acceso a la información, almacenamiento de data e interfaces de usuario para que puedan ser mantenidas de forma independiente y como módulos aislados.
-    
-    La solicitud del cliente es recuperada y autenticada por el Middleware antes de que el servidor la reciba. Es entonces cuando el servidor procesa la petición y envía la respuesta al cliente, también a través del Middleware.\cite{client_server_arch_3}         
-    
-    \begin{figure}[!htbp]
-    \centering
-    \includegraphics[width=9cm]{graphics/teg-c2/arquitectura_3_niveles.png}
-    \caption{Arquitectura de tres niveles}
-    \label{fig:figure4}
-    \end{figure}
-    
-\section{Arquitectura de n-niveles} 
+\section{Modelo MAPE-K}
 
-En una arquitectura de n-niveles, los objetos de una aplicación están distribuidos a lo largo de distintos niveles lógicos, normalmente tres o cuatro. El servidor de base de datos no comparte la misma máquina que el servidor que contiene la lógica de negocio, también conocido como \textbf{servidor de aplicación}. El servidor de aplicación es el segundo nivel y maneja toda la lógica de negocio que no requiere las funcionalidades de la base de datos. Un buen ejemplo de una aplicación de n-niveles es un sistema de intercambio de acciones, como la \textbf{Blockchain}.\cite{client_server_arch_3}
+\subsection{Componentes del Modelo MAPE-K}
+El modelo MAPE-K (Monitor, Analyze, Plan, Execute, Knowledge) es el marco arquitectónico de referencia introducido por IBM en 2003 para construir sistemas autonómicos \cite{kephart2003vision}. Divide el proceso de auto-gestión en cuatro fases apoyadas sobre una base de conocimiento compartida:
+\begin{itemize}
+    \item \textbf{Monitor (Monitoreo):} Recopila información de topología, métricas y logs de los recursos gestionados.
+    \item \textbf{Analyze (Análisis):} Procesa la información para entender el estado actual del sistema y determinar si se ha producido una anomalía.
+    \item \textbf{Plan (Planificación):} Estructura las acciones necesarias para alcanzar los objetivos o solucionar la falla detectada.
+    \item \textbf{Execute (Ejecución):} Aplica el plan a través de actuadores o comandos sobre el sistema objetivo.
+    \item \textbf{Knowledge (Conocimiento):} Base de datos o repositorio histórico que nutre y es nutrido por las otras cuatro fases \cite{ibm2006architectural}.
+\end{itemize}
 
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=10cm]{graphics/teg-c2/arquitectura_n_niveles.png}
-\caption{Arquitectura de n-niveles}
-\label{fig:figure3}
-\end{figure}
+\subsection{MAPE-K en Sistemas Distribuidos modernos (AWARE)}
+La transición hacia microservicios introdujo nuevos niveles de complejidad, haciendo que la implementación estricta de un único ciclo MAPE-K resultara un cuello de botella. Nuevos enfoques, como el marco AWARE (AIOps-based Workflow for Autonomic Resiliency and Execution), adaptan este modelo integrando capacidades de Inteligencia Artificial directamente en las fases de Análisis y Planificación. Esto permite que el sistema pase de decisiones basadas en reglas estáticas a razonamientos basados en modelos de lenguaje (LLMs) u otros clasificadores de aprendizaje automático \cite{dang2019aiops}.
 
- 
- 
+\section{Sistemas Auto-adaptativos}
+
+\subsection{Definición y Características}
+Un sistema auto-adaptativo tiene la capacidad de modificar su comportamiento y estructura en tiempo de ejecución en respuesta a cambios en su entorno u operaciones. Weyns (2019) establece que un sistema verdaderamente auto-adaptativo requiere retroalimentación constante y mecanismos de toma de decisiones no deterministas que reduzcan la carga cognitiva de los operadores humanos \cite{weyns2019software}.
+
+\subsection{Relación con la Computación Autonómica}
+Mientras que la computación autonómica abarca la visión completa de sistemas auto-manejables (auto-reparación, auto-optimización, auto-protección y auto-configuración), la auto-adaptación es el mecanismo de ingeniería de software práctico para implementarlo. Herramientas contemporáneas de aseguramiento de calidad (como análisis de cobertura de \textit{JaCoCo} o pruebas end-to-end con \textit{Cypress}) juegan un rol clave, ya que la auto-adaptación requiere que el código alterado mantenga su validez estructural.
+
+\newpage
+
+\section{Observabilidad en Sistemas Distribuidos}
+
+\subsection{Monitoreo}
+En arquitecturas monolíticas, el monitoreo a menudo se reducía a verificar si el servidor estaba encendido (uptime) y si el uso de CPU/RAM era normal. Sridharan (2018) \cite{sridharan2018distributed} distingue entre \textit{monitoreo} (el acto de observar el estado general y predecible de un sistema) y la \textit{observabilidad} (la cualidad de un sistema que permite inferir estados internos basándose únicamente en el conocimiento de sus salidas externas). En microservicios, la observabilidad es obligatoria debido a que las fallas rara vez son predecibles y provienen de la interacción compleja entre múltiples componentes pequeños.
+
+\subsection{Logs y Métricas}
+Los pilares de la observabilidad se fundamentan en la agregación de telemetría:
+\begin{itemize}
+    \item \textbf{Métricas:} Valores numéricos agregados a lo largo del tiempo, útiles para disparar alertas cuando se sobrepasan umbrales (ej. latencia p95 o el uso de CPU) \cite{sridharan2018distributed}. Herramientas como \textit{Prometheus} son el estándar en sistemas modernos.
+    \item \textbf{Logs (Registros):} Representan eventos discretos y detallados producidos por las aplicaciones. Al centralizarse en sistemas como \textit{Loki}, los logs proporcionan el contexto exacto ("el qué y el porqué") cuando una métrica señala que algo anda mal.
+\end{itemize}
+
+\subsection{Trazabilidad (Tracing)}
+La trazabilidad distribuida permite el seguimiento del ciclo de vida de una solicitud HTTP única a través de todos los microservicios involucrados en satisfacerla. Aporta un identificador único (Trace ID) que reconstruye la cadena temporal de llamadas de red y tiempos de espera, vital para debugear latencia entre microservicios \cite{sridharan2018distributed}.
+
+\section{Mantenimiento de Software}
+
+\subsection{Tipos de Mantenimiento}
+El estándar internacional ISO/IEC/IEEE 14764 \cite{iso14764} establece que el mantenimiento del software ocurre una vez que el sistema ha sido puesto en producción y lo categoriza en cuatro vertientes:
+\begin{itemize}
+    \item \textbf{Correctivo:} Modificaciones reactivas para corregir fallos o bugs descubiertos.
+    \item \textbf{Adaptativo:} Modificaciones para asegurar que el software siga siendo funcional en un entorno tecnológico cambiante (ej. migraciones de base de datos o de S.O.).
+    \item \textbf{Perfectivo:} Mejoras en el rendimiento o implementación de nuevas funcionalidades operativas (sin cambiar la lógica de negocio subyacente).
+    \item \textbf{Preventivo:} Refactorización o mitigación técnica para prevenir fallos latentes o corregir la deuda técnica antes de que cause incidencias.
+\end{itemize}
+
+\subsection{Retos en Sistemas Distribuidos}
+Realizar tareas de mantenimiento en arquitecturas basadas en microservicios introduce retos significativos. La falla no suele concentrarse en una sola línea de código, sino que puede deberse a interrupciones de red, fallos en contenedores terceros o latencias asíncronas \cite{richardson2018microservices}. Identificar la raíz del problema (Root Cause Analysis - RCA) consume una porción abrumadora del tiempo del desarrollador, lo cual incrementa el MTTR (Mean Time to Recovery).
+
+\section{Inteligencia Artificial aplicada al Mantenimiento de Software}
+
+\subsection{Detección de Anomalías}
+El uso de algoritmos de Machine Learning e IA permite establecer líneas base (baselines) del comportamiento "normal" de un sistema (tasa de errores, latencia habitual, picos estacionales de tráfico). Cuando los patrones reales se desvían de estas líneas base predictivas, la IA puede alertar al equipo antes de que ocurra una interrupción total del servicio \cite{notaro2021aiops}.
+
+\subsection{Apoyo a la Toma de Decisiones}
+El advenimiento de los Modelos de Lenguaje de Gran Escala (LLMs) ha revolucionado la gestión de operaciones de TI. Al abstraer métricas matemáticas, archivos de log crudos y topología de servicios en representaciones de texto, los LLMs son capaces de "entender" y sintetizar errores complejos en diagnósticos legibles por humanos. Actúan como asistentes (Copilots) para los ingenieros DevOps, sugiriendo fragmentos de código o configuraciones óptimas para recuperar o escalar la infraestructura.
+
+\section{AIOps y Automatización de Operaciones}
+
+\subsection{Concepto de AIOps}
+El término AIOps (Artificial Intelligence for IT Operations) fue acuñado por Gartner en 2016 \cite{gartner2017aiops} para describir la aplicación de Big Data, Machine Learning y otras tecnologías avanzadas a los flujos de operaciones de TI. AIOps mejora el monitoreo tradicional al correlacionar eventos ruidosos, encontrar la causa raíz (RCA) con mayor velocidad y proporcionar remediación predictiva.
+
+\subsection{Aplicaciones en Sistemas Modernos}
+En ecosistemas orquestados por herramientas como Docker o Kubernetes, AIOps puede predecir cuándo un contenedor fallará analizando un aumento anormal (drift) de la memoria o latencia. La integración de AIOps en modelos autonómicos (como MAPE-K) representa el estado del arte en la ingeniería de resiliencia (Resilience Engineering) \cite{notaro2021aiops}.
+
+\section{Integración de IA en Arquitecturas de Microservicios}
+
+\subsection{Desafíos de Integración}
+La principal barrera para incorporar Inteligencia Artificial en operaciones es la fragmentación de los datos. En un entorno de microservicios, los registros están distribuidos en múltiples nodos. Para que un LLM o un modelo estadístico funcione, se requiere la implementación de patrones de agregación mediante herramientas como Loki y Prometheus, garantizando un punto de entrada centralizado de contexto \cite{newman2015building}.
+
+\subsection{Oportunidades y Beneficios (Mantenimiento Proactivo)}
+Al abstraer las métricas como contexto ("prompts") para modelos generativos, los administradores obtienen diagnósticos en lenguaje natural. Esto democratiza la administración de servidores complejos y acelera drásticamente los tiempos de recuperación (MTTR). Además, permite establecer un canal de auto-mantenimiento donde el sistema puede inferir su propio nivel de riesgo, recomendando a los equipos humanos refactorizar secciones de código o ajustar límites de contenedores antes de que se convierta en una caída masiva.
