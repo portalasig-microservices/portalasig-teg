@@ -346,6 +346,13 @@ motor idéntico al de producción, en contraste con bases de datos en memoria co
 que pueden ocultar incompatibilidades de dialecto SQL o comportamientos específicos del
 motor.
 
+\begin{center}
+    \textit{[Placeholder: Figura \ref{fig:ide-testcontainers} — Screenshot del IDE
+    (IntelliJ) ejecutando la clase \texttt{AbstractMysqlIntegrationTest}, mostrando
+    la consola de Maven con los tests pasando, el contenedor Docker MySQL levantado
+    por Testcontainers en segundo plano, y el reporte de cobertura JaCoCo visible.]}
+\end{center}
+
 \textbf{Pruebas end-to-end.} Se creó el repositorio \texttt{portalasig-e2e} con
 \textbf{Cypress} como herramienta de automatización de pruebas de interfaz. Los tests
 simulan flujos completos del usuario —inicio de sesión, navegación por sitios de
@@ -355,6 +362,13 @@ WebDriver como Selenium. Dado que la autenticación está externalizada en el se
 UAA, los tests realizan peticiones directas de login para obtener el token JWT e
 inyectarlo en las peticiones subsecuentes, evitando la complejidad de navegar múltiples
 órdenes de dominio durante la prueba.
+
+\begin{center}
+    \textit{[Placeholder: Figura \ref{fig:cypress-suite} — Screenshot del runner de
+    Cypress mostrando la suite de pruebas end-to-end con múltiples specs ejecutadas
+    exitosamente (indicadores verdes), el panel de tiempo de ejecución y el selector
+    de navegador visible.]}
+\end{center}
 
 \textbf{Observabilidad distribuida.} Se configuró un stack de observabilidad compuesto
 por tres herramientas integradas. \textbf{Prometheus} recolecta métricas de cada
