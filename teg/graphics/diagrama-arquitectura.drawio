@@ -144,13 +144,39 @@
           </mxGeometry>
         </mxCell>
 
+        <!-- Edges: PAWARE to Services (health checks /actuator/health) -->
+        <mxCell id="e-paware-health-uaa" value="/actuator/health" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc3545;strokeWidth=1;dashed=1;endArrow=block;endFill=1;fontSize=9;fontColor=#dc3545;verticalAlign=bottom;spacingBottom=2" edge="1" parent="bg" source="paware" target="uaa">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="725" y="150" />
+              <mxPoint x="275" y="150" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-paware-health-site" value="/actuator/health" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc3545;strokeWidth=1;dashed=1;endArrow=block;endFill=1;fontSize=9;fontColor=#dc3545;verticalAlign=bottom;spacingBottom=2" edge="1" parent="bg" source="paware" target="site">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="725" y="150" />
+              <mxPoint x="425" y="150" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-paware-health-notify" value="/actuator/health" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc3545;strokeWidth=1;dashed=1;endArrow=block;endFill=1;fontSize=9;fontColor=#dc3545;verticalAlign=bottom;spacingBottom=2" edge="1" parent="bg" source="paware" target="notify">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="725" y="150" />
+              <mxPoint x="575" y="150" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
         <!-- Edge: PAWARE to LLM -->
         <mxCell id="e-paware-llm" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc3545;strokeWidth=1;dashed=1;endArrow=block;endFill=1" edge="1" parent="bg" source="paware" target="llm">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
         <!-- Legend -->
-        <mxCell id="legend" value="Leyenda&#xa;---&#xa;Azul: Proxy / Frontend&#xa;Verde: Microservicio&#xa;Rojo: PAWARE (Autogestion)&#xa;Violeta: Base de Datos MySQL&#xa;Naranja: Observabilidad&#xa;Amarillo punteado: Config Server&#xa;Rojo punteado: Proveedor LLM" style="text;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dee2e6;strokeWidth=1;fontSize=10;fontColor=#212529;align=left;verticalAlign=top;spacingLeft=8;spacingTop=8" vertex="1" parent="bg">
+        <mxCell id="legend" value="Leyenda&#xa;---&#xa;Azul: Proxy / Frontend&#xa;Verde: Microservicio&#xa;Rojo solido: PAWARE consulta metricas/logs&#xa;Rojo punteado: PAWARE health check / IA&#xa;Violeta: Base de Datos MySQL&#xa;Naranja: Observabilidad&#xa;Amarillo punteado: Config Server" style="text;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dee2e6;strokeWidth=1;fontSize=10;fontColor=#212529;align=left;verticalAlign=top;spacingLeft=8;spacingTop=8" vertex="1" parent="bg">
           <mxGeometry x="40" y="540" width="200" height="180" as="geometry" />
         </mxCell>
 

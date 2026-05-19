@@ -159,9 +159,10 @@ y del servicio de autogestión del mantenimiento.
     \includegraphics[width=0.95\textwidth]{graphics/diagrama-arquitectura.png}
     \caption{Arquitectura del ecosistema de microservicios de PortalAsig, mostrando
     el proxy Nginx, el Config Server, los cuatro microservicios (UAA, Site, Notify,
-    PAWARE), sus bases de datos MySQL aisladas, el proveedor LLM externo y el stack
-    de observabilidad (Prometheus, Loki, Grafana), todo desplegado sobre la red
-    virtual de Docker Compose.}
+    PAWARE), sus bases de datos MySQL aisladas, el proveedor LLM externo, el stack
+    de observabilidad (Prometheus, Loki, Grafana) y las conexiones de monitoreo de
+    PAWARE hacia los endpoints \texttt{/actuator/health} de cada microservicio, todo
+    desplegado sobre la red virtual de Docker Compose.}
     \label{fig:diagrama-arquitectura}
 \end{figure}
 
