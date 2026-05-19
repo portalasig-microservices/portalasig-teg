@@ -299,6 +299,16 @@ registrado en cada iteración fue el siguiente:
     frontend, rediseñado de manera tolerante a fallos, absorbió el error de red y
     continuó operando de forma parcial, mostrando un indicador de degradación en
     lugar de bloquear la interfaz completa.
+
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=0.9\textwidth]{graphics/ca-frontend-degradado.png}
+        \caption{Portal de asignaturas en estado degradado tras la caída del servicio Site.
+        El usuario mantiene la sesión activa (autenticación gestionada por UAA), pero
+        el listado de sitios académicos muestra un indicador de error en lugar de
+        bloquear toda la interfaz.}
+        \label{fig:ca-frontend-degradado}
+    \end{figure}
     \item \textbf{Clasificación y Notificación:} PAWARE categorizó la eventualidad
     como incidente de máxima prioridad (P1) e invocó al servicio \texttt{ms-notify}
     para despachar un correo de advertencia con formato institucional. La alerta
@@ -313,6 +323,15 @@ registrado en cada iteración fue el siguiente:
     que el endpoint de salud respondiera con código HTTP 200. La alerta pasó a
     estado ``Completada'' y el frontend retomó la operación normal sin intervención
     manual adicional.
+
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=0.9\textwidth]{graphics/ca-frontend-recuperado.png}
+        \caption{Portal de asignaturas tras la recuperación del servicio Site.
+        El listado de sitios académicos carga correctamente, confirmando que el
+        reinicio ejecutado por PAWARE restauró la funcionalidad completa.}
+        \label{fig:ca-frontend-recuperado}
+    \end{figure}
 \end{enumerate}
 
 \begin{figure}[htbp]
