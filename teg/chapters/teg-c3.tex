@@ -640,13 +640,27 @@ posible su implementación.
 
 \subsection{Arquitectura Interna de PAWARE}
 
-PAWARE opera como un microservicio independiente que encapsula físicamente la
-estructura del ciclo MAPE-K. Su arquitectura interna se basa en procesos asíncronos
-programados que evalúan periódicamente la estabilidad del ecosistema. Se divide en
-módulos lógicos: conectores de observabilidad, un orquestador del lazo de control
-autonómico y un adaptador para la Inteligencia Artificial. Asimismo, PAWARE expone
-puntos de acceso (API REST) consumidos por las interfaces de usuario para permitir
-la auditoría y la interacción manual cuando se requiere supervisión.
+PAWARE se implementó como un microservicio Spring Boot con un scheduler
+periódico que ejecuta el ciclo MAPE-K definido en el Marco Teórico. La
+arquitectura de clases se organiza en cinco paquetes que reflejan las fases del
+ciclo: \texttt{monitor}, \texttt{analyze}, \texttt{plan}, \texttt{execute} y
+\texttt{knowledge}. Cada paquete encapsula las interfaces y servicios que
+permiten sustituir implementaciones sin afectar al resto del sistema —por
+ejemplo, el proveedor de IA puede cambiarse de OpenAI a Gemini modificando
+únicamente la clase que implementa \texttt{AwareAiProvider}. La orquestación del
+ciclo completo la coordina la clase \texttt{AwareScheduler}, invocada mediante la
+anotación \texttt{@Scheduled} de Spring con una frecuencia configurable a través
+del Config Server. Adicionalmente, PAWARE expone endpoints REST bajo el prefijo
+\texttt{/v1/alert} que permiten a la interfaz de usuario consultar alertas
+activas, registrar decisiones humanas y auditar el historial de incidentes.
+
+\begin{center}
+    \textit{[Placeholder: Figura \ref{fig:paware-clases} — Diagrama de clases de
+    PAWARE mostrando los paquetes \texttt{monitor}, \texttt{analyze}, \texttt{plan},
+    \texttt{execute}, \texttt{knowledge}, las interfaces principales
+    (\texttt{AwareAiProvider}, \texttt{MonitoringConnector}, \texttt{ActionExecutor})
+    y la clase \texttt{AwareScheduler} que orquesta el ciclo.]}
+\end{center}
 
 \subsection{Fase Monitor: Recolección de Datos Operativos}
 
@@ -699,7 +713,7 @@ almacenan en una base de datos relacional (tablas \texttt{paware\_alert} y
 \texttt{paware\_alert\_feedback}). Esta persistencia actúa como la base de
 Conocimiento (Knowledge) del modelo MAPE-K. Los administradores interactúan con
 estas alertas para aprobar o rechazar acciones. Estas decisiones humanas,
-acompñadas de comentarios, se retroalimentan al sistema. A futuro, este registro
+acompañadas de comentarios, se retroalimentan al sistema. A futuro, este registro
 continuo de incidentes y decisiones permitirá perfeccionar los prompts o realizar
 fine-tuning del modelo de IA, logrando un proceso de auto-mantenimiento más
 autónomo y robusto.
