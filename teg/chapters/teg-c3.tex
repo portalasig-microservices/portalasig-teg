@@ -646,8 +646,10 @@ arquitectura de clases se organiza en cinco paquetes que reflejan las fases del
 ciclo: \texttt{monitor}, \texttt{analyze}, \texttt{plan}, \texttt{execute} y
 \texttt{knowledge}. Cada paquete encapsula las interfaces y servicios que
 permiten sustituir implementaciones sin afectar al resto del sistema —por
-ejemplo, el proveedor de IA puede cambiarse de OpenAI a Gemini modificando
-únicamente la clase que implementa \texttt{AwareAiProvider}. La orquestación del
+ejemplo, el proveedor de IA puede cambiarse de un modelo local (como Llama o
+Mistral ejecutado mediante Ollama) a uno remoto (como OpenAI o Gemini) modificando
+únicamente la clase que implementa \texttt{AwareAiProvider} y registrando el bean
+correspondiente en la configuración del Config Server. La orquestación del
 ciclo completo la coordina la clase \texttt{AwareScheduler}, invocada mediante la
 anotación \texttt{@Scheduled} de Spring con una frecuencia configurable a través
 del Config Server. Adicionalmente, PAWARE expone endpoints REST bajo el prefijo
@@ -697,8 +699,9 @@ cada servicio, las métricas numéricas relevantes y los fragmentos de log
 asociados, y lo envía al modelo de inteligencia artificial.
 
 La integración con el proveedor de IA se abstrae mediante una interfaz interna que
-permite sustituir el modelo subyacente —OpenAI, Gemini u otro compatible— sin
-modificar la lógica de orquestación. El modelo recibe el informe consolidado,
+permite sustituir el modelo subyacente —ya sea un servicio local de bajo
+consumo (Ollama) o una API remota (OpenAI, Gemini)— sin modificar la lógica de
+orquestación. El modelo recibe el informe consolidado,
 identifica la causa probable del problema y responde con un plan de acción
 estructurado que incluye una prioridad (P1 crítica, P2 moderada, P3 informativa),
 un modo de ejecución (asistido o autónomo) y una estrategia concreta de
