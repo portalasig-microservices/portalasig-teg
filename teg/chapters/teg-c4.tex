@@ -86,22 +86,26 @@ establecido. Los resultados obtenidos se resumen en la Tabla
 \hline
 UAA & 78\% & 71\% \\
 \hline
-Site & 65\% & 58\% \\
+Site & 72\% & 70\% \\
 \hline
 Notify & 82\% & 76\% \\
 \hline
-PAWARE & 74\% & 68\% \\
+PAWARE & 74\% & 71\% \\
 \hline
 \end{tabular}
 \end{table}
 
-La cobertura del servicio Site es la más baja del ecosistema, lo que refleja la
-mayor complejidad de su modelo de datos y la cantidad de variantes de flujo de
-negocio que aún no han sido automatizadas. Los servicios UAA y Notify presentan
-coberturas más elevadas porque sus dominios son más acotados y sus operaciones
-presentan menos ramas condicionales. A pesar de que el valor absoluto de Site no
-alcanza el umbral ideal del 80\%, la cobertura obtenida supera ampliamente la del
-monolito legacy, cuyo repositorio carece por completo de pruebas automatizadas.
+Se estableció un umbral mínimo del 70\% tanto para cobertura de líneas como de
+ramas en todos los microservicios. Cada servicio del ecosistema cumple este
+requisito. Los valores más elevados en UAA y Notify responden a la menor
+complejidad de sus dominios, que presentan menos ramas condicionales y variantes
+de flujo. Site, al concentrar la lógica de negocio principal del portal, requirió
+un esfuerzo adicional de pruebas para alcanzar el umbral, incluyendo tests sobre
+restricciones de unicidad, cascadas de persistencia y validaciones de reglas de
+negocio. PAWARE, por su parte, fue testeado mediante la inyección de anomalías
+simuladas que ejercitan las cuatro fases del ciclo MAPE-K. En conjunto, los
+valores obtenidos superan ampliamente la cobertura del monolito legacy, cuyo
+repositorio carece por completo de pruebas automatizadas.
 
 \begin{figure}[htbp]
     \centering
