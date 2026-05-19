@@ -741,15 +741,27 @@ autónomo y robusto.
 \subsection{Interfaz de Gestión de Incidentes (Frontend)}
 
 Se incorporó un módulo dedicado denominado ``Alertas PAWARE'' dentro de la
-aplicación frontend en Vue.js. Esta vista presenta de manera resiliente las alertas
-activas, divididas en ``Pendientes de Acción'' y ``Completadas / Gestionadas''.
-Para facilitar la atención del administrador, las incidencias se ordenan por
-severidad y se destacan con códigos de color (rojo para P1, amarillo para P2).
+aplicación frontend en Vue.js. La interfaz se organiza en cuatro vistas que cubren
+el ciclo completo de atención de incidentes: un panel de control general, un listado
+de alertas por estado, una vista de detalle individual y un asistente conversacional.
 
-Además, se integró un Asistente Virtual basado en LLM. Los administradores pueden
-abrir un chat contextual para una alerta específica y consultar a la IA sobre la
-naturaleza del error o los pasos manuales sugeridos, emulando una experiencia de
-operador asistido o ``Copilot'' de infraestructura.
+\textbf{Panel de control.} La vista principal presenta un resumen del estado del
+ecosistema: cantidad de alertas activas por severidad, servicios monitoreados en
+estado saludable vs. degradado, y gráficos de evolución temporal de incidentes.
+Este dashboard permite al administrador evaluar la situación global antes de
+adentrarse en casos específicos.
+
+\begin{center}
+    \textit{[Placeholder: Figura \ref{fig:paware-dashboard} — Screenshot del panel de
+    control de PAWARE mostrando contadores de alertas por severidad, indicadores de
+    estado de servicios y gráfico de tendencia de incidentes en las últimas 24 horas.]}
+\end{center}
+
+\textbf{Listado de alertas.} Esta vista divide las incidencias en dos pestañas:
+``Pendientes de Acción'' y ``Completadas / Gestionadas''. Cada fila muestra la
+prioridad (P1, P2, P3), el servicio afectado, la descripción del síntoma detectado
+y la fecha de generación. Las incidencias se ordenan por severidad y se destacan
+con códigos de color (rojo para P1, amarillo para P2).
 
 \begin{figure}[htbp]
     \centering
@@ -757,9 +769,29 @@ operador asistido o ``Copilot'' de infraestructura.
     \caption{Listado de alertas autonómicas priorizadas visibles para el administrador.}
     \label{fig:paware-alerts-list}
 \end{figure}
+
+\textbf{Detalle del incidente.} Al seleccionar una alerta, el administrador accede a
+una vista que consolida toda la evidencia asociada: métricas de Prometheus en el
+momento del evento, fragmentos de log de Loki, la recomendación estructurada
+producida por el modelo de IA y los controles para aprobar, rechazar o comentar la
+acción propuesta.
+
+\begin{center}
+    \textit{[Placeholder: Figura \ref{fig:paware-incident-detail} — Screenshot de la
+    vista de detalle de un incidente P1, mostrando métricas de latencia, logs de error,
+    recomendación de la IA y botones de acción (Aprobar, Rechazar, Comentar).]}
+\end{center}
+
+\textbf{Asistente conversacional.} Antes de ejecutar cualquier acción sobre una alerta,
+el administrador puede abrir un chat contextual para interrogar a la IA sobre la
+naturaleza del error, solicitar explicaciones adicionales o explorar pasos manuales
+alternativos. Esta interacción emula una experiencia de operador asistido o
+``Copilot'' de infraestructura, reduciendo la incertidumbre antes de la toma de
+decisiones.
+
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/paware-chat.png}
-    \caption{Interacción del administrador con el agente de IA para evaluar una alerta específica.}
+    \caption{Interacción del administrador con el agente de IA para refinar el diagnóstico antes de ejecutar una acción sobre la alerta.}
     \label{fig:paware-chat}
 \end{figure}
