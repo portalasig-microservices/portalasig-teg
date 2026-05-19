@@ -512,8 +512,8 @@ sistema. Los endpoints de carga implementados son los siguientes:
     roles asignados.
     \item \textbf{Site — \texttt{POST /v1/course/csv}}: Importación masiva de
     asignaturas académicas desde archivo CSV.
-    \item \textbf{Site — \texttt{POST /v1/site/party/student/csv}}: Carga masiva
-    de estudiantes inscritos en un sitio de asignatura desde archivo CSV.
+    \item \textbf{Site — \texttt{POST /v1/site/\{siteId\}/party/student/csv}}: Carga masiva
+    de estudiantes inscritos en un sitio de asignatura específico desde archivo CSV, garantizando que la operación se realiza sobre un sitio existente.
 \end{itemize}
 
 Adicionalmente, se contemplan los siguientes endpoints de carga que se encuentran
