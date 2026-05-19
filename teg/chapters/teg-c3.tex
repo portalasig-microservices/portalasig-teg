@@ -593,19 +593,22 @@ La Tabla \ref{tab:comparativa-monolito-ms} evidencia que la arquitectura de
 microservicios mejora sustancialmente las capacidades de despliegue, aislamiento,
 observabilidad y testing. Sin embargo, este beneficio no es gratuito: introduce una
 complejidad operativa que el equipo debe gestionar. En el contexto de PortalAsig,
-donde no existe un equipo de operaciones dedicado, esta complejidad se mitigó
-mediante dos decisiones clave: el uso de Docker Compose para reducir la curva de
-aprendizaje de la orquestación, y la implementación de PAWARE para asistir en el
-monitoreo y diagnóstico del ecosistema, reduciendo la carga cognitiva sobre el
-colaborador temporal.
+donde no existe un equipo de operaciones dedicado, esta complejidad se aborda de forma
+circular: la misma arquitectura distribuida que genera el problema —múltiples
+servicios que pueden fallar de forma independiente— proporciona también los
+instrumentos para resolverlo. El stack de observabilidad (Prometheus, Loki, Grafana)
+instalado para monitorear los microservicios no es un fin en sí mismo: constituye la
+infraestructura sensorial sobre la cual opera el servicio PAWARE, que asume la función
+de operador autónomo y reduce la carga cognitiva sobre el colaborador temporal.
 
-El monolito, a pesar de su simplicidad operativa inherente, alcanzó un punto donde
-esa misma simplicidad se convirtió en una trampa: la ausencia de mecanismos de
-aislamiento, observabilidad y validación automatizada generó un sistema que es fácil
-de operar pero extremadamente difícil de modificar sin introducir efectos colaterales.
-Los microservicios, al introducir límites explícitos entre dominios, permiten que cada
-uno evolucione, se pruebe y se despliegue de forma autónoma, transformando el
-mantenimiento de un proceso artesanal y reactivo en uno sistemático y predecible.
+De este modo, PAWARE no es un componente aislado ni una funcionalidad adicional
+disponible sobre cualquier arquitectura: es un caso de uso directo y consecuencia
+lógica de la migración a microservicios. En el monolito, un único proceso con un
+único log impide cualquier forma de observabilidad distribuida; sin métricas por
+servicio ni agregación centralizada de logs, no existe material sobre el cual un
+sistema de autogestión pueda razonar. La descomposición en dominios independientes,
+junto con la instrumentación de cada nodo, habilita por primera vez la posibilidad de
+detectar, diagnosticar y actuar sobre fallas de forma automatizada.
 
 \section{Servicio PAWARE — Autogestión del Mantenimiento Asistido por IA}
 
@@ -619,17 +622,21 @@ fuentes de datos. En un entorno donde no hay operadores dedicados las veinticuat
 horas del día, donde el mantenimiento recae en colaboradores académicos temporales que
 deben dividir su atención entre el desarrollo de nuevas funcionalidades y la
 resolución de incidencias, esta complejidad puede convertirse en un cuello de botella
-crítico.
+crítico. Frente a esta situación, la arquitectura misma suministra la solución: el
+stack de observabilidad instalado para monitorear los microservicios se convierte en
+la base sobre la cual PAWARE ejecuta su ciclo de control.
 
-Ante esta situación, surge la necesidad de un componente que asuma la función de
-operador inteligente: un servicio que monitoree continuamente el estado del
-ecosistema, detecte anomalías, las clasifique por severidad y asista al colaborador
-humano en el diagnóstico y la toma de decisiones. Este componente es \textbf{PAWARE}
-(PortalAsig Autonomous Watcher and REsponder), que implementa un ciclo de
-autogestión del mantenimiento inspirado en el modelo MAPE-K, pero con la diferencia
-crítica de que las fases de Análisis y Planificación se delegan a un modelo de
-inteligencia artificial externo, transformando el ciclo de un sistema basado en
-reglas estáticas a uno capaz de razonar sobre situaciones novedosas.
+Este servicio, denominado \textbf{PAWARE} (PortalAsig Autonomous Watcher and
+REsponder), implementa un ciclo de autogestión del mantenimiento inspirado en el
+modelo MAPE-K, pero con la diferencia crítica de que las fases de Análisis y
+Planificación se delegan a un modelo de inteligencia artificial externo. PAWARE no
+opera sobre una infraestructura abstracta: sus conectores de monitoreo apuntan
+específicamente a las instancias de Prometheus y Loki desplegadas junto a los
+microservicios documentados en la Sección 3.1.2, y sus acciones de remediación
+invocan directamente los contenedores gestionados por Docker Compose descritos en la
+Sección 3.1.5. En este sentido, PAWARE es un caso de uso directo de la arquitectura de
+microservicios: solo la existencia de un ecosistema distribuido e instrumentado hace
+posible su implementación.
 
 \subsection{Arquitectura Interna de PAWARE}
 
