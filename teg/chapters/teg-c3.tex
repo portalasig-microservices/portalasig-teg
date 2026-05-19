@@ -319,10 +319,16 @@ cada microservicio. Durante la ejecución de los tests, JaCoCo instrumenta el by
 Java y genera un reporte HTML detallado que indica, por paquete, clase y método, el
 porcentaje de líneas y ramas ejecutadas por las pruebas. El reporte se genera en el
 directorio \texttt{target/site/jacoco/} y puede consultarse localmente tras ejecutar
-\texttt{mvn test}. Se eligió JaCoCo sobre SonarQube porque este último requiere un
-servidor dedicado con base de datos propia para almacenar los análisis históricos,
-mientras que JaCoCo produce el reporte como parte del build sin infraestructura
-adicional.
+\texttt{mvn test}. Dado que JaCoCo se ejecuta dentro del mismo pipeline de Maven que
+GitHub Actions invoca en cada \textit{pull request}, es posible configurar un umbral
+mínimo de cobertura en el workflow de forma que el build falle automáticamente si el
+porcentaje de líneas o ramas cubiertas es inferior al valor establecido, bloqueando la
+fusión del código mediante las reglas de protección de ramas. En la implementación
+actual este umbral se utiliza con fines informativos, pero la arquitectura del pipeline
+lo habilita sin modificaciones adicionales. Se eligió JaCoCo sobre SonarQube porque
+este último requiere un servidor dedicado con base de datos propia para almacenar los
+análisis históricos, mientras que JaCoCo produce el reporte como parte del build sin
+infraestructura adicional.
 
 \textbf{Pruebas de integración.} Las pruebas de integración se implementaron con
 \textbf{Testcontainers}, una biblioteca que levanta contenedores Docker efímeros
