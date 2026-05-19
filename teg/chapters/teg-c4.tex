@@ -172,62 +172,87 @@ consistencia de la interfaz de usuario.
 \subsection{Diseño del Experimento}
 
 Para cuantificar el rendimiento del nuevo ecosistema bajo carga representativa se
-diseñó un plan de benchmarking que compara tres escenarios: consultas intensivas de
-lectura (GET), operaciones de creación (POST) y flujos de autenticación. Cada
-escenario se ejecutó durante cinco minutos utilizando \textbf{k6} como herramienta de
-generación de carga, configurada con cincuenta usuarios virtuales concurrentes y un
-rampa de inicio progresivo de treinta segundos.
+diseñó un plan de benchmarking que evalúa tres escenarios críticos: consultas
+intensivas de lectura (GET), operaciones de creación (POST) y flujos de
+autenticación. Cada escenario se ejecutará durante cinco minutos utilizando
+\textbf{k6} como herramienta de generación de carga, configurada con cincuenta
+usuarios virtuales concurrentes y un rampa de inicio progresivo de treinta segundos.
 
-Los endpoints seleccionados fueron:
+\textbf{Configuración de los escenarios de carga.} Los tres escenarios se
+implementan como scripts independientes de k6 escritos en JavaScript. Cada script
+realiza las siguientes operaciones:
 
-\begin{itemize}
-    \item \textbf{GET intensivo:} \texttt{GET /v1/site} (listado de sitios de
-    asignatura), que ejerce presión sobre el servicio Site y su base de datos
-    MySQL.
-    \item \textbf{POST de creación:} \texttt{POST /v1/course} (creación de
-    asignatura), que valida el rendimiento de escritura y la integridad de
-    transacciones.
-    \item \textbf{Flujo de autenticación:} \texttt{POST /oauth/token} seguido de
-    \texttt{GET /v1/user/me}, que mide la latencia del servicio UAA bajo carga
-    concurrente de validación JWT.
-\end{itemize}
+\textbf{GET intensivo:} El script \texttt{benchmark-site-list.js} ejecuta
+peticiones \texttt{GET /v1/site?page=0\&size=20} contra el servicio Site. Antes de
+cada iteración, el script obtiene un token JWT válido mediante el flujo
+\texttt{client\_credentials} contra el servicio UAA, inyectando el token en la
+cabecera \texttt{Authorization: Bearer <token>}. Este escenario ejerce presión
+sobre la capa de persistencia de Site, que debe resolver la consulta con
+paginación y ordenamiento sobre la tabla \texttt{site}.
 
-Se recolectaron las siguientes métricas: latencia percentil p95 y p99, throughput
-(peticiones por segundo), tasa de error y uso de CPU/memoria de los contenedores
-mediante Prometheus.
+\textbf{POST de creación:} El script \texttt{benchmark-course-create.js} ejecuta
+peticiones \texttt{POST /v1/course} con un payload JSON que incluye código de
+asignatura, nombre, descripción y número de créditos generados aleatoriamente
+mediante la biblioteca \texttt{k6/faker}. El token JWT se obtiene de la misma
+forma que en el escenario anterior. Este escenario valida el rendimiento de
+escritura, la integridad de transacciones y la ejecución de validaciones de
+negocio sobre restricciones de unicidad.
 
-\subsection{Resultados Cuantitativos}
+\textbf{Flujo de autenticación:} El script \texttt{benchmark-auth-flow.js}
+ejecuta una secuencia de dos peticiones: primero \texttt{POST /oauth/token} con
+las credenciales de un usuario de prueba (\texttt{grant\_type=password}) para
+obtener el token JWT, y seguidamente \texttt{GET /v1/user/me} con dicho token en
+la cabecera de autorización. Este escenario mide la latencia del servicio UAA
+bajo carga concurrente de validación JWT y resolución de identidad.
 
-La Tabla \ref{tab:benchmarking} resume los resultados obtenidos en el entorno de
-pruebas descrito.
+\textbf{Monolito legacy.} Los mismos tres escenarios se ejecutan sobre el
+monolito legacy utilizando los endpoints equivalentes: \texttt{GET /api/site}
+(listado), \texttt{POST /api/course} (creación) y \texttt{POST /api/auth/login}
+seguido de \texttt{GET /api/user/me} (autenticación). La carga se genera con la
+misma configuración de k6 para garantizar la comparabilidad de resultados.
+
+\textbf{Métricas recolectadas.} Para cada escenario se registran las siguientes
+métricas: latencia percentil p95 y p99, throughput (peticiones por segundo), tasa
+de error (porcentaje de respuestas con código HTTP distinto de 2xx) y uso de
+CPU/memoria de los contenedores mediante Prometheus. Los resultados se compararán
+término a término entre ambas arquitecturas.
+
+\subsection{Resultados Esperados}
+
+Los benchmarks aún no han sido ejecutados. La Tabla \ref{tab:benchmarking}
+consolida los escenarios planificados y las métricas que se medirán, tanto para el
+ecosistema de microservicios como para el monolito legacy. La expectativa es que el
+monolito, al concentrar toda la carga en un único proceso Node.js, exhiba mayor
+latencia y menor throughput ante la misma cantidad de usuarios concurrentes, dado
+que un cuello de botella en cualquier módulo afecta todas las operaciones. En
+contraste, la arquitectura de microservicios debería mostrar latencias más
+predecibles en el servicio UAA (especializado en autenticación) y un aislamiento
+efectivo de la carga entre dominios.
 
 \begin{table}[htbp]
 \centering
-\caption{Resultados del benchmarking de rendimiento del ecosistema de microservicios.}
+\caption{Plan de benchmarking de rendimiento: métricas a recolectar por escenario y arquitectura.}
 \label{tab:benchmarking}
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|c|c|c|c|c|}
+\begin{tabular}{|l|l|c|c|c|c|}
 \hline
-\textbf{Escenario} & \textbf{p95 (ms)} & \textbf{p99 (ms)} & \textbf{Throughput (rps)} & \textbf{Tasa de error} & \textbf{CPU pico} \\
+\textbf{Arquitectura} & \textbf{Escenario} & \textbf{p95 (ms)} & \textbf{Throughput (rps)} & \textbf{Tasa de error} & \textbf{CPU pico} \\
 \hline
-GET /v1/site & 245 & 412 & 187 & 0.0\% & 42\% \\
+Microservicios & GET /v1/site & TBD & TBD & TBD & TBD \\
 \hline
-POST /v1/course & 380 & 689 & 94 & 0.0\% & 51\% \\
+Microservicios & POST /v1/course & TBD & TBD & TBD & TBD \\
 \hline
-Auth (token + perfil) & 156 & 298 & 312 & 0.0\% & 28\% \\
+Microservicios & Auth (token + perfil) & TBD & TBD & TBD & TBD \\
+\hline
+Monolito legacy & Listado de sitios & TBD & TBD & TBD & TBD \\
+\hline
+Monolito legacy & Creación de curso & TBD & TBD & TBD & TBD \\
+\hline
+Monolito legacy & Inicio de sesión & TBD & TBD & TBD & TBD \\
 \hline
 \end{tabular}%
 }
 \end{table}
-
-El escenario de autenticación presenta la latencia más baja y el throughput más
-alto, lo que indica que el servicio UAA, al estar especializado únicamente en
-gestión de identidad, responde de forma eficiente bajo carga. El escenario POST de
-creación de asignatura exhibe la latencia más alta, explicable por la validación de
-múltiples restricciones de negocio, la inserción en varias tablas relacionadas y la
-propagación de eventos de auditoría. En ningún escenario se registró una tasa de
-error superior al cero por ciento, lo que confirma la estabilidad del ecosistema
-bajo la carga sintética aplicada.
 
 \begin{center}
     \textit{[Placeholder: Figura \ref{fig:benchmarking-grafana} — Screenshot de un
