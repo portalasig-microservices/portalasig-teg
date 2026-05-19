@@ -1,13 +1,18 @@
 \chapter{Marco Aplicativo}
 \pagestyle{fancy}
 
-Este capítulo presenta el desarrollo aplicativo del Trabajo Especial de Grado. Se
-inicia con la descripción de la migración del backend monolítico de PortalAsig hacia
-una arquitectura de microservicios, incluyendo las técnicas de mantenimiento de
-software implementadas para garantizar la calidad y sostenibilidad del nuevo
-ecosistema. Posteriormente, se detalla el diseño e implementación del servicio
-PAWARE, que constituye la propuesta de autogestión del mantenimiento asistido por
-inteligencia artificial sobre dicha arquitectura.
+La arquitectura monolítica de PortalAsig acumula seis años de modificaciones
+incrementales sin un proceso sistemático de mantenimiento, generando un grado de
+acoplamiento que dificulta cualquier intervención por parte de colaboradores
+académicos temporales. Para superar esta situación, se diseñó e implementó un
+nuevo backend basado en microservicios que descompone el sistema en dominios
+independientes, cada uno con su propia base de datos, su ciclo de despliegue
+autónomo y mecanismos de validación automatizada que reducen la dependencia del
+conocimiento tácito. Sobre este ecosistema distribuido se construyó el servicio
+PAWARE, que asume la función de operador autónomo mediante un ciclo de control
+MAPE-K asistido por inteligencia artificial, monitoreando métricas y logs,
+diagnosticando anomalías y proponiendo acciones de remediación que mitigan la
+carga cognitiva sobre el mantenedor humano.
 
 \section{Migración del Backend a una Arquitectura de Microservicios}
 
@@ -146,12 +151,19 @@ virtual de Docker Compose, utilizando el nombre del contenedor como host (por ej
 \texttt{http://ms-uaa:5860}). Si bien un API Gateway constituye una práctica
 recomendada en arquitecturas de microservicios para centralizar autenticación,
 enrutamiento y \textit{limitación de tasa de peticiones}, su implementación quedó
-fuera del alcance de este trabajo, priorizándose la funcionalidad core del ecosistema
+fuera del alcance de este trabajo, priorizándose la funcionalidad central del ecosistema
 y del servicio de autogestión del mantenimiento.
 
-\begin{center}
-    \textit{[Placeholder: Figura \ref{fig:diagrama-arquitectura} — Diagrama de arquitectura del ecosistema de microservicios, mostrando: Nginx/FE, Config Server, UAA, Site, Notify, PAWARE, sus BDs MySQL aisladas, y el stack de observabilidad Prometheus-Loki-Grafana, todo interconectado por la red virtual de Docker Compose.]}
-\end{center}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{graphics/diagrama-arquitectura.png}
+    \caption{Arquitectura del ecosistema de microservicios de PortalAsig, mostrando
+    el proxy Nginx, el Config Server, los cuatro microservicios (UAA, Site, Notify,
+    PAWARE), sus bases de datos MySQL aisladas, el proveedor LLM externo y el stack
+    de observabilidad (Prometheus, Loki, Grafana), todo desplegado sobre la red
+    virtual de Docker Compose.}
+    \label{fig:diagrama-arquitectura}
+\end{figure}
 
 \subsection{Stack Tecnológico del Backend}
 
@@ -167,9 +179,11 @@ tecnologías experimentales que pudieran convertirse en pasivos técnicos.
 \textit{Long Term Support} (LTS) más recientes disponibles al inicio del desarrollo de
 este trabajo, lo que garantizó soporte extendido, estabilidad y acceso a las mejoras de
 rendimiento y seguridad introducidas en ambas plataformas. Aunque el monolito original
-utiliza Node.js y Express.js, el ecosistema Spring ofrece soporte nativo para seguridad
-(OAuth2 y JWT), observabilidad (Micrometer, Actuator), comunicación entre servicios
-(WebClient) y configuración centralizada (Config Client). La tipificación fuerte de Java
+utiliza Node.js y Express.js, el ecosistema Spring Boot ofrece de forma nativa
+(\textit{out-of-the-box}) soporte para seguridad (OAuth2 y JWT), observabilidad
+(Micrometer, Actuator), comunicación entre servicios (WebClient) y configuración
+centralizada (Config Client), lo que elimina la dependencia de bibliotecas de terceros
+para funcionalidades críticas del ecosistema. La tipificación fuerte de Java
 facilita la detección temprana de errores en tiempo de compilación —como incompatibilidades
 de tipos en parámetros de métodos o acceso a propiedades inexistentes— que en JavaScript
 suelen pasar inadvertidos hasta la ejecución en producción.
@@ -238,7 +252,15 @@ de dialecto entre motores de base de datos. La migración de datos se gestiona m
 servicio, garantizando que el schema de la base de datos esté siempre alineado con la
 versión del código desplegado. Este enfoque elimina la necesidad de ejecutar migraciones
 manuales y permite reproducir el estado de la base de datos en cualquier entorno a
-partir del repositorio de código fuente.
+partir del repositorio de código fuente. Los scripts se organizan en el directorio
+\texttt{src/main/resources/db/migration/} con el prefijo de versión obligatorio
+(\texttt{V1\_\_}, \texttt{V2\_\_}), lo que permite a Flyway determinar el orden de
+ejecución y detectar conflictos si dos colaboradores intentan crear una migración con
+el mismo número de versión.
+
+\begin{center}
+    \textit{[Placeholder: Figura \ref{fig:flyway-migraciones} — Estructura de directorios de migraciones Flyway en un microservicio, mostrando archivos \texttt{V1\_\_init.sql}, \texttt{V2\_\_add\_site\_schedule.sql}, \texttt{V3\_\_add\_evaluation\_weights.sql} dentro de \texttt{src/main/resources/db/migration/}.]}
+\end{center}
 
 \begin{center}
     \textit{[Placeholder: Figura \ref{fig:pom-herencia} — Diagrama de herencia de dependencias Maven, mostrando \texttt{core-boot} como raíz, \texttt{core-lib} y \texttt{core-backend} como artefactos intermedios, y los microservicios UAA, Site, Notify, PAWARE como proyectos hijos que heredan configuración.]}
@@ -256,10 +278,15 @@ residen en el repositorio de código, sin requerir servidores adicionales ni
 infraestructura dedicada.
 
 \textbf{Análisis estático de código.} Se integró \textbf{Checkstyle} en el artefacto
-\texttt{core-boot}, configurado con el perfil \texttt{google\_checks.xml}. Todos los
-microservicios que heredan de \texttt{core-backend} ejecutan el análisis de estilo
-durante la fase de compilación de Maven. Si el código incumple alguna regla —como
-longitud de línea, convenciones de nombres, ausencia de Javadoc en métodos públicos o
+\texttt{core-boot}, configurado con el perfil \texttt{google\_checks.xml}. Este
+archivo es la codificación oficial de la guía de estilo de Google para Java, que
+define reglas precisas sobre indentación (dos espacios), longitud máxima de línea
+(100 caracteres), orden de imports, convenciones de nomenclatura (\texttt{camelCase}
+para métodos, \texttt{UpperCamelCase} para clases), y obligatoriedad de Javadoc en
+todos los métodos y clases públicas. Todos los microservicios que heredan de
+\texttt{core-backend} ejecutan el análisis de estilo durante la fase de compilación
+de Maven. Si el código incumple alguna regla —como longitud de línea excedida,
+convenciones de nombres violadas, ausencia de Javadoc en métodos públicos o
 indentación incorrecta— el build se interrumpe, impidiendo que código inconsistente
 llegue al repositorio principal. Esta decisión se tomó sobre alternativas como
 SpotBugs, que se centra en la detección de errores lógicos, porque la prioridad del

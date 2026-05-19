@@ -1,0 +1,160 @@
+<mxfile host="app.diagrams.net" modified="2026-05-18T12:00:00.000Z" agent="PortalAsig" version="22.1.0" type="device">
+  <diagram name="Arquitectura PortalAsig" id="portalasig-arch">
+    <mxGraphModel dx="1434" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Background Network -->
+        <mxCell id="bg" value="Red Docker Compose (portalasig)" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#f8f9fa;strokeColor=#495057;strokeWidth=2;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="20" y="20" width="1140" height="760" as="geometry" />
+        </mxCell>
+
+        <!-- Nginx -->
+        <mxCell id="nginx" value="Nginx&#xa;Proxy Inverso&#xa;(Vue.js FE)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cfe2ff;strokeColor=#0d6efd;strokeWidth=2;fontSize=11;fontColor=#000000;spacing=2" vertex="1" parent="bg">
+          <mxGeometry x="40" y="60" width="100" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Config Server -->
+        <mxCell id="config" value="Config Server&#xa;(Spring Cloud)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3cd;strokeColor=#ffc107;strokeWidth=2;fontSize=11;fontColor=#000000;spacing=2" vertex="1" parent="bg">
+          <mxGeometry x="40" y="180" width="100" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Microservices -->
+        <mxCell id="uaa" value="ms-uaa&#xa;Autenticacion&#xa;JWT / OAuth2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1e7dd;strokeColor=#198754;strokeWidth=2;fontSize=11;fontColor=#000000;spacing=2" vertex="1" parent="bg">
+          <mxGeometry x="220" y="60" width="110" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="site" value="ms-site&#xa;Asignaturas&#xa;Cursos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1e7dd;strokeColor=#198754;strokeWidth=2;fontSize=11;fontColor=#000000;spacing=2" vertex="1" parent="bg">
+          <mxGeometry x="370" y="60" width="110" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="notify" value="ms-notify&#xa;Correos&#xa;Notificaciones" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1e7dd;strokeColor=#198754;strokeWidth=2;fontSize=11;fontColor=#000000;spacing=2" vertex="1" parent="bg">
+          <mxGeometry x="520" y="60" width="110" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="paware" value="PAWARE&#xa;Autogestion&#xa;MAPE-K + IA" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8d7da;strokeColor=#dc3545;strokeWidth=2;fontSize=11;fontColor=#000000;spacing=2" vertex="1" parent="bg">
+          <mxGeometry x="670" y="60" width="110" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- LLM External -->
+        <mxCell id="llm" value="Proveedor LLM&#xa;(OpenAI / Gemini)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e2e3e5;strokeColor=#6c757d;strokeWidth=2;dashed=1;fontSize=11;fontColor=#000000;spacing=2" vertex="1" parent="bg">
+          <mxGeometry x="840" y="55" width="120" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Databases -->
+        <mxCell id="db-uaa" value="mysql-uaa&#xa;Usuarios,&#xa;Roles" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#e0c3fc;strokeColor=#6f42c1;strokeWidth=2;fontSize=10;fontColor=#000000;spacing=2" vertex="1" parent="bg">
+          <mxGeometry x="220" y="200" width="110" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="db-site" value="mysql-site&#xa;Asignaturas,&#xa;Cursos" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#e0c3fc;strokeColor=#6f42c1;strokeWidth=2;fontSize=10;fontColor=#000000;spacing=2" vertex="1" parent="bg">
+          <mxGeometry x="370" y="200" width="110" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="db-notify" value="mysql-notify&#xa;Eventos&#xa;Email" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#e0c3fc;strokeColor=#6f42c1;strokeWidth=2;fontSize=10;fontColor=#000000;spacing=2" vertex="1" parent="bg">
+          <mxGeometry x="520" y="200" width="110" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="db-paware" value="mysql-paware&#xa;Alertas,&#xa;Feedback" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#e0c3fc;strokeColor=#6f42c1;strokeWidth=2;fontSize=10;fontColor=#000000;spacing=2" vertex="1" parent="bg">
+          <mxGeometry x="670" y="200" width="110" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- Observability -->
+        <mxCell id="prometheus" value="Prometheus&#xa;Metricas" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe5d0;strokeColor=#fd7e14;strokeWidth=2;fontSize=11;fontColor=#000000;spacing=2" vertex="1" parent="bg">
+          <mxGeometry x="220" y="380" width="110" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="loki" value="Loki&#xa;Agregacion&#xa;de Logs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe5d0;strokeColor=#fd7e14;strokeWidth=2;fontSize=11;fontColor=#000000;spacing=2" vertex="1" parent="bg">
+          <mxGeometry x="370" y="380" width="110" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="grafana" value="Grafana&#xa;Dashboards" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe5d0;strokeColor=#fd7e14;strokeWidth=2;fontSize=11;fontColor=#000000;spacing=2" vertex="1" parent="bg">
+          <mxGeometry x="520" y="380" width="110" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Edges: Service to DB -->
+        <mxCell id="e-uaa-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6c757d;strokeWidth=1;endArrow=block;endFill=1" edge="1" parent="bg" source="uaa" target="db-uaa">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-site-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6c757d;strokeWidth=1;endArrow=block;endFill=1" edge="1" parent="bg" source="site" target="db-site">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-notify-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6c757d;strokeWidth=1;endArrow=block;endFill=1" edge="1" parent="bg" source="notify" target="db-notify">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-paware-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6c757d;strokeWidth=1;endArrow=block;endFill=1" edge="1" parent="bg" source="paware" target="db-paware">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Edges: Nginx to Services (dashed) -->
+        <mxCell id="e-nginx-uaa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0d6efd;strokeWidth=1;dashed=1;endArrow=block;endFill=1" edge="1" parent="bg" source="nginx" target="uaa">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-nginx-site" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0d6efd;strokeWidth=1;dashed=1;endArrow=block;endFill=1" edge="1" parent="bg" source="nginx" target="site">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Edges: Config to Services (dashed yellow) -->
+        <mxCell id="e-config-uaa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ffc107;strokeWidth=1;dashed=1;endArrow=block;endFill=1" edge="1" parent="bg" source="config" target="uaa">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-config-site" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ffc107;strokeWidth=1;dashed=1;endArrow=block;endFill=1" edge="1" parent="bg" source="config" target="site">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-config-notify" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ffc107;strokeWidth=1;dashed=1;endArrow=block;endFill=1" edge="1" parent="bg" source="config" target="notify">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-config-paware" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ffc107;strokeWidth=1;dashed=1;endArrow=block;endFill=1" edge="1" parent="bg" source="config" target="paware">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Edges: PAWARE to Observability -->
+        <mxCell id="e-paware-prom" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc3545;strokeWidth=2;endArrow=block;endFill=1" edge="1" parent="bg" source="paware" target="prometheus">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="725" y="330" />
+              <mxPoint x="275" y="330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-paware-loki" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc3545;strokeWidth=2;endArrow=block;endFill=1" edge="1" parent="bg" source="paware" target="loki">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="725" y="330" />
+              <mxPoint x="425" y="330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Edges: Grafana to Prometheus/Loki -->
+        <mxCell id="e-grafana-prom" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#fd7e14;strokeWidth=1;endArrow=block;endFill=1" edge="1" parent="bg" source="grafana" target="prometheus">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="575" y="480" />
+              <mxPoint x="275" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-grafana-loki" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#fd7e14;strokeWidth=1;endArrow=block;endFill=1" edge="1" parent="bg" source="grafana" target="loki">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="575" y="480" />
+              <mxPoint x="425" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Edge: PAWARE to LLM -->
+        <mxCell id="e-paware-llm" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc3545;strokeWidth=1;dashed=1;endArrow=block;endFill=1" edge="1" parent="bg" source="paware" target="llm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend" value="Leyenda&#xa;---&#xa;Azul: Proxy / Frontend&#xa;Verde: Microservicio&#xa;Rojo: PAWARE (Autogestion)&#xa;Violeta: Base de Datos MySQL&#xa;Naranja: Observabilidad&#xa;Amarillo punteado: Config Server&#xa;Rojo punteado: Proveedor LLM" style="text;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dee2e6;strokeWidth=1;fontSize=10;fontColor=#212529;align=left;verticalAlign=top;spacingLeft=8;spacingTop=8" vertex="1" parent="bg">
+          <mxGeometry x="40" y="540" width="200" height="180" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
