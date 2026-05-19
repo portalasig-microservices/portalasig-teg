@@ -554,6 +554,7 @@ enfoques en las dimensiones más relevantes para el contexto operativo de Portal
 \centering
 \caption{Comparativa cualitativa: arquitectura monolítica vs. microservicios}
 \label{tab:comparativa-monolito-ms}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{|p{3.2cm}|p{5.5cm}|p{5.5cm}|}
 \hline
 \textbf{Dimensión} & \textbf{Monolito} & \textbf{Microservicios} \\
@@ -584,7 +585,8 @@ configuración de GitHub Actions y las reglas de protección de ramas
 un único despliegue. & Mayor. Múltiples procesos, múltiples bases de datos,
 orquestación con Docker Compose, resolución de dependencias de red. \\
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 La Tabla \ref{tab:comparativa-monolito-ms} evidencia que la arquitectura de
