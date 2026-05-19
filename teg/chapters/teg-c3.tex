@@ -530,10 +530,14 @@ pendientes de implementación para completar la cobertura de datos de prueba:
 
 La invocación de estos endpoints se orquesta desde \texttt{portalasig-seeding},
 garantizando que cada instancia del ecosistema comience con un estado conocido y
-reproducible. Los datos de prueba incluyen usuarios con distintos roles,
-asignaturas, semestres, sitios de curso con contenido variado y configuraciones de
-notificación, lo que permite validar los flujos de negocio sin depender de la base
-de datos de producción.
+reproducible. Como fuente de verdad, el módulo utiliza una migración anonimizada
+de la base de datos de producción, en la cual los campos sensibles —como cédulas
+de identidad, correos electrónicos y nombres completos— se sustituyen por valores
+aleatorios que preservan el formato y la cardinalidad originales. Esta estrategia
+permite que los datos de prueba conserven la forma, las distribuciones y las
+relaciones del entorno real, facilitando la validación de flujos de negocio bajo
+condiciones que emulan fielmente la operación en producción, sin exponer
+información personal de los usuarios.
 
 \begin{center}
     \textit{[Placeholder: Figura \ref{fig:modelo-datos-distribuido} — Diagrama entidad-relación del modelo de datos distribuido, mostrando los cuatro schemas aislados (UAA, Site, Notify, PAWARE) con sus tablas respectivas, sin relaciones cruzadas entre schemas.]}
