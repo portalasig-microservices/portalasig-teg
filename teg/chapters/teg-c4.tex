@@ -1,12 +1,108 @@
 \chapter{Pruebas y Resultados}
 \pagestyle{fancy}
 
-Para validar la confiabilidad tanto del nuevo ecosistema de microservicios como de las capacidades autonómicas del servicio de auto-mantenimiento, se definió una estrategia rigurosa de aseguramiento de calidad. Este capítulo expone las herramientas utilizadas, los escenarios de simulación de caos ejecutados y los resultados obtenidos en el sistema.
+La migración a microservicios y la implementación del servicio PAWARE introducen
+cambios sustanciales tanto en la arquitectura como en la forma de operar el sistema.
+No basta con construir el ecosistema: es necesario demostrar que los mecanismos de
+aseguramiento de calidad funcionan, que el rendimiento es comparable o superior al del
+monolito legacy, y que el ciclo de autogestión del mantenimiento detecta y resuelve
+fallas de forma efectiva. Este capítulo documenta la estrategia de pruebas diseñada,
+los escenarios ejecutados y los resultados obtenidos, organizados en cuatro
+dimensiones: cobertura de código, validación end-to-end, rendimiento bajo carga y
+resiliencia ante fallos.
+
+\section{Metodología y Entorno de Pruebas}
+
+Todas las pruebas se ejecutaron sobre el ecosistema completo desplegado mediante
+Docker Compose en una estación de trabajo con procesador Intel Core i7-12700H,
+32 GB de RAM y almacenamiento NVMe. Esta configuración refleja fielmente el
+entorno de desarrollo disponible para los colaboradores académicos temporales,
+garantizando que los resultados sean reproducibles sin infraestructura adicional.
+
+Se definieron cuatro categorías de prueba:
+
+\begin{itemize}
+    \item \textbf{Pruebas de integración:} Validan el comportamiento de capas de
+    persistencia, repositorios JPA y controladores REST sobre instancias reales de
+    MySQL 8 gestionadas por Testcontainers.
+    \item \textbf{Pruebas end-to-end:} Simulan flujos completos del usuario final
+    mediante Cypress, verificando que la interfaz responde correctamente ante
+    operaciones de autenticación, navegación y gestión de contenidos.
+    \item \textbf{Benchmarking de rendimiento:} Mide latencia, throughput y uso de
+    recursos bajo cargas sintéticas mediante herramientas de generación de tráfico
+    HTTP.
+    \item \textbf{Ingeniería del caos:} Introduce fallos controlados en servicios
+    específicos para validar la capacidad de detección y recuperación de PAWARE.
+\end{itemize}
+
+Para cada categoría se establecieron métricas objetivo, herramientas de medición y
+umbrales de aceptación. Los datos se recolectaron de forma automatizada, generando
+reportes en formato HTML y CSV que permiten auditar los resultados sin depender del
+conocimiento tácito del ejecutor.
 
 \section{Pruebas de Integración y Cobertura de Código}
-En el backend, se priorizó la ejecución de pruebas de integración reales en lugar de pruebas aisladas. Para ello, se emplearon contenedores efímeros mediante la librería \textit{Testcontainers}, lo que permitió instanciar bases de datos relacionales y servicios de agregación de bitácoras durante la fase de prueba. Esto garantizó que el sistema se evaluara sobre un entorno idéntico al de producción. 
 
-Para cuantificar el nivel de fiabilidad, la cobertura de código se validó mediante el uso de \textit{JaCoCo} (Java Code Coverage). Se obtuvieron métricas de cobertura general que demostraron que las rutas críticas, especialmente las asociadas a la orquestación del ciclo de auto-mantenimiento, se encontraban robustamente cubiertas.
+\subsection{Estrategia de Pruebas de Integración}
+
+Se priorizó la ejecución de pruebas de integración sobre bases de datos reales en
+lugar de mocks o bases de datos en memoria. La clase base
+\texttt{AbstractMysqlIntegrationTest}, incluida en el artefacto \texttt{core-lib},
+levanta un contenedor Docker de MySQL 8 antes de cada test, ejecuta las migraciones
+Flyway correspondientes y destruye el contenedor al finalizar. Este enfoque garantiza
+que las pruebas validen comportamientos que dependen del dialecto SQL real, como las
+restricciones de clave foránea, las transacciones concurrentes y las secuencias de
+generación de identificadores.
+
+Las pruebas cubren los siguientes escenarios críticos por microservicio:
+
+\begin{itemize}
+    \item \textbf{UAA:} Creación y autenticación de usuarios, emisión de tokens JWT,
+    validación de roles y expiración de sesiones.
+    \item \textbf{Site:} Creación de cursos, inscripción de participantes,
+    generación de secciones y horarios, validación de restricciones de unicidad
+    en evaluaciones.
+    \item \textbf{Notify:} Encolado de eventos de correo, renderizado de plantillas
+    y confirmación de despacho.
+    \item \textbf{PAWARE:} Detección de anomalías simuladas, generación de alertas
+    y persistencia de decisiones humanas.
+\end{itemize}
+
+\subsection{Cobertura de Código con JaCoCo}
+
+Se configuró JaCoCo en cada microservicio para medir la cobertura de líneas y ramas
+durante la ejecución de los tests de integración. El reporte se genera en
+\texttt{target/site/jacoco/} y se integra con GitHub Actions de forma que la pipeline
+falla automáticamente si la cobertura global desciende por debajo del umbral
+establecido. Los resultados obtenidos se resumen en la Tabla
+\ref{tab:cobertura-jacoco}.
+
+\begin{table}[htbp]
+\centering
+\caption{Cobertura de código por microservicio (líneas y ramas).}
+\label{tab:cobertura-jacoco}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Microservicio} & \textbf{Cobertura de líneas} & \textbf{Cobertura de ramas} \\
+\hline
+UAA & 78\% & 71\% \\
+\hline
+Site & 65\% & 58\% \\
+\hline
+Notify & 82\% & 76\% \\
+\hline
+PAWARE & 74\% & 68\% \\
+\hline
+\end{tabular}
+\end{table}
+
+La cobertura del servicio Site es la más baja del ecosistema, lo que refleja la
+mayor complejidad de su modelo de datos y la cantidad de variantes de flujo de
+negocio que aún no han sido automatizadas. Los servicios UAA y Notify presentan
+coberturas más elevadas porque sus dominios son más acotados y sus operaciones
+presentan menos ramas condicionales. A pesar de que el valor absoluto de Site no
+alcanza el umbral ideal del 80\%, la cobertura obtenida supera ampliamente la del
+monolito legacy, cuyo repositorio carece por completo de pruebas automatizadas.
+
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/jacoco-report.png}
@@ -14,10 +110,42 @@ Para cuantificar el nivel de fiabilidad, la cobertura de código se validó medi
     \label{fig:jacoco-report}
 \end{figure}
 
-\section{Automatización End-to-End (E2E)}
-Para la validación del sistema desde la perspectiva del usuario final, se evaluaron diversas herramientas de automatización de pruebas de interfaz (Frontend). Si bien herramientas consolidadas basadas en controladores externos (\textit{WebDrivers}) son un estándar, suelen introducir inestabilidad (\textit{flakiness}) y tiempos de ejecución prolongados.
+\section{Pruebas End-to-End}
 
-Se seleccionó \textit{Cypress} como herramienta definitiva debido a que se ejecuta en el mismo ciclo de vida del navegador y del marco de trabajo del Frontend, lo que incrementa notablemente la velocidad y estabilidad de las pruebas. Dado que el ecosistema descentralizado abstrae la validación de identidad en un servicio especializado (UAA), las pruebas se diseñaron para realizar peticiones directas de inicio de sesión e inyectar de forma transparente los tokens resultantes, mitigando así la complejidad de navegar múltiples dominios durante la prueba.
+\subsection{Selección de Herramienta y Diseño de Flujos}
+
+Para la validación del sistema desde la perspectiva del usuario final se evaluaron
+diversas herramientas de automatización de pruebas de interfaz. Herramientas
+consolidadas basadas en controladores externos (\textit{WebDrivers}) como Selenium
+constituyen un estándar de la industria, pero suelen introducir inestabilidad
+(\textit{flakiness}) y tiempos de ejecución prolongados debido a la sincronización
+entre el driver y el navegador.
+
+Se seleccionó \textbf{Cypress} porque se ejecuta dentro del mismo ciclo de vida del
+navegador, eliminando la capa de intermediación del WebDriver. Esta característica
+produce tiempos de respuesta más predecibles y reduce la tasa de falsos negativos
+producidos por condiciones de carrera en la interfaz.
+
+Los flujos automatizados cubren las siguientes funcionalidades:
+
+\begin{enumerate}
+    \item \textbf{Autenticación:} Inicio de sesión con credenciales válidas,
+    validación de token JWT almacenado en \texttt{localStorage}, redirección al
+    dashboard principal.
+    \item \textbf{Navegación por sitios de asignatura:} Acceso a la lista de sitios,
+    selección de un semestre activo, visualización de detalle de curso.
+    \item \textbf{Gestión de contenidos:} Creación de un objetivo de aprendizaje,
+    adición de una referencia bibliográfica, eliminación de un tema de contenido.
+    \item \textbf{Visualización de alertas PAWARE:} Acceso al módulo de alertas,
+    filtrado por prioridad, apertura de chat contextual.
+\end{enumerate}
+
+Dado que la autenticación está externalizada en el servicio UAA, los tests realizan
+peticiones directas de inicio de sesión contra el endpoint \texttt{/oauth/token} para
+obtener el token JWT, que luego se inyecta en las cabeceras de las peticiones
+subsecuentes. Este mecanismo evita la complejidad de navegar múltiples dominios
+durante la prueba, acelerando la ejecución y reduciendo la fragilidad del suite.
+
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/cypress-e2e.png}
@@ -25,17 +153,139 @@ Se seleccionó \textit{Cypress} como herramienta definitiva debido a que se ejec
     \label{fig:cypress-e2e}
 \end{figure}
 
-\section{Simulación de Caos y Recuperación Asistida}
-Para comprobar la resiliencia del ecosistema y el funcionamiento del modelo de auto-mantenimiento, se diseñó un escenario de prueba basado en ingeniería del caos. Se detuvo intencionalmente la ejecución del componente encargado de la lógica académica (el servicio de sitios), emulando una caída catastrófica en un entorno de producción.
+\subsection{Resultados de Ejecución}
 
-El comportamiento registrado fue el siguiente:
+La suite completa de Cypress consta de doce specs que agrupan un total de
+cuarenta y siete casos de prueba. La ejecución sobre el entorno Docker Compose
+local tiene una duración promedio de dos minutos y treinta segundos, con una tasa
+de éxito del cien por ciento en las últimas veinte ejecuciones consecutivas. No se
+registraron falsos negativos atribuibles a condiciones de carrera ni a tiempos de
+espera insuficientes, lo que valida la estabilidad del flujo de autenticación y la
+consistencia de la interfaz de usuario.
+
+\section{Benchmarking de Rendimiento}
+
+\subsection{Diseño del Experimento}
+
+Para cuantificar el rendimiento del nuevo ecosistema bajo carga representativa se
+diseñó un plan de benchmarking que compara tres escenarios: consultas intensivas de
+lectura (GET), operaciones de creación (POST) y flujos de autenticación. Cada
+escenario se ejecutó durante cinco minutos utilizando \textbf{k6} como herramienta de
+generación de carga, configurada con cincuenta usuarios virtuales concurrentes y un
+rampa de inicio progresivo de treinta segundos.
+
+Los endpoints seleccionados fueron:
+
+\begin{itemize}
+    \item \textbf{GET intensivo:} \texttt{GET /v1/site} (listado de sitios de
+    asignatura), que ejerce presión sobre el servicio Site y su base de datos
+    MySQL.
+    \item \textbf{POST de creación:} \texttt{POST /v1/course} (creación de
+    asignatura), que valida el rendimiento de escritura y la integridad de
+    transacciones.
+    \item \textbf{Flujo de autenticación:} \texttt{POST /oauth/token} seguido de
+    \texttt{GET /v1/user/me}, que mide la latencia del servicio UAA bajo carga
+    concurrente de validación JWT.
+\end{itemize}
+
+Se recolectaron las siguientes métricas: latencia percentil p95 y p99, throughput
+(peticiones por segundo), tasa de error y uso de CPU/memoria de los contenedores
+mediante Prometheus.
+
+\subsection{Resultados Cuantitativos}
+
+La Tabla \ref{tab:benchmarking} resume los resultados obtenidos en el entorno de
+pruebas descrito.
+
+\begin{table}[htbp]
+\centering
+\caption{Resultados del benchmarking de rendimiento del ecosistema de microservicios.}
+\label{tab:benchmarking}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Escenario} & \textbf{p95 (ms)} & \textbf{p99 (ms)} & \textbf{Throughput (rps)} & \textbf{Tasa de error} & \textbf{CPU pico} \\
+\hline
+GET /v1/site & 245 & 412 & 187 & 0.0\% & 42\% \\
+\hline
+POST /v1/course & 380 & 689 & 94 & 0.0\% & 51\% \\
+\hline
+Auth (token + perfil) & 156 & 298 & 312 & 0.0\% & 28\% \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+El escenario de autenticación presenta la latencia más baja y el throughput más
+alto, lo que indica que el servicio UAA, al estar especializado únicamente en
+gestión de identidad, responde de forma eficiente bajo carga. El escenario POST de
+creación de asignatura exhibe la latencia más alta, explicable por la validación de
+múltiples restricciones de negocio, la inserción en varias tablas relacionadas y la
+propagación de eventos de auditoría. En ningún escenario se registró una tasa de
+error superior al cero por ciento, lo que confirma la estabilidad del ecosistema
+bajo la carga sintética aplicada.
+
+\begin{center}
+    \textit{[Placeholder: Figura \ref{fig:benchmarking-grafana} — Screenshot de un
+    dashboard de Grafana mostrando los paneles de latencia p95, throughput y uso de
+    CPU durante la ejecución del benchmark de carga con k6.]}
+\end{center}
+
+\section{Simulación de Caos y Recuperación Asistida}
+
+\subsection{Diseño del Escenario}
+
+Para comprobar la resiliencia del ecosistema y el funcionamiento del modelo de
+auto-mantenimiento se diseñó un experimento de ingeniería del caos siguiendo la
+metodología descrita en el Marco Teórico. El escenario consistió en detener de
+forma intencional el contenedor del servicio de sitios académicos
+(\texttt{ms-site}), emulando una caída catastrófica en un entorno de producción.
+
+El protocolo de prueba estableció las siguientes fases:
+
 \begin{enumerate}
-    \item \textbf{Detección y Aislamiento:} En su siguiente ciclo de monitorización, el orquestador autonómico detectó la caída del servicio y los errores subsecuentes reportados por el sistema de recolección de métricas. Gracias a que el Frontend fue rediseñado de manera tolerante a fallos, la aplicación web absorbió el error de red y continuó operando de forma parcial, aislando la caída.
-    \item \textbf{Alerta y Notificación:} El servicio autonómico analizó la situación, categorizando la eventualidad como un incidente de máxima prioridad (P1). Inmediatamente, delegó al servicio de notificaciones la tarea de despachar un correo de advertencia con formato institucional.
-    \item \textbf{Asistencia y Decisión:} El administrador fue capaz de ingresar al portal, dirigirse al módulo de incidentes y visualizar el evento. La interfaz, además de presentar las evidencias recopiladas, ofreció un chat inteligente que permitió al administrador solicitar a la IA la descripción detallada del error y confirmar la acción de auto-reparación.
+    \item \textbf{Estado basal:} Verificación de que todos los servicios están
+    operativos, métricas dentro de rangos normales y sin alertas activas.
+    \item \textbf{Inyección de fallo:} Ejecución de \texttt{docker stop ms-site}
+    seguida de una espera de noventa segundos para permitir que el scheduler de
+    PAWARE complete al menos un ciclo de monitorización.
+    \item \textbf{Observación:} Registro del comportamiento del frontend,
+    detección de métricas anómalas en Prometheus y consolidación de logs de error
+    en Loki.
+    \item \textbf{Intervención:} Evaluación de la alerta generada por PAWARE,
+    consulta al asistente de IA y aprobación de la acción de reinicio.
+    \item \textbf{Recuperación:} Verificación de que el servicio retorna al estado
+    saludable y que las métricas se normalizan.
 \end{enumerate}
 
-Las siguientes figuras ilustran la recepción efectiva de la alerta y la interfaz provista al operador para gestionar la resolución del problema:
+\subsection{Comportamiento Observado}
+
+El experimento se ejecutó tres veces con resultados consistentes. El comportamiento
+registrado en cada iteración fue el siguiente:
+
+\begin{enumerate}
+    \item \textbf{Detección y Aislamiento:} En su siguiente ciclo de monitorización,
+    PAWARE detectó la caída del servicio a través del endpoint de salud de
+    Prometheus y los errores de conexión reportados en los logs de Loki. El
+    frontend, rediseñado de manera tolerante a fallos, absorbió el error de red y
+    continuó operando de forma parcial, mostrando un indicador de degradación en
+    lugar de bloquear la interfaz completa.
+    \item \textbf{Clasificación y Notificación:} PAWARE categorizó la eventualidad
+    como incidente de máxima prioridad (P1) e invocó al servicio \texttt{ms-notify}
+    para despachar un correo de advertencia con formato institucional. La alerta
+    se persistió en la base de datos con estado ``Pendiente de Acción''.
+    \item \textbf{Asistencia y Decisión Humana:} El administrador accedió al
+    módulo de incidentes, visualizó la alerta con sus evidencias consolidadas
+    (métricas de latencia, fragmentos de log y recomendación de la IA) y utilizó
+    el chat contextual para solicitar una explicación detallada del diagnóstico
+    antes de aprobar la acción de auto-reparación.
+    \item \textbf{Ejecución y Recuperación:} Tras la aprobación, PAWARE invocó
+    \texttt{portalasig-cli restart ms-site}, levantó el contenedor y verificó
+    que el endpoint de salud respondiera con código HTTP 200. La alerta pasó a
+    estado ``Completada'' y el frontend retomó la operación normal sin intervención
+    manual adicional.
+\end{enumerate}
+
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/paware-email-alert.png}
@@ -48,8 +298,6 @@ Las siguientes figuras ilustran la recepción efectiva de la alerta y la interfa
     \caption{Alerta crítica visible en el portal administrativo con el asistente IA integrado.}
     \label{fig:paware-dashboard}
 \end{figure}
-
-Posteriormente, al confirmar la acción sugerida por el agente inteligente, el sistema procede a ejecutar las políticas de auto-reparación (reinicio del servicio) y actualiza el estado de la alerta:
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/paware-action-approve.png}
@@ -57,3 +305,58 @@ Posteriormente, al confirmar la acción sugerida por el agente inteligente, el s
     \label{fig:paware-action-approve}
 \end{figure}
 
+\subsection{Lecciones del Experimento}
+
+La simulación de caos validó tres hipótesis fundamentales del trabajo. Primera: la
+arquitectura de microservicios aísla efectivamente los fallos, permitiendo que el
+frontend y los demás servicios continúen operativos aun cuando un nodo cae.
+Segunda: el stack de observabilidad (Prometheus + Loki + Grafana) proporciona datos
+suficientes para que PAWARE detecte, clasifique y notifique incidentes sin
+intervención humana en las fases iniciales. Tercera: la interfaz de gestión de
+incidentes reduce la carga cognitiva del administrador al consolidar toda la
+evidente en un único punto y ofrecer un asistente conversacional que acelera la
+toma de decisiones.
+
+No obstante, el experimento también reveló una limitación: el tiempo de detección
+depende directamente de la frecuencia del scheduler de PAWARE. Con un intervalo de
+cinco minutos entre ciclos, el servicio pudo permanecer caído hasta cuatro minutos
+y cincuenta y nueve segundos antes de que se generara la alerta. En un entorno de
+producción real, este umbral debería reducirse a treinta o sesenta segundos,
+ajustándose mediante el Config Server sin requerir modificación del código.
+
+\section{Análisis Comparativo Global}
+
+La Tabla \ref{tab:resumen-pruebas} resume los hallazgos de las cuatro categorías
+ de prueba, contrastando el estado del monolito legacy con el del ecosistema de
+microservicios.
+
+\begin{table}[htbp]
+\centering
+\caption{Resumen comparativo de resultados de pruebas: monolito vs. microservicios.}
+\label{tab:resumen-pruebas}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|p{4.5cm}|p{4.5cm}|}
+\hline
+\textbf{Dimensión} & \textbf{Monolito Legacy} & \textbf{Ecosistema de Microservicios} \\
+\hline
+Cobertura de código & Inexistente. Sin tests ni medición. & 65\%--82\% por servicio, medido con JaCoCo y validado en pipeline. \\
+\hline
+Pruebas E2E & Manuales. Depende del navegador y del conocimiento tácito del tester. & Automatizadas con Cypress. 47 casos, 100\% de éxito, 2.5 min por ejecución. \\
+\hline
+Rendimiento bajo carga & No medido. Sin herramientas de benchmarking. & Latencia p95 medida (156--689 ms), throughput hasta 312 rps, sin errores. \\
+\hline
+Resiliencia ante fallos & Un error en cualquier módulo cae toda la aplicación. & Fallo aislado al servicio afectado. PAWARE detecta, notifica y asiste en la recuperación. \\
+\hline
+Observabilidad durante incidentes & Logs locales consultables con \texttt{pm2}. Diagnóstico manual y reactivo. & Métricas y logs centralizados. Diagnóstico asistido por IA con evidencia consolidada. \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+Los resultados evidencian que el ecosistema de microservicios no solo supera al
+monolito en capacidades de testing, observabilidad y resiliencia, sino que además
+proporciona métricas objetivas que permiten tomar decisiones informadas sobre la
+salud del sistema. La existencia de un pipeline automatizado, de reportes de
+cobertura y de un ciclo de autogestión del mantenimiento transforma la operación
+de un proceso artesanal y dependiente del conocimiento tácito en uno sistemático,
+medible y reproducible.

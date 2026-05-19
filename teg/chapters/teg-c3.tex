@@ -287,7 +287,7 @@ todos los métodos y clases públicas. Todos los microservicios que heredan de
 \texttt{core-backend} ejecutan el análisis de estilo durante la fase de compilación
 de Maven. Si el código incumple alguna regla —como longitud de línea excedida,
 convenciones de nombres violadas, ausencia de Javadoc en métodos públicos o
-indentación incorrecta— el build se interrumpe, impidiendo que código inconsistente
+indentación incorrecta— la compilación se interrumpe, impidiendo que código inconsistente
 llegue al repositorio principal. Esta decisión se tomó sobre alternativas como
 SpotBugs, que se centra en la detección de errores lógicos, porque la prioridad del
 proyecto era garantizar la legibilidad y uniformidad del código fuente, aspectos
@@ -321,7 +321,7 @@ porcentaje de líneas y ramas ejecutadas por las pruebas. El reporte se genera e
 directorio \texttt{target/site/jacoco/} y puede consultarse localmente tras ejecutar
 \texttt{mvn test}. Dado que JaCoCo se ejecuta dentro del mismo pipeline de Maven que
 GitHub Actions invoca en cada \textit{pull request}, se configuró un umbral mínimo
-de cobertura en el workflow de forma que el build falla automáticamente si el
+de cobertura en el workflow de forma que la compilación falla automáticamente si el
 porcentaje de líneas o ramas cubiertas es inferior al valor establecido, bloqueando
 la fusión del código mediante las reglas de protección de ramas.
 
@@ -332,8 +332,8 @@ la fusión del código mediante las reglas de protección de ramas.
     exitoso o fallido en función del umbral configurado.]}
 \end{center} Se eligió JaCoCo sobre SonarQube porque
 este último requiere un servidor dedicado con base de datos propia para almacenar los
-análisis históricos, mientras que JaCoCo produce el reporte como parte del build sin
-infraestructura adicional.
+análisis históricos, mientras que JaCoCo produce el reporte como parte del proceso
+de compilación sin infraestructura adicional.
 
 \textbf{Pruebas de integración.} Las pruebas de integración se implementaron con
 \textbf{Testcontainers}, una biblioteca que levanta contenedores Docker efímeros
@@ -381,8 +381,8 @@ contexto de los logs en un único punto de consulta. Se seleccionó esta combina
 sobre alternativas como ELK (Elasticsearch, Logstash, Kibana) porque Elasticsearch
 consume memoria RAM de forma agresiva, lo cual resulta problemático en estaciones de
 trabajo locales con recursos limitados. Loki, diseñado específicamente para entornos
-cloud-native, indexa únicamente las etiquetas de los logs en lugar de su contenido
-completo, logrando un consumo de recursos significativamente menor.
+para entornos distribuidos, indexa únicamente las etiquetas de los logs en lugar de
+su contenido completo, logrando un consumo de recursos significativamente menor.
 
 \textbf{Documentación viva de APIs.} Como se mencionó en la Sección 3.1.3, la
 integración de SpringDoc OpenAPI genera automáticamente documentación interactiva de
@@ -421,7 +421,7 @@ insostenible para un equipo sin personal de operaciones dedicado.
 Para optimizar los flujos de despliegue, se desarrolló el script
 \texttt{portalasig-cli}, que encapsula las operaciones más frecuentes: preparación
 inicial del entorno (\texttt{bootstrap}), que descarga y cachea las dependencias de
-Maven en un volumen compartido para permitir compilaciones offline; levantamiento del
+Maven en un volumen compartido para permitir compilaciones desconectadas; levantamiento del
 ecosistema (\texttt{up}); detención ordenada (\texttt{down}); y visualización de logs
 por servicio (\texttt{logs}). Este script reduce la curva de aprendizaje para nuevos
 colaboradores, quienes no necesitan memorizar los comandos de Docker Compose ni la
