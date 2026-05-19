@@ -687,19 +687,23 @@ de total portabilidad e independencia de infraestructura específica.
 
 \subsection{Fase Analyze y Plan: Asistencia con Inteligencia Artificial}
 
-Una vez que la fase Monitor consolida las métricas y logs en un
-\texttt{MonitoringSnapshot}, PAWARE transiciona a las fases de Análisis y
-Planificación. Si se detectan anomalías —tales como servicios caídos
-(\texttt{DOWN}), latencias superiores a los umbrales esperados en métricas de
-Prometheus, o un alto volumen de excepciones detectadas mediante Loki— el snapshot
-es procesado por un proveedor de Inteligencia Artificial.
-El sistema abstrae la integración mediante la interfaz \texttt{AwareAiProvider},
-permitiendo el uso de modelos como OpenAI o Gemini. El LLM evalúa el snapshot,
-diagnostica la raíz del problema y estructura un plan de acción en formato JSON.
-Este plan asigna una prioridad (P1, P2 o P3), sugiere un tipo de acción
-(\texttt{SEMI\_ASSISTED} o \texttt{AUTONOMOUS}) y propone estrategias de
-remediación como reiniciar el servicio, escalar infraestructura o revisar el
-código fuente.
+Una vez consolidadas las métricas y los logs de todas las fuentes de monitoreo,
+PAWARE evalúa si las condiciones del ecosistema indican una anomalía que requiera
+intervención. Los criterios de detección incluyen servicios sin respuesta
+(\texttt{DOWN}), latencias superiores a los umbrales configurados en Prometheus, o
+un volumen inusual de excepciones registradas en Loki. Cuando se supera alguno de
+estos umbrales, el sistema compone un informe que agrupa el estado de salud de
+cada servicio, las métricas numéricas relevantes y los fragmentos de log
+asociados, y lo envía al modelo de inteligencia artificial.
+
+La integración con el proveedor de IA se abstrae mediante una interfaz interna que
+permite sustituir el modelo subyacente —OpenAI, Gemini u otro compatible— sin
+modificar la lógica de orquestación. El modelo recibe el informe consolidado,
+identifica la causa probable del problema y responde con un plan de acción
+estructurado que incluye una prioridad (P1 crítica, P2 moderada, P3 informativa),
+un modo de ejecución (asistido o autónomo) y una estrategia concreta de
+remediación, como reiniciar el servicio afectado, revisar el código fuente o
+escalar recursos.
 
 \subsection{Fase Execute: Automatización y Notificación}
 
