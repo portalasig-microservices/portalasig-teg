@@ -389,9 +389,9 @@ microservicios.
 \hline
 Cobertura de código & Inexistente. Sin tests ni medición. & 65\%--82\% por servicio, medido con JaCoCo y validado en pipeline. \\
 \hline
-Pruebas E2E & Manuales. Depende del navegador y del conocimiento tácito del tester. & Automatizadas con Cypress. 47 casos, 100\% de éxito, 2.5 min por ejecución. \\
+Pruebas E2E & Manuales. Depende del navegador y del conocimiento tácito del tester. & TBD. Suite automatizada con Cypress; número de casos, tasa de éxito y duración por ejecución se reportarán tras la implementación completa. \\
 \hline
-Rendimiento bajo carga & No medido. Sin herramientas de benchmarking. & Latencia p95 medida (156--689 ms), throughput hasta 312 rps, sin errores. \\
+Rendimiento bajo carga & TBD. Planificado bajo idéntica configuración de carga que el ecosistema de microservicios. & TBD. Latencia p95, throughput y tasa de error se medirán mediante k6 bajo carga sintética. \\
 \hline
 Resiliencia ante fallos & Un error en cualquier módulo cae toda la aplicación. & Fallo aislado al servicio afectado. PAWARE detecta, notifica y asiste en la recuperación. \\
 \hline
