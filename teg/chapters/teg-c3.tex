@@ -31,9 +31,34 @@ Estos componentes se configuran para interactuar entre sí, permitiendo una reco
 
 \subsection{Despliegue y Gestión de Contenedores}
 El ecosistema completo se orquesta de manera estandarizada empleando \textit{Docker Compose}. Mediante archivos de definición declarativos, se despliegan simultáneamente las bases de datos, los componentes de observabilidad y las instancias de los microservicios. Este enfoque asegura que todas las dependencias compartan una única red virtual, permitiendo el enrutamiento interno mediante resolución de nombres nativa de Docker.
-\begin{center}
-    \textit{[Placeholder: Fragmento del archivo docker-compose.yml o captura de consola demostrando la orquestación y el estado de los contenedores]}
-\end{center}
+
+\begin{figure}[htbp]
+\begin{small}
+\begin{verbatim}
+frank-ponte@trabajo-de-grado:~/infra/stack$ docker compose ps
+NAME                       SERVICE         STATUS                    PORTS
+portalasig-config-server   config-server   Up 42 minutes             0.0.0.0:5859->5859/tcp
+portalasig-fe              frontend        Up 42 minutes             0.0.0.0:8080->8080/tcp
+portalasig-grafana         grafana         Up 42 minutes             0.0.0.0:3000->3000/tcp
+portalasig-kafka           kafka           Up 42 minutes             0.0.0.0:9092->9092/tcp
+portalasig-loki            loki            Up 42 minutes             0.0.0.0:3100->3100/tcp
+portalasig-mailhog         mailhog         Up 42 minutes             0.0.0.0:8025->8025/tcp
+portalasig-ms-notify       ms-notify       Up 42 minutes             0.0.0.0:5862->5862/tcp
+portalasig-ms-site         ms-site         Up 1 minute               0.0.0.0:5861->5861/tcp
+portalasig-ms-uaa          ms-uaa          Up 42 minutes (healthy)   0.0.0.0:5860->5860/tcp
+portalasig-mysql-notify    mysql-notify    Up 42 minutes (healthy)   0.0.0.0:11020->3306/tcp
+portalasig-mysql-paware    mysql-paware    Up 42 minutes (healthy)   0.0.0.0:11200->3306/tcp
+portalasig-mysql-site      mysql-site      Up 42 minutes (healthy)   0.0.0.0:11019->3306/tcp
+portalasig-mysql-uaa       mysql-uaa       Up 42 minutes (healthy)   0.0.0.0:11110->3306/tcp
+portalasig-nginx           nginx           Up 42 minutes             0.0.0.0:80->80/tcp
+portalasig-paware          paware          Up 42 minutes             0.0.0.0:8085->8080/tcp
+portalasig-prometheus      prometheus      Up 42 minutes             0.0.0.0:9090->9090/tcp
+\end{verbatim}
+\end{small}
+\caption{Estado de los contenedores Docker orquestados mediante Docker Compose.}
+\label{fig:docker-compose-ps}
+\end{figure}
+
 Para optimizar los flujos de despliegue en entornos de desarrollo local, se implementaron scripts de terminal capaces de inicializar bases de datos, detener entornos y visualizar flujos de logs centralizados sin requerir configuración manual extensa.
 
 \section{Diseño e Implementación del Servicio PAWARE}
@@ -65,10 +90,16 @@ Todo el estado, los planes propuestos por la IA y la evidencia de las fallas se 
 Se incorporó un módulo dedicado denominado ``Alertas PAWARE'' dentro de la aplicación frontend en Vue.js. Esta vista presenta de manera resiliente las alertas activas, divididas en ``Pendientes de Acción'' y ``Completadas / Gestionadas''. Para facilitar la atención del administrador, las incidencias se ordenan por severidad y se destacan con códigos de color (rojo para P1, amarillo para P2). 
 
 Además, se integró un Asistente Virtual basado en LLM. Los administradores pueden abrir un chat contextual para una alerta específica y consultar a la IA sobre la naturaleza del error o los pasos manuales sugeridos, emulando una experiencia de operador asistido o ``Copilot'' de infraestructura.
-\begin{center}
-    \textit{[Placeholder: Captura del listado de alertas priorizadas en el Frontend]}
-\end{center}
-\begin{center}
-    \textit{[Placeholder: Captura del Chat con el asistente de IA en la vista de Alertas]}
-\end{center}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/paware-alerts-list.png}
+    \caption{Listado de alertas autonómicas priorizadas visibles para el administrador.}
+    \label{fig:paware-alerts-list}
+\end{figure}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/paware-chat.png}
+    \caption{Interacción del administrador con el agente de IA para evaluar una alerta específica.}
+    \label{fig:paware-chat}
+\end{figure}
 

@@ -7,17 +7,23 @@ Para validar la confiabilidad tanto del nuevo ecosistema de microservicios como 
 En el backend, se priorizó la ejecución de pruebas de integración reales en lugar de pruebas aisladas. Para ello, se emplearon contenedores efímeros mediante la librería \textit{Testcontainers}, lo que permitió instanciar bases de datos relacionales y servicios de agregación de bitácoras durante la fase de prueba. Esto garantizó que el sistema se evaluara sobre un entorno idéntico al de producción. 
 
 Para cuantificar el nivel de fiabilidad, la cobertura de código se validó mediante el uso de \textit{JaCoCo} (Java Code Coverage). Se obtuvieron métricas de cobertura general que demostraron que las rutas críticas, especialmente las asociadas a la orquestación del ciclo de auto-mantenimiento, se encontraban robustamente cubiertas.
-\begin{center}
-    \textit{[Placeholder: Captura del reporte HTML de JaCoCo mostrando la cobertura del servicio de auto-mantenimiento]}
-\end{center}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/jacoco-report.png}
+    \caption{Reporte de cobertura de código (JaCoCo) enfocado en los módulos críticos del orquestador autonómico (MAPE).}
+    \label{fig:jacoco-report}
+\end{figure}
 
 \section{Automatización End-to-End (E2E)}
 Para la validación del sistema desde la perspectiva del usuario final, se evaluaron diversas herramientas de automatización de pruebas de interfaz (Frontend). Si bien herramientas consolidadas basadas en controladores externos (\textit{WebDrivers}) son un estándar, suelen introducir inestabilidad (\textit{flakiness}) y tiempos de ejecución prolongados.
 
 Se seleccionó \textit{Cypress} como herramienta definitiva debido a que se ejecuta en el mismo ciclo de vida del navegador y del marco de trabajo del Frontend, lo que incrementa notablemente la velocidad y estabilidad de las pruebas. Dado que el ecosistema descentralizado abstrae la validación de identidad en un servicio especializado (UAA), las pruebas se diseñaron para realizar peticiones directas de inicio de sesión e inyectar de forma transparente los tokens resultantes, mitigando así la complejidad de navegar múltiples dominios durante la prueba.
-\begin{center}
-    \textit{[Placeholder: Captura de la ejecución exitosa de pruebas Cypress en consola o en su interfaz gráfica]}
-\end{center}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/cypress-e2e.png}
+    \caption{Ejecución exitosa de las pruebas End-to-End (E2E) mediante Cypress.}
+    \label{fig:cypress-e2e}
+\end{figure}
 
 \section{Simulación de Caos y Recuperación Asistida}
 Para comprobar la resiliencia del ecosistema y el funcionamiento del modelo de auto-mantenimiento, se diseñó un escenario de prueba basado en ingeniería del caos. Se detuvo intencionalmente la ejecución del componente encargado de la lógica académica (el servicio de sitios), emulando una caída catastrófica en un entorno de producción.
@@ -30,10 +36,24 @@ El comportamiento registrado fue el siguiente:
 \end{enumerate}
 
 Las siguientes figuras ilustran la recepción efectiva de la alerta y la interfaz provista al operador para gestionar la resolución del problema:
-\begin{center}
-    \textit{[Placeholder: Captura del correo de alerta (P1) generado por el servicio de notificaciones, visible en la bandeja de entrada]}
-\end{center}
-\begin{center}
-    \textit{[Placeholder: Captura de la alerta P1 generada en el Frontend evidenciando la caída del servicio, acompañada del chat de asistencia]}
-\end{center}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/paware-email-alert.png}
+    \caption{Notificación de alerta crítica generada por el orquestador autonómico.}
+    \label{fig:paware-email-alert}
+\end{figure}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/paware-dashboard.png}
+    \caption{Alerta crítica visible en el portal administrativo con el asistente IA integrado.}
+    \label{fig:paware-dashboard}
+\end{figure}
+
+Posteriormente, al confirmar la acción sugerida por el agente inteligente, el sistema procede a ejecutar las políticas de auto-reparación (reinicio del servicio) y actualiza el estado de la alerta:
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/paware-action-approve.png}
+    \caption{Aprobación y ejecución de la acción de auto-reparación mediante el asistente IA.}
+    \label{fig:paware-action-approve}
+\end{figure}
 
