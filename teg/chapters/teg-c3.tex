@@ -427,31 +427,36 @@ por servicio (\texttt{logs}). Este script reduce la curva de aprendizaje para nu
 colaboradores, quienes no necesitan memorizar los comandos de Docker Compose ni la
 secuencia de dependencias entre servicios.
 
-El siguiente listing muestra el estado de los contenedores del ecosistema en
-funcionamiento, donde cada servicio resuelve sus dependencias mediante la red interna
-de Docker, utilizando el nombre del contenedor como host.
+\begin{center}
+    \textit{[Placeholder: Figura \ref{fig:portalasig-cli-help} — Screenshot de una
+    terminal ejecutando \texttt{portalasig-cli help}, mostrando la lista de comandos
+    disponibles (\texttt{bootstrap}, \texttt{up}, \texttt{down}, \texttt{logs}) con sus
+    descripciones y la sintaxis de uso.]}
+\end{center}
+
+La Figura \ref{fig:docker-compose-ps} muestra el estado de los contenedores del
+ecosistema en funcionamiento, donde cada servicio resuelve sus dependencias mediante
+la red interna de Docker, utilizando el nombre del contenedor como host.
 
 \begin{figure}[htbp]
-\begin{small}
-\begin{verbatim}
+\begin{lstlisting}
 frank-ponte@trabajo-de-grado:~/infra/stack$ docker compose ps
 NAME                       SERVICE         STATUS                    PORTS
-portalasig-config-server   config-server   Up 42 minutes             0.0.0.0:5859->5859/tcp
-portalasig-fe              frontend        Up 42 minutes             0.0.0.0:8080->8080/tcp
-portalasig-grafana         grafana         Up 42 minutes             0.0.0.0:3000->3000/tcp
-portalasig-loki            loki            Up 42 minutes             0.0.0.0:3100->3100/tcp
-portalasig-ms-notify       ms-notify       Up 42 minutes             0.0.0.0:5862->5862/tcp
-portalasig-ms-site         ms-site         Up 1 minute               0.0.0.0:5861->5861/tcp
-portalasig-ms-uaa          ms-uaa          Up 42 minutes (healthy)   0.0.0.0:5860->5860/tcp
-portalasig-mysql-notify    mysql-notify    Up 42 minutes (healthy)   0.0.0.0:11020->3306/tcp
-portalasig-mysql-paware    mysql-paware    Up 42 minutes (healthy)   0.0.0.0:11200->3306/tcp
-portalasig-mysql-site      mysql-site      Up 42 minutes (healthy)   0.0.0.0:11019->3306/tcp
-portalasig-mysql-uaa       mysql-uaa       Up 42 minutes (healthy)   0.0.0.0:11110->3306/tcp
-portalasig-nginx           nginx           Up 42 minutes             0.0.0.0:80->80/tcp
-portalasig-paware          paware          Up 42 minutes             0.0.0.0:8085->8080/tcp
-portalasig-prometheus      prometheus      Up 42 minutes             0.0.0.0:9090->9090/tcp
-\end{verbatim}
-\end{small}
+portalasig-config-server   config-server   Up 42 minutes             5859->5859/tcp
+portalasig-fe              frontend        Up 42 minutes             8080->8080/tcp
+portalasig-grafana         grafana         Up 42 minutes             3000->3000/tcp
+portalasig-loki            loki            Up 42 minutes             3100->3100/tcp
+portalasig-ms-notify       ms-notify       Up 42 minutes             5862->5862/tcp
+portalasig-ms-site         ms-site         Up 1 minute               5861->5861/tcp
+portalasig-ms-uaa          ms-uaa          Up 42 minutes (healthy)   5860->5860/tcp
+portalasig-mysql-notify    mysql-notify    Up 42 minutes (healthy)   11020->3306/tcp
+portalasig-mysql-paware    mysql-paware    Up 42 minutes (healthy)   11200->3306/tcp
+portalasig-mysql-site      mysql-site      Up 42 minutes (healthy)   11019->3306/tcp
+portalasig-mysql-uaa       mysql-uaa       Up 42 minutes (healthy)   11110->3306/tcp
+portalasig-nginx           nginx           Up 42 minutes             80->80/tcp
+portalasig-paware          paware          Up 42 minutes             8085->8080/tcp
+portalasig-prometheus      prometheus      Up 42 minutes             9090->9090/tcp
+\end{lstlisting}
 \caption{Estado de los contenedores Docker orquestados mediante Docker Compose.}
 \label{fig:docker-compose-ps}
 \end{figure}
