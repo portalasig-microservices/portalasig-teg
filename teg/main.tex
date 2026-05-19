@@ -10,6 +10,16 @@
 \usepackage{fancyhdr}
 \usepackage{xurl}
 \usepackage{cite}
+\usepackage{microtype}
+
+% Evita que texto largo (URLs, paths, nombres tecnicos) se salga del margen
+\tolerance=1000
+\emergencystretch=3em
+\hyphenpenalty=50
+\exhyphenpenalty=50
+
+% Permite saltos de linea dentro de \texttt{} despues de caracteres especiales
+\renewcommand{\texttt}[1]{\begingroup\ttfamily\allowbreak\aftergroup\endgroup #1}
 
 \graphicspath{ {Graphics/} }
 \setlength{\headheight}{13.07225pt}
