@@ -1,70 +1,141 @@
 \chapter{Planteamiento del problema}
 \pagestyle{fancy}
 
-El sistema PortalAsig, desarrollado para la gestión académica en la Facultad de Ciencias de la
-Universidad Central de Venezuela, fue concebido como una plataforma centralizada orientada a
-facilitar la comunicación entre docentes y estudiantes. A lo largo de su evolución, el sistema ha
-incorporado mejoras parciales, particularmente en su frontend, orientadas a mejorar su organización
-y mantenibilidad. Sin embargo, su backend ha permanecido basado en una arquitectura monolítica,
-a pesar de la complejidad del sistema. Esta situación ha dificultado su mantenimiento y su capacidad de adaptación
-a nuevos requerimientos.
+El sistema PortalAsig, desarrollado para la gesti\'{o}n acad\'{e}mica en la Facultad
+de Ciencias de la Universidad Central de Venezuela, se ejecuta desde el a\~{n}o
+2016 sobre una arquitectura monol\'{i}tica que concentra todas sus funcionalidades
+---autenticaci\'{o}n de usuarios, gesti\'{o}n de asignaturas, sitios acad\'{e}micos,
+evaluaciones, foros, entregas de archivos, env\'{i}o de correos y encuestas--- en un
+\'{u}nico proceso Node.js. En este backend, el archivo \texttt{site.js}, ubicado en el
+directorio \texttt{api/controllers/}, alcanza 3.629 l\'{i}neas de c\'{o}digo que gestionan
+quince dominios de negocio distintos, desde bibliograf\'{i}as hasta calificaciones,
+sin mecanismo de aislamiento que impida que un fallo en un m\'{o}dulo comprometa la
+estabilidad de la aplicaci\'{o}n completa. La entidad \texttt{Site}, definida en el modelo
+\texttt{api/models/site.js}, declara dieciocho relaciones con otras tablas de la base de
+datos PostgreSQL, de modo que su eliminaci\'{o}n requiere la ejecuci\'{o}n manual de
+dieciocho operaciones de borrado en cascada dentro de un hook del modelo,
+implementado mediante promesas anidadas que, si fallan, dejan el sistema en un
+estado de inconsistencia parcial.
 
-Actualmente, la respuesta ante un error del sistema se detecta de forma empírica y reactiva, principalmente ante
-fallas visibles o durante períodos específicos de intervención, como el inicio o cierre de un semestre académico.
-Este mecanismo de mantenimiento del Software depende en gran medida de acciones manuales y del
-conocimiento implícito de los colaboradores, sin contar con mecanismos formales de monitoreo,
-observabilidad o diagnóstico que permitan gestionar el sistema de forma eficiente. Como
-consecuencia, se dificulta la detección temprana de problemas, se incrementan los tiempos de
-resolución de fallas y se limita la incorporación de nuevas características.
+Esta acumulaci\'{o}n de deuda t\'{e}cnica durante seis a\~{n}os de modificaciones
+incrementales sin un proceso sistem\'{a}tico de mantenimiento ha generado un grado
+de acoplamiento que dificulta cualquier intervenci\'{o}n por parte de colaboradores
+acad\'{e}micos temporales. El monolito no cuenta con un directorio de pruebas
+automatizadas, ni pipelines de integraci\'{o}n continua, ni herramientas de an\'{a}lisis
+est\'{a}tico de c\'{o}digo. El despliegue en producci\'{o}n se realiza de forma manual
+directamente sobre el servidor del Centro de Computaci\'{o}n de la Facultad de Ciencias,
+sin mecanismos que validen el comportamiento del sistema despu\'{e}s de cada cambio.
+La autenticaci\'{o}n emplea un mecanismo propietario basado en cadenas aleatorias
+almacenadas en una tabla \texttt{Session} de PostgreSQL, sin soporte para tokens JWT ni
+protocolos OAuth2, lo que impide la escalabilidad horizontal y complica la
+integraci\'{o}n con est\'{a}ndares de seguridad modernos. El sistema no expone endpoints
+de m\'{e}tricas ni cuenta con agregaci\'{o}n centralizada de logs; la \'{u}nica forma de
+detectar una anomal\'{i}a es la observaci\'{o}n directa de fallas visibles por parte de
+usuarios o mantenedores.
 
-En este escenario, y considerando cómo en pocos años se ha acelarado la transición hacia la Web~3.0,
-donde los sistemas deben ser capaces de adaptarse y evolucionar de forma continua,
-se evidencia la necesidad de transformar tanto la arquitectura como el proceso de mantenimiento de PortalAsig.
-En particular, se identifica la ausencia de un enfoque que combine una arquitectura modular basada en microservicios con
-mecanismos de observabilidad y técnicas de inteligencia artificial, que permitan asistir el
-mantenimiento del sistema. Esto permitiría pasar de un esquema enteramente reactivo a uno sistemático y orientado a la mejora
-rápida y confiable del Software.
+La respuesta ante un error del sistema es, por tanto, emp\'{i}rica y reactiva,
+principalmente durante per\'{i}odos espec\'{i}ficos de intervenci\'{o}n como el inicio o cierre
+de un semestre acad\'{e}mico. Este mecanismo de mantenimiento depende en gran medida
+de acciones manuales y del conocimiento impl\'{i}cito de los colaboradores, sin contar
+con mecanismos formales de monitoreo, observabilidad o diagn\'{o}stico que permitan
+gestionar el sistema de forma eficiente. Como consecuencia, se dificulta la
+detecci\'{o}n temprana de problemas, se incrementan los tiempos de resoluci\'{o}n de
+fallas y se limita la incorporaci\'{o}n de nuevas caracter\'{i}sticas.
 
-\section{Justificación}
+En este escenario se evidencia la necesidad de transformar tanto la arquitectura
+como el proceso de mantenimiento de PortalAsig. La migraci\'{o}n hacia una
+arquitectura de microservicios resuelve el problema del acoplamiento
+arquitect\'{o}nico, descomponiendo el sistema en dominios acotados con bases de datos
+independientes y ciclos de despliegue aut\'{o}nomos. No obstante, esta
+transformaci\'{o}n introduce una complejidad operativa inherente a los sistemas
+distribuidos: m\'{u}ltiples procesos, m\'{u}ltiples bases de datos, latencia de red,
+tolerancia a fallos y monitoreo distribuido. En un entorno donde no existe un
+equipo de operaciones dedicado y donde el mantenimiento recae en colaboradores
+acad\'{e}micos temporales que permanecen uno o dos semestres, esta complejidad puede
+convertirse en un cuello de botella cr\'{i}tico si no se acompa\~{n}a de mecanismos
+automatizados de validaci\'{o}n, observabilidad y autogesti\'{o}n.
 
-La modernización del sistema PortalAsig responde a la necesidad de garantizar su sostenibilidad,
-mantenibilidad y capacidad de adaptación en el tiempo. En el contexto actual, caracterizado por la
-transición hacia la Web~3.0, los sistemas de software deben ser capaces de evolucionar de forma
-continua, lo que exige no solo una arquitectura adecuada, sino también procesos de mantenimiento
-más eficientes y sistemáticos.
+Frente a esta situaci\'{o}n, se identifica la necesidad de un enfoque que combine la
+arquitectura modular con mecanismos de observabilidad distribuida y t\'{e}cnicas de
+inteligencia artificial, que permitan asistir el mantenimiento del sistema y
+reducir la carga cognitiva sobre el mantenedor humano. Este enfoque posibilita el
+paso de un esquema enteramente reactivo a uno sistem\'{a}tico, donde el propio
+ecosistema detecta anomal\'{i}as, diagnostica causas y propone acciones de
+remediaci\'{o}n que un operador eval\'{u}a y aprueba.
 
-La adopción de una arquitectura basada en microservicios permite establecer una base modular que
-facilita el aislamiento de cambios y la evolución del sistema. Sin embargo, esta transformación
-incrementa la complejidad operativa, haciendo necesario incorporar mecanismos que permitan
-la gestión semi-asistida.
+\section{Justificaci\'{o}n}
 
-En este sentido, la incorporación de inteligencia artificial como apoyo al mantenimiento del
-sistema representa una alternativa viable para automatizar tareas de análisis, detección de
-anomalías y apoyo a la toma de decisiones. Este enfoque permite reducir la dependencia de
-intervenciones manuales y mejorar la capacidad de respuesta ante fallas, siendo especialmente
-relevante en el caso de PortalAsig, donde los recursos humanos son limitados.
+La modernizaci\'{o}n del sistema PortalAsig responde a una realidad operativa
+concreta: el sistema carece de un equipo de desarrollo y operaciones de tiempo
+completo asignado. El \'{u}nico soporte t\'{e}cnico recurrente proviene del grupo docente,
+y las mejoras al sistema se originan
+exclusivamente en colaboradores acad\'{e}micos temporales ---estudiantes de Trabajo
+Especial de Grado, de seminario o de servicio comunitario--- que permanecen en el
+proyecto entre uno y dos semestres. Esta rotaci\'{o}n perpetua implica que el
+conocimiento t\'{a}cito acumulado sobre el c\'{o}digo, la infraestructura y los procesos de
+despliegue se pierde cada vez que un colaborador concluye su per\'{i}odo, obligando al
+siguiente a reconstruir ese conocimiento desde cero sobre una base de c\'{o}digo de
+dif\'{i}cil comprensi\'{o}n.
 
-Por lo tanto, el desarrollo de un modelo de mantenimiento asistido por inteligencia artificial
-permite no solo mejorar el estado actual del sistema, sino establecer una base para su evolución
-continua, alineándolo con las exigencias tecnológicas propias de la Web~3.0.
+El monolito de producci\'{o}n de PortalAsig se aloja en los servidores del Centro de
+Computaci\'{o}n de la Facultad de Ciencias, bajo una modalidad \textit{on-premise} donde no
+existe acceso a servicios de computaci\'{o}n en la nube ni equipo de DevOps dedicado.
+El despliegue se realiza de forma manual mediante conexi\'{o}n directa al servidor. En estas condiciones, cualquier
+herramienta adicional que requiera infraestructura propia, configuraci\'{o}n compleja o
+mantenimiento continuo constituye un pasivo t\'{e}cnico que el siguiente colaborador
+deber\'{a} asumir sin garant\'{i}a de transferencia de conocimiento.
+
+La adopci\'{o}n de una arquitectura basada en microservicios permite descomponer el
+sistema en dominios independientes, cada uno comprensible de forma aislada y con
+un \'{a}rea de impacto acotada ante modificaciones. Sin embargo, esta transformaci\'{o}n
+incrementa la complejidad operativa: un ecosistema distribuido tiene m\'{u}ltiples
+puntos de fallo, cada servicio expone sus propias m\'{e}tricas y logs, y la
+correlaci\'{o}n de problemas entre nodos requiere observar simult\'{a}neamente m\'{u}ltiples
+fuentes de datos. Sin operadores dedicados las veinticuatro horas del d\'{i}a, esta
+complejidad puede superar los beneficios arquitect\'{o}nicos si no se acompa\~{n}a de
+automatizaci\'{o}n.
+
+En este contexto, la incorporaci\'{o}n de un mecanismo de autogesti\'{o}n del
+mantenimiento asistido por inteligencia artificial representa una alternativa
+viable para automatizar tareas de an\'{a}lisis, detecci\'{o}n de anomal\'{i}as y apoyo a la
+toma de decisiones. Este enfoque permite reducir la dependencia de intervenciones
+manuales y mejorar la capacidad de respuesta ante fallas, siendo especialmente
+relevante en un sistema donde los recursos humanos son limitados, temporales y
+rotativos. El resultado no es un sistema que elimine al mantenedor, sino uno que
+reduce su carga cognitiva y acelere sus decisiones mediante diagn\'{o}sticos
+consolidados y recomendaciones estructuradas.
 
 \section{Objetivo General}
 
-Diseñar e implementar un modelo de mantenimiento de software asistido por inteligencia artificial
-en una arquitectura de microservicios para el sistema PortalAsig, que permita mejorar su
-mantenibilidad, capacidad de adaptación y sostenibilidad en el tiempo.
+Dise\~{n}ar e implementar una arquitectura de microservicios para el backend del
+sistema PortalAsig, incorporando t\'{e}cnicas sistem\'{a}ticas de mantenimiento de software
+---integraci\'{o}n continua con validaci\'{o}n automatizada, an\'{a}lisis est\'{a}tico de c\'{o}digo,
+pruebas de integraci\'{o}n sobre bases de datos reales, pruebas end-to-end e
+instrumentaci\'{o}n de observabilidad distribuida--- que mejoren su mantenibilidad,
+capacidad de adaptaci\'{o}n y sostenibilidad en el tiempo; e integrar, sobre dicho
+ecosistema, el servicio PAIMA como mecanismo de autogesti\'{o}n del mantenimiento
+asistido por inteligencia artificial mediante el ciclo MAPE-K.
 
-\section{Objetivos Específicos}
+\section{Objetivos Espec\'{i}ficos}
 
 \begin{itemize}
-    \item Analizar el estado actual del sistema PortalAsig y su proceso de mantenimiento.
-    \item Identificar las limitaciones asociadas a la arquitectura monolítica existente.
-    \item Diseñar una arquitectura basada en microservicios que mejore la modularidad,
-    escalabilidad y mantenibilidad del sistema.
-    \item Diseñar un modelo de mantenimiento basado en principios de sistemas auto-adaptativos.
-    \item Integrar mecanismos de observabilidad para el monitoreo del comportamiento del sistema.
-    \item Implementar un prototipo funcional que incluya el rediseño del backend y el modelo de
-    mantenimiento propuesto.
-    \item Evaluar el impacto del modelo en términos de mantenibilidad, operación y capacidad de
-    adaptación del sistema.
+    \item Documentar el estado actual del sistema PortalAsig y caracterizar sus
+carencias estructurales mediante an\'{a}lisis de c\'{o}digo fuente, modelo de datos y
+procesos de despliegue.
+    \item Dise\~{n}ar una arquitectura de microservicios que desacople el backend en
+dominios independientes (UAA, Site, Notify), cada uno con su propia base de datos,
+su esquema de versionado y su ciclo de despliegue aut\'{o}nomo.
+    \item Implementar t\'{e}cnicas de mantenimiento de software que incluyan an\'{a}lisis
+est\'{a}tico con Checkstyle, pruebas de integraci\'{o}n con Testcontainers, medici\'{o}n de
+cobertura con JaCoCo, pruebas end-to-end con Cypress, e integraci\'{o}n continua con
+GitHub Actions.
+    \item Dise\~{n}ar e implementar el servicio PAIMA, que ejecute un ciclo MAPE-K
+donde las fases de An\'{a}lisis y Planificaci\'{o}n se deleguen a un modelo de inteligencia
+artificial, configurado con proveedores intercambiables y fallback determinista.
+    \item Instrumentar mecanismos de observabilidad distribuida ---m\'{e}tricas con
+Prometheus, agregaci\'{o}n de logs con Loki, visualizaci\'{o}n con Grafana--- que
+constituyan la base sensorial sobre la cual PAIMA opere.
+    \item Evaluar el ecosistema resultante mediante pruebas de integraci\'{o}n,
+validaci\'{o}n end-to-end, simulaci\'{o}n de caos con PAIMA y an\'{a}lisis comparativo
+cualitativo frente al monolito legacy.
 \end{itemize}

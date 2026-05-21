@@ -1,60 +1,114 @@
-\chapter*{Introducción}
-\addcontentsline{toc}{chapter}{Introducción}
+\chapter*{Introducci\'{o}n}
+\addcontentsline{toc}{chapter}{Introducci\'{o}n}
 
-En los últimos años, el avance de la inteligencia artificial ha impulsado una transformación
-significativa en la forma en que se conciben y desarrollan las aplicaciones web. Este fenómeno ha
-favorecido la transición desde el paradigma de la Web~2.0, centrado en la interacción y la generación
-de contenido por parte de los usuarios, hacia un modelo más dinámico y adaptativo, directamente
-asociado con la Web~3.0. En este nuevo contexto, las aplicaciones no solo procesan información,
-sino que incorporan mecanismos que les permiten analizar su entorno, adaptarse a condiciones
-cambiantes y evolucionar de manera continua.
+El sistema PortalAsig fue desarrollado en el a\~{n}o 2013 para la gesti\'{o}n
+acad\'{e}mica de la Facultad de Ciencias de la Universidad Central de Venezuela.
+Inicialmente concebido como una plataforma centralizada que facilitara la
+comunicaci\'{o}n entre docentes y estudiantes, el sistema ha evolucionado durante
+m\'{a}s de una d\'{e}cada mediante modificaciones incrementales que expandieron su
+funcionalidad sin alterar su arquitectura fundamental. El frontend del sistema
+fue redise\~{n}ado en el a\~{n}o 2020 por V\'{a}squez Balza \cite{teg_rafael}, quien
+migr\'{o} la interfaz de usuario desde Angular hacia Vue.js bajo un enfoque
+orientado a la mantenibilidad. Este redise\~{n}o mejor\'{o} sustancialmente la
+organizaci\'{o}n del c\'{o}digo cliente, sent\'{o} las bases para una evoluci\'{o}n
+controlada de la capa de presentaci\'{o}n y demostr\'{o} que un redise\~{n}o
+arquitect\'{o}nico bien planificado puede extender la vida \'{u}til de un sistema sin
+reescribirlo por completo. No obstante, el backend del sistema permaneci\'{o}
+basado en una arquitectura monol\'{i}tica que acumul\'{o}, durante seis a\~{n}os
+consecutivos, una deuda t\'{e}cnica creciente sin proceso sistem\'{a}tico de
+mantenimiento.
 
-En este nuevo escenario, la integración de mecanismos basados en inteligencia artificial surge como
-una consecuencia natural de esta evolución, permitiendo incorporar capacidades de análisis,
-automatización y apoyo a la toma de decisiones dentro del sistema.
+Esta situaci\'{o}n no es exclusiva de PortalAsig. Los sistemas de software
+acad\'{e}mico frecuentemente se desarrollan como proyectos de estudiantes que
+concluyen sus per\'{i}odos sin dejar documentaci\'{o}n exhaustiva ni procesos de
+transferencia de conocimiento. Cuando un nuevo colaborador asume el
+mantenimiento, debe reconstruir el modelo mental del sistema desde el c\'{o}digo
+fuente, una tarea que se vuelve exponencialmente m\'{a}s dif\'{i}cil a medida que
+la base de c\'{o}digo crece sin l\'{i}mites arquitect\'{o}nicos. En el caso de
+PortalAsig, el backend monol\'{i}tico concentra todas las responsabilidades del
+negocio ---autenticaci\'{o}n de usuarios, gesti\'{o}n de asignaturas, creaci\'{o}n de
+sitios acad\'{e}micos, administraci\'{o}n de evaluaciones, foros, entregas de
+archivos, env\'{i}o de correos y encuestas--- dentro de un \'{u}nico proceso
+desplegable. A medida que el sistema creci\'{o} en funcionalidad, la base de
+c\'{o}digo se densific\'{o} progresivamente, generando acoplamiento entre dominios que
+originalmente eran independientes. La ausencia de pruebas automatizadas, de
+mecanismos de validaci\'{o}n de cambios y de herramientas de observabilidad
+convirti\'{o} cada modificaci\'{o}n en un ejercicio de alto riesgo, donde la
+introducci\'{o}n de un cambio local pod\'{i}a afectar funcionalidades aparentemente no
+relacionadas. El despliegue en producci\'{o}n se realiza de forma manual mediante
+conexi\'{o}n directa al servidor, sin mecanismos que verifiquen el comportamiento del
+sistema despu\'{e}s de cada cambio.
 
-Para ello, es necesario establecer bases arquitectónicas que faciliten la incorporación progresiva
-de estos mecanismos sin comprometer la estabilidad del software. Esto implica diseñar aplicaciones
-que puedan escalar, mantenerse y evolucionar de forma controlada. Sin embargo, la efectividad de
-esta integración depende en gran medida del estilo arquitectónico, ya que estructuras altamente
-acopladas pueden limitar la incorporación de nuevos componentes, especialmente en sistemas de
-mayor complejidad.
+El contexto operativo agrava esta problem\'{a}tica. El sistema carece de un equipo
+de desarrollo y operaciones de tiempo completo; el soporte t\'{e}cnico recurrente
+proviene del grupo docente y las mejoras se originan en colaboradores acad\'{e}micos
+temporales ---estudiantes de Trabajo Especial de Grado, de seminario o de servicio
+comunitario--- que permanecen en el proyecto entre uno y dos semestres. Esta
+rotaci\'{o}n perpetua implica que el conocimiento t\'{a}cito acumulado sobre el
+c\'{o}digo, la infraestructura y los procesos de despliegue se pierde cada vez que
+un colaborador concluye su per\'{i}odo, obligando al siguiente a reconstruirlo desde
+cero sobre una base de c\'{o}digo de dif\'{i}cil comprensi\'{o}n. La infraestructura donde
+se aloja el monolito opera bajo una modalidad \textit{on-premise}, sin acceso a
+servicios de computaci\'{o}n en la nube ni a un equipo de DevOps dedicado. El
+despliegue se realiza de forma manual mediante conexi\'{o}n directa al servidor. En
+estas condiciones, cualquier herramienta adicional que requiera infraestructura
+propia, configuraci\'{o}n compleja o mantenimiento continuo constituye un pasivo
+t\'{e}cnico que el siguiente colaborador deber\'{a} asumir sin garant\'{i}a de
+transferencia de conocimiento.
 
-Como respuesta a esta limitación, han surgido enfoques arquitectónicos orientados a la
-modularidad, entre los cuales destacan las arquitecturas basadas en microservicios. Este tipo de
-arquitectura permite descomponer un sistema complejo en componentes simples e independientes,
-facilitando el desarrollo incremental, el despliegue continuo y la evolución controlada de sus
-funcionalidades. Sin embargo, la adopción de estos enfoques también introduce nuevos desafíos,
-especialmente en lo relacionado con la gestión de la complejidad operativa, la observabilidad del
-sistema y el mantenimiento en entornos distribuidos.
+Frente a esta situaci\'{o}n, se decidi\'{o} dise\~{n}ar e implementar una arquitectura de
+microservicios que descompusiera el backend en dominios acotados e
+independientes ---UAA (gesti\'{o}n de identidad), Site (sitios acad\'{e}micos) y
+Notify (notificaciones)--- cada uno con su propia base de datos, su esquema de
+versionado y su ciclo de despliegue aut\'{o}nomo. Esta transformaci\'{o}n elimina el
+acoplamiento referencial del modelo monol\'{i}tico y habilita el aislamiento de
+fallos, de modo que la ca\'{i}da de un servicio no compromete la estabilidad del
+ecosistema completo. Sin embargo, la migraci\'{o}n a microservicios introduce una
+complejidad operativa inherente a los sistemas distribuidos: m\'{u}ltiples
+procesos, m\'{u}ltiples bases de datos, latencia de red, tolerancia a fallos y
+monitoreo distribuido. En un entorno donde no existen operadores dedicados las
+veinticuatro horas del d\'{i}a, esta complejidad puede convertirse en un cuello de
+botella cr\'{i}tico si no se acompa\~{n}a de mecanismos automatizados de validaci\'{o}n,
+observabilidad y autogesti\'{o}n.
 
-El sistema PortalAsig, desarrollado para la gestión académica en la Facultad de Ciencias de la
-Universidad Central de Venezuela, constituye un caso representativo de estas problemáticas. Desde
-su creación en 2013, el sistema fue concebido con una arquitectura centralizada, acompañada de una
-interfaz de usuario desarrollada en Angular. Posteriormente, el trabajo de grado de Vásquez Balza \cite{teg_rafael}
-introdujo un rediseño del frontend  en Vue bajo un enfoque orientado a la mantenibilidad, incorporando
-prácticas de organización y mejora de la calidad del código.
+Para afrontar esta complejidad, se implementaron t\'{e}cnicas sistem\'{a}ticas de
+mantenimiento de software que abarcan todo el ciclo de vida del c\'{o}digo. Se
+incorporaron mecanismos de validaci\'{o}n automatizada que analizan el estilo del
+c\'{o}digo antes de su fusi\'{o}n, ejecutan pruebas sobre bases de datos reales y miden
+la cobertura de las mismas. Se dise\~{n}aron pruebas que simulan flujos completos del
+usuario final sobre la interfaz, verificando que las capas de presentaci\'{o}n,
+aplicaci\'{o}n y persistencia operen de forma coordinada. Asimismo, se instrumentaron
+mecanismos de observabilidad distribuida que recolectan m\'{e}tricas de rendimiento,
+agregan registros de ejecuci\'{o}n y visualizan correlaciones entre eventos. Estas
+t\'{e}cnicas no son complementos optativos: son la condici\'{o}n previa que permite a un
+colaborador acad\'{e}mico temporal comprender el estado del sistema, detectar
+anomal\'{i}as antes de que afecten a los usuarios y realizar cambios con confianza,
+reduciendo la dependencia del conocimiento t\'{a}cito.
 
-No obstante, el backend ha permanecido basado en una arquitectura monolítica con limitaciones
-estructurales significativas, lo que ha incrementado su complejidad y dificultado su evolución.
-El rediseño del backend hacia una arquitectura de microservicios se plantea como una necesidad
-para soportar una nueva forma de gestionar el mantenimiento del sistema.
+Sobre este ecosistema distribuido e instrumentado se construy\'{o} el servicio
+PAIMA (PortalAsig Intelligent MAPE-K Agent), que asume la funci\'{o}n de operador
+aut\'{o}nomo mediante un ciclo de control MAPE-K donde las fases de An\'{a}lisis y
+Planificaci\'{o}n se delegan a un modelo de inteligencia artificial. PAIMA monitorea
+las m\'{e}tricas y logs del ecosistema, detecta anomal\'{i}as, diagnostica causas,
+clasifica incidencias por severidad, notifica al administrador y propone acciones
+de remediaci\'{o}n que el operador humano eval\'{u}a y aprueba. La simulaci\'{o}n de caos
+ejecutada sobre el ecosistema valid\'{o} que PAIMA detecta la ca\'{i}da de un servicio,
+consolida la evidencia en un panel de gesti\'{o}n y asiste en la recuperaci\'{o}n sin
+requerir intervenci\'{o}n manual en las fases de detecci\'{o}n y diagn\'{o}stico. Este flujo
+reduce la carga cognitiva del mantenedor y acelera la respuesta ante fallas en un
+contexto donde los recursos humanos son limitados y rotativos.
 
-En la actualidad, el mantenimiento del sistema se realiza principalmente de forma reactiva, donde
-el personal a cargo atiende fallas bajo demanda ante la aparición de errores visibles o durante
-períodos específicos, como el inicio o cierre de un semestre. Las acciones correctivas son
-manuales y no responden a un proceso sistemático de diagnóstico o análisis de causa raíz, lo que
-dificulta la evolución controlada del sistema y la implementación de mejoras.
-
-La integración de mecanismos asistidos por inteligencia artificial
-representa una oportunidad para transformar el proceso actual de mantenimiento del software. Estas
-capacidades permiten complementar el trabajo humano mediante la automatización de tareas de
-análisis, diagnóstico y apoyo en la toma de decisiones, lo cual resulta especialmente relevante en
-contextos donde los recursos humanos son limitados.
-
-En consecuencia, el presente Trabajo Especial de Grado propone el diseño e implementación de un
-modelo de mantenimiento asistido por inteligencia artificial para una arquitectura de
-microservicios en el sistema PortalAsig. Este modelo busca integrar principios de sistemas
-auto-adaptativos, mecanismos de observabilidad y técnicas de inteligencia artificial, con el
-objetivo de transformar el mantenimiento del software en un proceso semi-asistido, sistemático,
-eficiente y alineado con las tendencias de la cada vez más presente Web~3.0.
+El presente documento se organiza en cinco cap\'{i}tulos. El Cap\'{i}tulo 1 plantea el
+problema, justifica la necesidad de transformaci\'{o}n y establece los objetivos
+general y espec\'{i}ficos del trabajo. El Cap\'{i}tulo 2 presenta el marco te\'{o}rico,
+abordando las arquitecturas monol\'{i}ticas y de microservicios, el modelo MAPE-K, la
+computaci\'{o}n auton\'{o}mica, la observabilidad en sistemas distribuidos y las
+tendencias convergentes que sustentan la autogesti\'{o}n del mantenimiento asistida
+por inteligencia artificial. El Cap\'{i}tulo 3 documenta el desarrollo aplicativo:
+el an\'{a}lisis del monolito legacy, el dise\~{n}o de la arquitectura de
+microservicios, las t\'{e}cnicas de mantenimiento implementadas y la arquitectura
+del servicio PAIMA. El Cap\'{i}tulo 4 describe la estrategia de pruebas dise\~{n}ada,
+los escenarios ejecutados y los resultados obtenidos en cobertura de c\'{o}digo,
+validaci\'{o}n end-to-end, simulaci\'{o}n de caos y an\'{a}lisis comparativo. El
+Cap\'{i}tulo 5 cierra el trabajo con las conclusiones, las limitaciones observadas
+y las l\'{i}neas de evoluci\'{o}n propuestas para el ecosistema.

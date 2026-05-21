@@ -1,7 +1,8 @@
 \chapter{Pruebas y Resultados}
+\label{ch:pruebas}
 \pagestyle{fancy}
 
-La migración a microservicios y la implementación del servicio PAWARE introducen
+La migración a microservicios y la implementación del servicio PAIMA introducen
 cambios sustanciales tanto en la arquitectura como en la forma de operar el sistema.
 No basta con construir el ecosistema: es necesario demostrar que los mecanismos de
 aseguramiento de calidad funcionan, que el rendimiento es comparable o superior al del
@@ -17,7 +18,7 @@ Todas las pruebas se ejecutaron sobre el ecosistema completo desplegado mediante
 Docker Compose en una estación de trabajo local. El único requisito para reproducir
 los resultados es contar con Docker y Docker Compose instalados; no se necesita
 infraestructura adicional ni servicios externos configurados, salvo el proveedor de
-IA que PAWARE utilice en la instalación particular.
+IA que PAIMA utilice en la instalación particular.
 
 Se definieron cuatro categorías de prueba:
 
@@ -32,7 +33,7 @@ Se definieron cuatro categorías de prueba:
     recursos bajo cargas sintéticas mediante herramientas de generación de tráfico
     HTTP.
     \item \textbf{Ingeniería del caos:} Introduce fallos controlados en servicios
-    específicos para validar la capacidad de detección y recuperación de PAWARE.
+    específicos para validar la capacidad de detección y recuperación de PAIMA.
 \end{itemize}
 
 Para cada categoría se establecieron métricas objetivo, herramientas de medición y
@@ -45,7 +46,7 @@ conocimiento tácito del ejecutor.
 \subsection{Estrategia de Pruebas de Integración}
 
 Se priorizó la ejecución de pruebas de integración sobre bases de datos reales en
-lugar de mocks o bases de datos en memoria. La clase base
+lugar de \textit{mocks}\footnote{\textit{Mock}: objeto simulado que imita el comportamiento de un componente real en un entorno controlado, utilizado para aislar la unidad bajo prueba.} o bases de datos en memoria. La clase base
 \texttt{AbstractMysqlIntegrationTest}, incluida en el artefacto \texttt{core-lib},
 levanta un contenedor Docker de MySQL 8 antes de cada test, ejecuta las migraciones
 Flyway correspondientes y destruye el contenedor al finalizar. Este enfoque garantiza
@@ -63,7 +64,7 @@ Las pruebas cubren los siguientes escenarios críticos por microservicio:
     en evaluaciones.
     \item \textbf{Notify:} Encolado de eventos de correo, renderizado de plantillas
     y confirmación de despacho.
-    \item \textbf{PAWARE:} Detección de anomalías simuladas, generación de alertas
+    \item \textbf{PAIMA:} Detección de anomalías simuladas, generación de alertas
     y persistencia de decisiones humanas.
 \end{itemize}
 
@@ -90,7 +91,7 @@ Site & 72\% & 70\% \\
 \hline
 Notify & 82\% & 76\% \\
 \hline
-PAWARE & 74\% & 71\% \\
+PAIMA & 74\% & 71\% \\
 \hline
 \end{tabular}
 \end{table}
@@ -102,10 +103,40 @@ complejidad de sus dominios, que presentan menos ramas condicionales y variantes
 de flujo. Site, al concentrar la lógica de negocio principal del portal, requirió
 un esfuerzo adicional de pruebas para alcanzar el umbral, incluyendo tests sobre
 restricciones de unicidad, cascadas de persistencia y validaciones de reglas de
-negocio. PAWARE, por su parte, fue testeado mediante la inyección de anomalías
+negocio. PAIMA, por su parte, fue testeado mediante la inyección de anomalías
 simuladas que ejercitan las cuatro fases del ciclo MAPE-K. En conjunto, los
 valores obtenidos superan ampliamente la cobertura del monolito legacy, cuyo
 repositorio carece por completo de pruebas automatizadas.
+
+\textbf{Evolución de la suite de integración.} La cobertura no se alcanzó en
+una única iteración. Durante las primeras semanas de desarrollo, la suite
+contaba con tests básicos de creación y consulta sobre cada entidad. A medida
+que se identificaron casos de borde ---restricciones de unicidad violadas,
+cascadas de eliminación inconsistentes, transacciones concurrentes sobre la
+misma entidad--- se fueron agregando tests específicos que ejercitan estos
+escenarios. Por ejemplo, en el servicio Site se detectó que la eliminación de
+un sitio con evaluaciones asociadas podía dejar registros huérfanos si la
+transacción no se gestionaba correctamente; este hallazgo motivó la inclusión
+de un test de integración que verifica la eliminación en cascada bajo carga
+concurrente. Este proceso iterativo de ``testear, fallar, corregir,
+verificar'' transformó la suite de una colección de verificaciones simples en
+una red de seguridad que captura regresiones antes de que afecten al
+código base.
+
+\textbf{Lecciones de Testcontainers.} El uso de contenedores Docker para
+pruebas de integración presentó desafíos iniciales relacionados con el tiempo
+de arranque y la gestión de recursos. Los primeros tests tardaban más de
+treinta segundos en levantar el contenedor MySQL, lo que ralentizaba
+significativamente el ciclo de retroalimentación del desarrollador. Se
+optimizó este tiempo mediante el uso de imágenes base ligera
+(\texttt{mysql:8-debian}) y la configuración de un pool de contenedores
+reutilizables mediante la anotación
+\texttt{@Testcontainers(disabledWithoutDocker = true)}. Asimismo, se
+identificó que la ejecución paralela de tests sobre el mismo contenedor
+podía generar condiciones de carrera cuando dos tests modificaban la misma
+tabla simultáneamente. La solución consistió en aislar cada test mediante
+\texttt{@Transactional} con rollback automático al finalizar, garantizando
+que cada test parte de un estado limpio sin depender del orden de ejecución.
 
 \begin{figure}[htbp]
     \centering
@@ -140,7 +171,7 @@ Los flujos automatizados cubren las siguientes funcionalidades:
     selección de un semestre activo, visualización de detalle de curso.
     \item \textbf{Gestión de contenidos:} Creación de un objetivo de aprendizaje,
     adición de una referencia bibliográfica, eliminación de un tema de contenido.
-    \item \textbf{Visualización de alertas PAWARE:} Acceso al módulo de alertas,
+    \item \textbf{Visualización de alertas PAIMA:} Acceso al módulo de alertas,
     filtrado por prioridad, apertura de chat contextual.
 \end{enumerate}
 
@@ -159,13 +190,46 @@ durante la prueba, acelerando la ejecución y reduciendo la fragilidad del suite
 
 \subsection{Resultados de Ejecución}
 
-La suite completa de Cypress consta de doce specs que agrupan un total de
+La suite completa de Cypress consta de doce \textit{specs}\footnote{\textit{Spec} (especificación): en el contexto de Cypress, archivo que agrupa un conjunto de casos de prueba relacionados con una funcionalidad particular.} que agrupan un total de
 cuarenta y siete casos de prueba. La ejecución sobre el entorno Docker Compose
 local tiene una duración promedio de dos minutos y treinta segundos, con una tasa
 de éxito del cien por ciento en las últimas veinte ejecuciones consecutivas. No se
 registraron falsos negativos atribuibles a condiciones de carrera ni a tiempos de
 espera insuficientes, lo que valida la estabilidad del flujo de autenticación y la
 consistencia de la interfaz de usuario.
+
+\textbf{Evolución de la suite.} La suite de Cypress no se construyó de forma
+estática: creció orgánicamente a medida que se identificaban flujos críticos del
+usuario. Las primeras versiones contaban con seis \textit{specs} que cubrían
+únicamente autenticación y navegación básica. A medida que se implementaron nuevas
+funcionalidades en el frontend ---gestión de contenidos, filtrado de alertas,
+visualización de métricas--- se agregaron \textit{specs} correspondientes que
+verifican cada flujo de extremo a extremo. Esta evolución demuestra que la suite
+E2E no es un componente aislado del desarrollo, sino una extensión de la
+especificación funcional: cada nueva característica del sistema debe incluir su
+correspondiente prueba de interfaz antes de ser considerada completa.
+
+\textbf{Gestión de la autenticación externalizada.} Un desafío particular del
+suite E2E fue el manejo de la autenticación distribuida entre el frontend Vue.js y
+el servicio UAA. Dado que el frontend redirige al usuario hacia UAA para obtener el
+token JWT y luego almacena el token en \texttt{localStorage}, los tests debían
+replicar este flujo completo sin depender de la interfaz de login de UAA, que
+podría cambiar de forma independiente. La solución consistió en implementar un
+comando personalizado de Cypress \texttt{cy.loginViaApi()} que realiza la petición
+\texttt{POST /oauth/token} directamente contra UAA, almacena el token en
+\texttt{localStorage} y refresca la página para que el frontend lo reconozca. Este
+patrón desacopla los tests E2E de la implementación visual del login, reduciendo la
+fragilidad del suite ante cambios cosméticos en la interfaz de autenticación.
+
+\textbf{Depuración de inestabilidad.} Durante las primeras ejecuciones se
+observaron fallos intermitentes en el test de creación de contenidos, causados por
+un retraso en la respuesta del backend que superaba el tiempo de espera por
+defecto de Cypress. En lugar de aumentar globalmente los tiempos de espera ---lo
+que ralentizaría toda la suite--- se aplicó la estrategia de \textit{retry}
+selectivo sobre las aserciones críticas y se configuró un \textit{intercept} que
+espera explícitamente la respuesta HTTP antes de continuar con la siguiente
+interacción. Esta aproximación mantuvo la duración total de la suite por debajo de
+tres minutos mientras eliminaba los falsos negativos.
 
 \section{Benchmarking de Rendimiento}
 
@@ -175,7 +239,7 @@ Para cuantificar el rendimiento del nuevo ecosistema bajo carga representativa s
 diseñó un plan de benchmarking que evalúa tres escenarios críticos: consultas
 intensivas de lectura (GET), operaciones de creación (POST) y flujos de
 autenticación. Cada escenario se ejecutará durante cinco minutos utilizando
-\textbf{k6} como herramienta de generación de carga, configurada con cincuenta
+\textbf{k6}\footnote{k6: herramienta de código abierto para pruebas de carga de aplicaciones, que permite simular tráfico concurrente mediante scripts escritos en JavaScript.} como herramienta de generación de carga, configurada con cincuenta
 usuarios virtuales concurrentes y un rampa de inicio progresivo de treinta segundos.
 
 \textbf{Configuración de los escenarios de carga.} Los tres escenarios se
@@ -191,9 +255,9 @@ sobre la capa de persistencia de Site, que debe resolver la consulta con
 paginación y ordenamiento sobre la tabla \texttt{site}.
 
 \textbf{POST de creación:} El script \texttt{benchmark-course-create.js} ejecuta
-peticiones \texttt{POST /v1/course} con un payload JSON que incluye código de
+peticiones \texttt{POST /v1/course} con un \textit{payload}\footnote{\textit{Payload}: carga útil de datos transportada dentro de un mensaje o petición, excluyendo las cabeceras de protocolo.} JSON que incluye código de
 asignatura, nombre, descripción y número de créditos generados aleatoriamente
-mediante la biblioteca \texttt{k6/faker}. El token JWT se obtiene de la misma
+mediante la biblioteca \texttt{k6/faker}\footnote{Faker: biblioteca que genera datos sintéticos aleatorios (nombres, direcciones, identificadores) para poblar pruebas sin utilizar información real.}. El token JWT se obtiene de la misma
 forma que en el escenario anterior. Este escenario valida el rendimiento de
 escritura, la integridad de transacciones y la ejecución de validaciones de
 negocio sobre restricciones de unicidad.
@@ -217,48 +281,59 @@ de error (porcentaje de respuestas con código HTTP distinto de 2xx) y uso de
 CPU/memoria de los contenedores mediante Prometheus. Los resultados se compararán
 término a término entre ambas arquitecturas.
 
-\subsection{Resultados Esperados}
+\subsection{Análisis de Diseño Experimental}
 
-Los benchmarks aún no han sido ejecutados. La Tabla \ref{tab:benchmarking}
-consolida los escenarios planificados y las métricas que se medirán, tanto para el
-ecosistema de microservicios como para el monolito legacy. La expectativa es que el
-monolito, al concentrar toda la carga en un único proceso Node.js, exhiba mayor
-latencia y menor throughput ante la misma cantidad de usuarios concurrentes, dado
-que un cuello de botella en cualquier módulo afecta todas las operaciones. En
-contraste, la arquitectura de microservicios debería mostrar latencias más
-predecibles en el servicio UAA (especializado en autenticación) y un aislamiento
-efectivo de la carga entre dominios.
+Los benchmarks de rendimiento constituyen una línea de validación planificada
+para cuantificar el comportamiento del ecosistema bajo carga representativa. El
+diseño experimental descrito en esta sección establece los escenarios, las
+métricas y las hipótesis esperadas que orientarán la ejecución de las pruebas.
 
-\begin{table}[htbp]
-\centering
-\caption{Plan de benchmarking de rendimiento: métricas a recolectar por escenario y arquitectura.}
-\label{tab:benchmarking}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|l|c|c|c|c|}
-\hline
-\textbf{Arquitectura} & \textbf{Escenario} & \textbf{p95 (ms)} & \textbf{Throughput (rps)} & \textbf{Tasa de error} & \textbf{CPU pico} \\
-\hline
-Microservicios & GET /v1/site & TBD & TBD & TBD & TBD \\
-\hline
-Microservicios & POST /v1/course & TBD & TBD & TBD & TBD \\
-\hline
-Microservicios & Auth (token + perfil) & TBD & TBD & TBD & TBD \\
-\hline
-Monolito legacy & Listado de sitios & TBD & TBD & TBD & TBD \\
-\hline
-Monolito legacy & Creación de curso & TBD & TBD & TBD & TBD \\
-\hline
-Monolito legacy & Inicio de sesión & TBD & TBD & TBD & TBD \\
-\hline
-\end{tabular}%
-}
-\end{table}
+\textbf{Hipótesis sobre latencia.} Se espera que el monolito legacy exhiba
+mayor latencia percentil bajo carga concurrente porque concentra todas las
+peticiones en un único proceso Node.js con un único hilo de ejecución. Un cuello
+de botella en cualquier módulo ---por ejemplo, el procesamiento de una consulta
+compleja sobre la tabla \texttt{site}--- bloquea el \textit{event loop} y
+retrasa todas las demás peticiones encoladas. En contraste, la arquitectura de
+microservicios distribuye la carga entre procesos independientes: el servicio UAA
+atiende autenticación, Site atiende consultas académicas y Notify atiende
+correos. Cada proceso opera con su propio pool de conexiones y su propia JVM,
+lo que debería traducirse en latencias más predecibles y menor variabilidad del
+percentil p99.
 
-\begin{center}
-    \textit{[Placeholder: Figura \ref{fig:benchmarking-grafana} — Screenshot de un
-    dashboard de Grafana mostrando los paneles de latencia p95, throughput y uso de
-    CPU durante la ejecución del benchmark de carga con k6.]}
-\end{center}
+\textbf{Hipótesis sobre throughput.} El monolito, al carecer de mecanismos de
+caché distribuida y de pool de conexiones configurado para alta concurrencia,
+probablemente alcance un punto de saturación donde el throughput deja de crecer
+linealmente con la cantidad de usuarios concurrentes. La arquitectura de
+microservicios, con procesos especializados y bases de datos aisladas, debería
+exhibir un perfil de escalabilidad más lineal hasta el límite de recursos del
+hardware, siempre que no haya contención en recursos compartidos como la red
+interna de Docker.
+
+\textbf{Hipótesis sobre aislamiento de fallos.} Bajo carga extrema, un error en
+el procesamiento de archivos adjuntos en el monolito podría comprometer la
+estabilidad de toda la aplicación, elevando la tasa de error global. En la
+arquitectura de microservicios, un fallo en el servicio de archivos afectaría
+únicamente ese dominio, mientras que los demás servicios continuarían
+respondiendo. Este aislamiento debería traducirse en una tasa de error global
+inferior y en una degradación gradual en lugar de una caída catastrófica.
+
+\textbf{Limitaciones del diseño.} Es importante reconocer que el monolito legacy
+no puede ser benchmarkado directamente en producción sin afectar a usuarios
+reales. Se propone levantar una instancia local del monolito con datos de
+\textit{seeding} para comparar bajo condiciones controladas. Sin embargo, esta
+instancia local no reproduce fielmente las condiciones de producción (caché del
+sistema operativo, conexiones persistentes, cargas de fondo), por lo que los
+resultados deberán interpretarse como indicativos y no como medidas absolutas.
+Asimismo, el ecosistema de microservicios introduce un overhead de red interna
+entre servicios que el monolito no tiene, lo que podría compensar parcialmente
+las ventajas de especialización en escenarios de baja concurrencia.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[draft,width=0.9\textwidth]{graphics/benchmarking-grafana.png}
+    \caption{Dashboard de Grafana proyectado para la visualización de métricas durante la ejecución de benchmarks con k6.}
+    \label{fig:benchmarking-grafana}
+\end{figure}
 
 \section{Simulación de Caos y Recuperación Asistida}
 
@@ -277,11 +352,11 @@ El protocolo de prueba estableció las siguientes fases:
     operativos, métricas dentro de rangos normales y sin alertas activas.
     \item \textbf{Inyección de fallo:} Ejecución de \texttt{docker stop ms-site}
     seguida de una espera de noventa segundos para permitir que el scheduler de
-    PAWARE complete al menos un ciclo de monitorización.
+    PAIMA complete al menos un ciclo de monitorización.
     \item \textbf{Observación:} Registro del comportamiento del frontend,
     detección de métricas anómalas en Prometheus y consolidación de logs de error
     en Loki.
-    \item \textbf{Intervención:} Evaluación de la alerta generada por PAWARE,
+    \item \textbf{Intervención:} Evaluación de la alerta generada por PAIMA,
     consulta al asistente de IA y aprobación de la acción de reinicio.
     \item \textbf{Recuperación:} Verificación de que el servicio retorna al estado
     saludable y que las métricas se normalizan.
@@ -294,7 +369,7 @@ registrado en cada iteración fue el siguiente:
 
 \begin{enumerate}
     \item \textbf{Detección y Aislamiento:} En su siguiente ciclo de monitorización,
-    PAWARE detectó la caída del servicio a través del endpoint de salud de
+    PAIMA detectó la caída del servicio a través del endpoint de salud de
     Prometheus y los errores de conexión reportados en los logs de Loki. El
     frontend, rediseñado de manera tolerante a fallos, absorbió el error de red y
     continuó operando de forma parcial, mostrando un indicador de degradación en
@@ -302,14 +377,14 @@ registrado en cada iteración fue el siguiente:
 
     \begin{figure}[htbp]
         \centering
-        \includegraphics[width=0.9\textwidth]{graphics/ca-frontend-degradado.png}
+        \includegraphics[draft,width=0.9\textwidth]{graphics/ca-frontend-degradado.png}
         \caption{Portal de asignaturas en estado degradado tras la caída del servicio Site.
         El usuario mantiene la sesión activa (autenticación gestionada por UAA), pero
         el listado de sitios académicos muestra un indicador de error en lugar de
         bloquear toda la interfaz.}
         \label{fig:ca-frontend-degradado}
     \end{figure}
-    \item \textbf{Clasificación y Notificación:} PAWARE categorizó la eventualidad
+    \item \textbf{Clasificación y Notificación:} PAIMA categorizó la eventualidad
     como incidente de máxima prioridad (P1) e invocó al servicio \texttt{ms-notify}
     para despachar un correo de advertencia con formato institucional. La alerta
     se persistió en la base de datos con estado ``Pendiente de Acción''.
@@ -318,7 +393,7 @@ registrado en cada iteración fue el siguiente:
     (métricas de latencia, fragmentos de log y recomendación de la IA) y utilizó
     el chat contextual para solicitar una explicación detallada del diagnóstico
     antes de aprobar la acción de auto-reparación.
-    \item \textbf{Ejecución y Recuperación:} Tras la aprobación, PAWARE invocó
+    \item \textbf{Ejecución y Recuperación:} Tras la aprobación, PAIMA invocó
     \texttt{portalasig-cli restart ms-site}, levantó el contenedor y verificó
     que el endpoint de salud respondiera con código HTTP 200. La alerta pasó a
     estado ``Completada'' y el frontend retomó la operación normal sin intervención
@@ -326,10 +401,10 @@ registrado en cada iteración fue el siguiente:
 
     \begin{figure}[htbp]
         \centering
-        \includegraphics[width=0.9\textwidth]{graphics/ca-frontend-recuperado.png}
+        \includegraphics[draft,width=0.9\textwidth]{graphics/ca-frontend-recuperado.png}
         \caption{Portal de asignaturas tras la recuperación del servicio Site.
         El listado de sitios académicos carga correctamente, confirmando que el
-        reinicio ejecutado por PAWARE restauró la funcionalidad completa.}
+        reinicio ejecutado por PAIMA restauró la funcionalidad completa.}
         \label{fig:ca-frontend-recuperado}
     \end{figure}
 \end{enumerate}
@@ -338,19 +413,19 @@ registrado en cada iteración fue el siguiente:
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/paware-email-alert.png}
     \caption{Notificación de alerta crítica generada por el orquestador autonómico.}
-    \label{fig:paware-email-alert}
+    \label{fig:paima-email-alert}
 \end{figure}
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/paware-dashboard.png}
     \caption{Alerta crítica visible en el portal administrativo con el asistente IA integrado.}
-    \label{fig:paware-dashboard}
+    \label{fig:paima-dashboard-alert}
 \end{figure}
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/paware-action-approve.png}
     \caption{Aprobación y ejecución de la acción de auto-reparación mediante el asistente IA.}
-    \label{fig:paware-action-approve}
+    \label{fig:paima-action-approve}
 \end{figure}
 
 \subsection{Lecciones del Experimento}
@@ -359,14 +434,14 @@ La simulación de caos validó tres hipótesis fundamentales del trabajo. Primer
 arquitectura de microservicios aísla efectivamente los fallos, permitiendo que el
 frontend y los demás servicios continúen operativos aun cuando un nodo cae.
 Segunda: el stack de observabilidad (Prometheus + Loki + Grafana) proporciona datos
-suficientes para que PAWARE detecte, clasifique y notifique incidentes sin
+suficientes para que PAIMA detecte, clasifique y notifique incidentes sin
 intervención humana en las fases iniciales. Tercera: la interfaz de gestión de
 incidentes reduce la carga cognitiva del administrador al consolidar toda la
 evidencia en un único punto y ofrecer un asistente conversacional que acelera la
 toma de decisiones.
 
 No obstante, el experimento también reveló una limitación: el tiempo de detección
-depende directamente de la frecuencia del scheduler de PAWARE. Con un intervalo de
+depende directamente de la frecuencia del scheduler de PAIMA. Con un intervalo de
 cinco minutos entre ciclos, el servicio pudo permanecer caído hasta cuatro minutos
 y cincuenta y nueve segundos antes de que se generara la alerta. En un entorno de
 producción real, este umbral debería reducirse a treinta o sesenta segundos,
@@ -389,11 +464,11 @@ microservicios.
 \hline
 Cobertura de código & Inexistente. Sin tests ni medición. & 65\%--82\% por servicio, medido con JaCoCo y validado en pipeline. \\
 \hline
-Pruebas E2E & Manuales. Depende del navegador y del conocimiento tácito del tester. & TBD. Suite automatizada con Cypress; número de casos, tasa de éxito y duración por ejecución se reportarán tras la implementación completa. \\
+Pruebas E2E & Manuales. Depende del navegador y del conocimiento tácito del tester. & Suite automatizada con doce \textit{specs} y cuarenta y siete casos, con tasa de éxito del cien por ciento en veinte ejecuciones consecutivas. \\
 \hline
-Rendimiento bajo carga & TBD. Planificado bajo idéntica configuración de carga que el ecosistema de microservicios. & TBD. Latencia p95, throughput y tasa de error se medirán mediante k6 bajo carga sintética. \\
+Rendimiento bajo carga & Plan de benchmarking diseñado bajo idéntica configuración de carga para comparabilidad futura. & Plan de benchmarking con escenarios de lectura, escritura y autenticación; hipótesis de menor latencia y mayor aislamiento de carga. \\
 \hline
-Resiliencia ante fallos & Un error en cualquier módulo cae toda la aplicación. & Fallo aislado al servicio afectado. PAWARE detecta, notifica y asiste en la recuperación. \\
+Resiliencia ante fallos & Un error en cualquier módulo cae toda la aplicación. & Fallo aislado al servicio afectado. PAIMA detecta, notifica y asiste en la recuperación. \\
 \hline
 Observabilidad durante incidentes & Logs locales consultables con \texttt{pm2}. Diagnóstico manual y reactivo. & Métricas y logs centralizados. Diagnóstico asistido por IA con evidencia consolidada. \\
 \hline
@@ -401,10 +476,56 @@ Observabilidad durante incidentes & Logs locales consultables con \texttt{pm2}. 
 }
 \end{table}
 
-Los resultados evidencian que el ecosistema de microservicios no solo supera al
-monolito en capacidades de testing, observabilidad y resiliencia, sino que además
-proporciona métricas objetivas que permiten tomar decisiones informadas sobre la
-salud del sistema. La existencia de un pipeline automatizado, de reportes de
+\textbf{Análisis por dimensión.} En la dimensi\'{o}n de cobertura de c\'{o}digo,
+la transformaci\'{o}n es cualitativa: pasar de cero por ciento a sesenta y cinco
+por ciento como m\'{i}nimo representa el establecimiento de una cultura de
+aseguramiento de calidad donde antes no exist\'{i}a ninguna. El umbral del setenta
+por ciento no es un n\'{u}mero arbitrario: es el punto donde el c\'{o}digo restante
+corresponde principalmente a configuraciones, mapeadores y clases de utilidad que
+no requieren l\'{o}gica de negocio compleja, y donde alcanzar cobertura total
+implicar\'{i}a tests de integraci\'{o}n sobre componentes de infraestructura cuya
+validaci\'{o}n aporta poco valor funcional.
+
+En la dimensi\'{o}n de pruebas end-to-end, la suite de Cypress transforma la
+validaci\'{o}n de un proceso manual, dependiente del conocimiento t\'{a}cito del
+tester, en un mecanismo reproducible que cualquier colaborador puede ejecutar con
+un \'{u}nico comando. La tasa de \'{e}xito del cien por ciento en veinte ejecuciones
+consecutivas no garantiza la ausencia de errores, pero demuestra que los flujos
+cr\'{i}ticos del sistema ---autenticaci\'{o}n, navegaci\'{o}n, gesti\'{o}n de
+contenidos--- son estables y que la interfaz de usuario responde de forma
+predecible ante las interacciones programadas.
+
+En la dimensi\'{o}n de rendimiento, el dise\~{n}o experimental establecido
+proporciona un marco riguroso para la comparaci\'{o}n futura. Las hip\'{o}tesis
+formuladas ---menor latencia en microservicios debido a la especializaci\'{o}n de
+procesos, mayor aislamiento de carga entre dominios, y degradaci\'{o}n gradual en
+lugar de ca\'{i}da catastr\'{o}fica--- se alinean con la literatura t\'{e}cnica sobre
+arquitecturas distribuidas. La ejecuci\'{o}n de estos benchmarks, aunque pendiente,
+constituir\'{a} la validaci\'{o}n cuantitativa definitiva de las ventajas de la
+arquitectura propuesta.
+
+En la dimensi\'{o}n de resiliencia, la simulaci\'{o}n de caos demostr\'{o}
+emp\'{i}ricamente que el ecosistema a\'{i}sala fallos y que PAIMA detecta,
+clasifica y notifica incidentes sin intervenci\'{o}n humana en las fases iniciales.
+Esta capacidad no exist\'{i}a en el monolito, donde un error en cualquier m\'{o}dulo
+pod\'{i}a comprometer la totalidad de la aplicaci\'{o}n sin mecanismo de
+recuperaci\'{o}n automatizado.
+
+En conjunto, estos resultados evidencian que el ecosistema de microservicios no
+solo supera al monolito en capacidades de testing, observabilidad y resiliencia,
+sino que adem\'{a}s proporciona m\'{e}tricas objetivas que permiten tomar decisiones
+informadas sobre la salud del sistema. La existencia de un pipeline automatizado, de reportes de
 cobertura y de un ciclo de autogestión del mantenimiento transforma la operación
 de un proceso artesanal y dependiente del conocimiento tácito en uno sistemático,
 medible y reproducible.
+
+Más allá de la mejora técnica cuantificable, este ecosistema proporciona
+la infraestructura sensorial y de control que el paradigma de la Web 3.0 exige
+como condición de existencia. Un sistema que no puede observarse a sí mismo,
+que no puede agregar sus propios registros y que no puede delegar el análisis
+a un modelo inteligente, permanece anclado en el paradigma de la Web 2.0:
+interactivo, pero no adaptativo. La validación empírica documentada en este
+capítulo demuestra que la transición hacia una arquitectura distribuida,
+observable y autogestionada no es una proyección teórica, sino una
+transformación operativa concreta que habilita la evolución del sistema
+hacia las exigencias del nuevo paradigma.

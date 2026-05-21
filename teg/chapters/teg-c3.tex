@@ -9,7 +9,7 @@ nuevo backend basado en microservicios que descompone el sistema en dominios
 independientes, cada uno con su propia base de datos, su ciclo de despliegue
 autónomo y mecanismos de validación automatizada que reducen la dependencia del
 conocimiento tácito. Sobre este ecosistema distribuido se construyó el servicio
-PAWARE, que asume la función de operador autónomo mediante un ciclo de control
+PAIMA, que asume la función de operador autónomo mediante un ciclo de control
 MAPE-K asistido por inteligencia artificial, monitoreando métricas y logs,
 diagnosticando anomalías y proponiendo acciones de remediación que mitigan la
 carga cognitiva sobre el mantenedor humano.
@@ -65,7 +65,7 @@ horizontal y complica la integración con estándares de seguridad modernos.
 \textbf{Dependencias gestionadas de forma global.} El archivo principal
 \texttt{app.js} instancia todos los componentes del sistema —conexión a base de datos,
 modelos ORM, servicio de correo, utilidades de cifrado— y los inyecta en un
-contenedor global \texttt{app.locals}, desde donde los controladores acceden
+contenedor global \texttt{app.locals}\footnote{\texttt{app.locals}: objeto global proporcionado por Express.js para compartir datos entre \textit{middlewares} y controladores durante el ciclo de vida de la aplicación.}, desde donde los controladores acceden
 directamente. Esta práctica elimina cualquier posibilidad de prueba unitaria aislada y
 dificulta la identificación de las dependencias reales de cada módulo.
 
@@ -92,7 +92,12 @@ que descomponga el sistema en dominios independientes, con límites claros y
 mecanismos de validación automatizada.
 
 \begin{center}
-    \textit{[Placeholder: Figura \ref{fig:modelo-datos-monolito} — Diagrama entidad-relación simplificado del modelo de datos monolítico, mostrando la tabla \texttt{site} como núcleo con sus 15+ relaciones hacia entidades dependientes.]}
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[draft,width=0.85\textwidth]{graphics/modelo-datos-monolito.png}
+        \caption{Diagrama entidad-relación simplificado del modelo de datos monolítico, mostrando la tabla \texttt{site} como núcleo con sus 15+ relaciones hacia entidades dependientes.}
+        \label{fig:modelo-datos-monolito}
+    \end{figure}
 \end{center}
 
 \subsection{Diseño de la Arquitectura de Microservicios}
@@ -121,7 +126,7 @@ sistema:
     notificaciones de las operaciones síncronas de los demás servicios.
 \end{itemize}
 
-El ecosistema incluye además el servicio \textbf{PAWARE}, que opera como un nodo
+El ecosistema incluye además el servicio \textbf{PAIMA}, que opera como un nodo
 autonómico encargado del ciclo de autogestión del mantenimiento y se detalla en la
 Sección 3.2.
 
@@ -132,7 +137,7 @@ elimina el riesgo de bloqueos entre servicios y permite que cada estudiante o
 colaborador que forme parte del desarrollo y mantenimiento del portal pueda evolucionar
 el modelo de datos de un servicio sin afectar dominios no relacionados. Las bases de
 datos se identifican como \texttt{mysql-uaa}, \texttt{mysql-site},
-\texttt{mysql-notify} y \texttt{mysql-paware}, cada una expuesta en un puerto distinto
+\texttt{mysql-notify} y \texttt{mysql-paima}, cada una expuesta en un puerto distinto
 del host para facilitar el diagnóstico local.
 
 \textbf{Configuración centralizada.} Para evitar la dispersión de propiedades y
@@ -159,9 +164,9 @@ y del servicio de autogestión del mantenimiento.
     \includegraphics[width=0.95\textwidth]{graphics/diagrama-arquitectura.png}
     \caption{Arquitectura del ecosistema de microservicios de PortalAsig, mostrando
     el proxy Nginx, el Config Server, los cuatro microservicios (UAA, Site, Notify,
-    PAWARE), sus bases de datos MySQL aisladas, el proveedor LLM externo, el stack
+    PAIMA), sus bases de datos MySQL aisladas, el proveedor LLM externo, el stack
     de observabilidad (Prometheus, Loki, Grafana) y las conexiones de monitoreo de
-    PAWARE hacia los endpoints \texttt{/actuator/health} de cada microservicio, todo
+    PAIMA hacia los endpoints \texttt{/actuator/health} de cada microservicio, todo
     desplegado sobre la red virtual de Docker Compose.}
     \label{fig:diagrama-arquitectura}
 \end{figure}
@@ -177,11 +182,11 @@ tecnologías experimentales que pudieran convertirse en pasivos técnicos.
 
 \textbf{Lenguaje y framework.} Se seleccionaron \textbf{Java 17} y \textbf{Spring Boot
 3} como base para todos los microservicios. Estas versiones correspondían a las
-\textit{Long Term Support} (LTS) más recientes disponibles al inicio del desarrollo de
+\textit{Long Term Support} (LTS)\footnote{LTS (\textit{Long Term Support}): versión de software que recibe actualizaciones de seguridad y correcciones durante un período extendido, típicamente varios años.} más recientes disponibles al inicio del desarrollo de
 este trabajo, lo que garantizó soporte extendido, estabilidad y acceso a las mejoras de
 rendimiento y seguridad introducidas en ambas plataformas. Aunque el monolito original
 utiliza Node.js y Express.js, el ecosistema Spring Boot ofrece de forma nativa
-(\textit{out-of-the-box}) soporte para seguridad (OAuth2 y JWT), observabilidad
+(\textit{out-of-the-box})\footnote{\textit{Out-of-the-box}: expresión que indica que una funcionalidad está disponible de forma inmediata, sin requerir configuración adicional.} soporte para seguridad (OAuth2 y JWT), observabilidad
 (Micrometer, Actuator), comunicación entre servicios (WebClient) y configuración
 centralizada (Config Client), lo que elimina la dependencia de bibliotecas de terceros
 para funcionalidades críticas del ecosistema. La tipificación fuerte de Java
@@ -195,16 +200,16 @@ entre los distintos nodos del ecosistema. Se diseñó el módulo \texttt{portala
 como biblioteca compartida, estructurado en tres artefactos:
 
 \begin{itemize}
-    \item \texttt{core-boot}: POM padre con el \textit{catálogo centralizado de versiones}
+    \item \texttt{core-boot}: POM\footnote{POM (\textit{Project Object Model}): archivo descriptor XML en Maven que define la configuración, dependencias y ciclo de vida de un proyecto Java.} padre con el \textit{Bill of Materials} (BOM)\footnote{BOM (\textit{Bill of Materials}): en Maven, mecanismo que centraliza y alinea las versiones de un conjunto de dependencias relacionadas.}
     de Spring Boot y Spring Cloud. Define las versiones de todas las dependencias del
     ecosistema, eliminando conflictos de versiones entre microservicios.
     \item \texttt{core-lib}: Código reutilizable incluyendo configuración de seguridad
-    JWT, manejo centralizado de excepciones, serialización JSON, CORS y clientes HTTP
-    con soporte para \texttt{client\_credentials} y \texttt{bearer} tokens.
+    JWT, manejo centralizado de excepciones, serialización JSON, CORS\footnote{CORS (\textit{Cross-Origin Resource Sharing}): mecanismo de seguridad que permite a un servidor web restringir los recursos que pueden solicitarse desde un dominio diferente al suyo.} y clientes HTTP
+    con soporte para \texttt{client\_credentials}\footnote{\texttt{client\_credentials}: flujo de autorización OAuth2 donde una aplicación se autentica directamente con sus credenciales, sin intervención de un usuario final.} y \texttt{bearer} tokens\footnote{\textit{Bearer token}: tipo de token de seguridad que otorga acceso a quien lo posee, transmitido en la cabecera \texttt{Authorization} de las peticiones HTTP.}.
     \item \texttt{core-backend}: POM padre específico para microservicios backend, que
     hereda de \texttt{core-boot}, incluye \texttt{core-lib} y añade dependencias de
     persistencia (JPA, Flyway, conector MySQL), observabilidad (Micrometer Prometheus,
-    appender Loki) y utilidades de compilación (Lombok, MapStruct).
+    \textit{appender}\footnote{\textit{Appender}: componente de un framework de \textit{logging} que define el destino de los registros (consola, archivo, servidor remoto, etc.).} Loki) y utilidades de compilación (Lombok, MapStruct).
 \end{itemize}
 
 Esta estructura evita la duplicación de configuración y garantiza que cualquier
@@ -219,7 +224,7 @@ los servicios modificando únicamente el artefacto común.
     geoespaciales y un optimizador de consultas robusto. Sin embargo, su
     configuración y operación en entornos locales de desarrollo resultan más
     complejas para colaboradores académicos temporales.
-    \item \textbf{MongoDB}: base de datos NoSQL orientada a documentos que ofrece
+    \item \textbf{MongoDB}: base de datos NoSQL\footnote{NoSQL (\textit{Not Only SQL}): categoría de bases de datos que no emplean el modelo relacional tradicional, ofreciendo esquemas flexibles y escalabilidad horizontal.} orientada a documentos que ofrece
     flexibilidad de schema y escalabilidad horizontal. No obstante, su modelo de
     datos no relacional introduce una curva de aprendizaje adicional y complica
     las transacciones que involucran múltiples documentos, lo cual resulta
@@ -260,11 +265,21 @@ ejecución y detectar conflictos si dos colaboradores intentan crear una migraci
 el mismo número de versión.
 
 \begin{center}
-    \textit{[Placeholder: Figura \ref{fig:flyway-migraciones} — Estructura de directorios de migraciones Flyway en un microservicio, mostrando archivos \texttt{V1\_\_init.sql}, \texttt{V2\_\_add\_site\_schedule.sql}, \texttt{V3\_\_add\_evaluation\_weights.sql} dentro de \texttt{src/main/resources/db/migration/}.]}
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[draft,width=0.7\textwidth]{graphics/flyway-migraciones.png}
+        \caption{Estructura de directorios de migraciones Flyway en un microservicio.}
+        \label{fig:flyway-migraciones}
+    \end{figure}
 \end{center}
 
 \begin{center}
-    \textit{[Placeholder: Figura \ref{fig:pom-herencia} — Diagrama de herencia de dependencias Maven, mostrando \texttt{core-boot} como raíz, \texttt{core-lib} y \texttt{core-backend} como artefactos intermedios, y los microservicios UAA, Site, Notify, PAWARE como proyectos hijos que heredan configuración.]}
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[draft,width=0.85\textwidth]{graphics/pom-herencia.png}
+        \caption{Diagrama de herencia de dependencias Maven.}
+        \label{fig:pom-herencia}
+    \end{figure}
 \end{center}
 
 \subsection{Técnicas de Mantenimiento de Software Implementadas}
@@ -273,276 +288,94 @@ Una migración a microservicios no garantiza por sí sola la mantenibilidad del 
 Es necesario incorporar prácticas sistemáticas de aseguramiento de calidad que
 permitan detectar problemas antes de que lleguen a producción, reducir la deuda
 técnica y facilitar la incorporación de nuevos colaboradores. A continuación se
-describen las técnicas implementadas en el ecosistema, seleccionadas bajo el criterio
-de simplicidad operativa: cada herramienta debe ser configurable mediante archivos que
-residen en el repositorio de código, sin requerir servidores adicionales ni
-infraestructura dedicada.
+describen las técnicas implementadas, seleccionadas bajo el criterio de simplicidad
+operativa: cada herramienta debe ser configurable mediante archivos que residen en el
+repositorio de código, sin requerir servidores adicionales ni infraestructura dedicada.
 
-\textbf{Análisis estático de código.} Se integró \textbf{Checkstyle} en el artefacto
-\texttt{core-boot}, configurado con el perfil \texttt{google\_checks.xml}. Este
-archivo es la codificación oficial de la guía de estilo de Google para Java, que
-define reglas precisas sobre indentación (dos espacios), longitud máxima de línea
-(100 caracteres), orden de imports, convenciones de nomenclatura (\texttt{camelCase}
-para métodos, \texttt{UpperCamelCase} para clases), y obligatoriedad de Javadoc en
-todos los métodos y clases públicas. Todos los microservicios que heredan de
-\texttt{core-backend} ejecutan el análisis de estilo durante la fase de compilación
-de Maven. Si el código incumple alguna regla —como longitud de línea excedida,
-convenciones de nombres violadas, ausencia de Javadoc en métodos públicos o
-indentación incorrecta— la compilación se interrumpe, impidiendo que código inconsistente
-llegue al repositorio principal. Esta decisión se tomó sobre alternativas como
-SpotBugs, que se centra en la detección de errores lógicos, porque la prioridad del
-proyecto era garantizar la legibilidad y uniformidad del código fuente, aspectos
-críticos cuando múltiples colaboradores rotativos deben leer y modificar el mismo
-código a lo largo del tiempo.
+Se integró \textbf{Checkstyle} en el artefacto \texttt{core-boot} con el perfil
+\texttt{google\_checks.xml}, ejecutándose durante la compilación de Maven en todos
+los microservicios. La compilación se interrumpe si el código incumple reglas de
+estilo, impidiendo que código inconsistente llegue al repositorio. Se optó por
+Checkstyle sobre SpotBugs porque la prioridad del proyecto era garantizar la
+legibilidad y uniformidad del código fuente, aspectos críticos cuando múltiples
+colaboradores rotativos modifican el mismo código.
 
-\textbf{Integración continua.} Se configuró \textbf{GitHub Actions} en cada repositorio
-como pipeline de integración continua. El flujo de trabajo se ejecuta automáticamente
-en cada \textit{pull request} y en cada cambio sobre la rama principal, realizando en
-secuencia: compilación del proyecto, ejecución de Checkstyle, ejecución de pruebas de
-integración y generación del reporte de cobertura JaCoCo. Se optó por GitHub Actions
-sobre Jenkins porque este último requiere un servidor propio, configuración manual de
-plugins, actualizaciones periódicas y mantenimiento de la infraestructura. GitHub
-Actions, en cambio, se define mediante archivos YAML que residen en el mismo
-repositorio del código, y la ejecución corre sobre los servidores de GitHub sin costo
-adicional para repositorios públicos, eliminando un pasivo técnico que el siguiente
-colaborador debería mantener.
+Se configuró \textbf{GitHub Actions} como pipeline de integración continua en cada
+repositorio, ejecutando en secuencia: compilación, Checkstyle, pruebas de integración
+y generación del reporte de cobertura. Las ramas principales están protegidas
+mediante \textit{branch protection}, bloqueando el envío directo de código y
+exigiendo que todo cambio llegue mediante un \textit{pull request} que pase
+exitosamente la pipeline antes de su fusión. Se optó por GitHub Actions sobre Jenkins
+porque este último requiere un servidor propio y mantenimiento de infraestructura,
+mientras que GitHub Actions se define mediante archivos YAML en el mismo repositorio
+y ejecuta sobre los servidores de GitHub sin costo adicional.
 
-\textbf{Protección de ramas.} Las ramas principales de cada repositorio están
-protegidas mediante \textit{branch protection}. Se bloqueó el envío directo de código
-(\textit{push}) a la rama principal, exigiendo que todo cambio llegue mediante un
-\textit{pull request} que, a su vez, debe pasar exitosamente la pipeline de GitHub
-Actions antes de permitirse su fusión. Esta práctica garantiza que el código
-integrado haya sido compilado, analizado y probado de forma automatizada, reduciendo
-la introducción de errores en la línea base del proyecto.
+Se incorporó \textbf{JaCoCo} como plugin de Maven para medir la cobertura de líneas y
+ramas durante la ejecución de los tests, generando un reporte HTML detallado por
+paquete, clase y método. Se configuró un umbral mínimo del setenta por ciento en el
+workflow de GitHub Actions, de forma que la compilación falla automáticamente si la
+cobertura desciende por debajo del valor establecido. Se eligió JaCoCo sobre
+SonarQube porque este último requiere un servidor dedicado con base de datos propia,
+mientras que JaCoCo produce el reporte como parte del proceso de compilación.
+Los resultados de cobertura por microservicio y el análisis de su evolución se
+documentan en el Capítulo \ref{ch:pruebas}.
 
-\textbf{Cobertura de pruebas.} Se incorporó \textbf{JaCoCo} como plugin de Maven en
-cada microservicio. Durante la ejecución de los tests, JaCoCo instrumenta el bytecode
-Java y genera un reporte HTML detallado que indica, por paquete, clase y método, el
-porcentaje de líneas y ramas ejecutadas por las pruebas. El reporte se genera en el
-directorio \texttt{target/site/jacoco/} y puede consultarse localmente tras ejecutar
-\texttt{mvn test}. Dado que JaCoCo se ejecuta dentro del mismo pipeline de Maven que
-GitHub Actions invoca en cada \textit{pull request}, se configuró un umbral mínimo
-de cobertura en el workflow de forma que la compilación falla automáticamente si el
-porcentaje de líneas o ramas cubiertas es inferior al valor establecido, bloqueando
-la fusión del código mediante las reglas de protección de ramas.
+Las pruebas de integración se implementaron con \textbf{Testcontainers}, que levanta
+contenedores Docker efímeros de MySQL 8 durante la fase de pruebas de Maven. La clase
+base \texttt{AbstractMysqlIntegrationTest} instancia la base de datos, ejecuta las
+migraciones Flyway y destruye el contenedor al finalizar, garantizando que las
+pruebas validen el comportamiento real sobre un motor idéntico al de producción.
+La evolución de la suite de integración, los escenarios cubiertos y las lecciones
+aprendidas se presentan en el Capítulo \ref{ch:pruebas}.
 
-\begin{center}
-    \textit{[Placeholder: Figura \ref{fig:github-actions-jacoco} — Screenshot de la
-    interfaz de GitHub Actions mostrando una ejecución de pipeline donde el paso de
-    JaCoCo reporta el porcentaje de cobertura y el workflow marca el check como
-    exitoso o fallido en función del umbral configurado.]}
-\end{center} Se eligió JaCoCo sobre SonarQube porque
-este último requiere un servidor dedicado con base de datos propia para almacenar los
-análisis históricos, mientras que JaCoCo produce el reporte como parte del proceso
-de compilación sin infraestructura adicional.
+Se creó el repositorio \texttt{portalasig-e2e} con \textbf{Cypress} para pruebas de
+interfaz que simulan flujos completos del usuario ---inicio de sesión, navegación por
+sitios de asignatura, gestión de contenidos--- ejecutándose dentro del mismo ciclo de
+vida del navegador. Los tests realizan peticiones directas de login contra el
+servicio UAA para obtener el token JWT, inyectándolo en las peticiones subsecuentes.
+La suite completa, los resultados de ejecución y el análisis de estabilidad se
+documentan en el Capítulo \ref{ch:pruebas}.
 
-\textbf{Pruebas de integración.} Las pruebas de integración se implementaron con
-\textbf{Testcontainers}, una biblioteca que levanta contenedores Docker efímeros
-durante la fase de pruebas de Maven. Se diseñó una clase base
-\texttt{AbstractMysqlIntegrationTest} que instancia una base de datos MySQL 8 real
-antes de cada test, ejecuta las migraciones Flyway sobre ella y destruye el contenedor
-al finalizar. Este enfoque garantiza que las pruebas validen el comportamiento real de
-las capas de persistencia, los repositorios JPA y los controladores REST sobre un
-motor idéntico al de producción, en contraste con bases de datos en memoria como H2,
-que pueden ocultar incompatibilidades de dialecto SQL o comportamientos específicos del
-motor.
-
-\begin{center}
-    \textit{[Placeholder: Figura \ref{fig:ide-testcontainers} — Screenshot del IDE
-    (IntelliJ) ejecutando la clase \texttt{AbstractMysqlIntegrationTest}, mostrando
-    la consola de Maven con los tests pasando, el contenedor Docker MySQL levantado
-    por Testcontainers en segundo plano, y el reporte de cobertura JaCoCo visible.]}
-\end{center}
-
-\textbf{Pruebas end-to-end.} Se creó el repositorio \texttt{portalasig-e2e} con
-\textbf{Cypress} como herramienta de automatización de pruebas de interfaz. Los tests
-simulan flujos completos del usuario —inicio de sesión, navegación por sitios de
-asignatura, gestión de contenidos— ejecutándose dentro del mismo runtime del navegador,
-lo que reduce la inestabilidad (\textit{flakiness}) propia de herramientas basadas en
-WebDriver como Selenium. Dado que la autenticación está externalizada en el servicio
-UAA, los tests realizan peticiones directas de login para obtener el token JWT e
-inyectarlo en las peticiones subsecuentes, evitando la complejidad de navegar múltiples
-órdenes de dominio durante la prueba.
-
-\begin{center}
-    \textit{[Placeholder: Figura \ref{fig:cypress-suite} — Screenshot del runner de
-    Cypress mostrando la suite de pruebas end-to-end con múltiples specs ejecutadas
-    exitosamente (indicadores verdes), el panel de tiempo de ejecución y el selector
-    de navegador visible.]}
-\end{center}
-
-\textbf{Observabilidad distribuida.} Se configuró un stack de observabilidad compuesto
-por tres herramientas integradas. \textbf{Prometheus} recolecta métricas de cada
-microservicio mediante scraping periódico sobre el endpoint
-\texttt{/actuator/prometheus} expuesto por Spring Boot Actuator. \textbf{Loki}
-agrega los logs de todas las aplicaciones, recibiendo los registros enviados por el
-\textit{appender} configurado en \texttt{core-lib}. \textbf{Grafana} unifica ambas
-fuentes en dashboards interactivos, permitiendo correlacionar métricas anómalas con el
-contexto de los logs en un único punto de consulta. Se seleccionó esta combinación
-sobre alternativas como ELK (Elasticsearch, Logstash, Kibana) porque Elasticsearch
-consume memoria RAM de forma agresiva, lo cual resulta problemático en estaciones de
-trabajo locales con recursos limitados. Loki, diseñado específicamente para entornos
-para entornos distribuidos, indexa únicamente las etiquetas de los logs en lugar de
-su contenido completo, logrando un consumo de recursos significativamente menor.
-
-\textbf{Documentación viva de APIs.} Como se mencionó en la Sección 3.1.3, la
-integración de SpringDoc OpenAPI genera automáticamente documentación interactiva de
-todos los endpoints REST. Esta documentación se actualiza con cada cambio en el código
-fuente, eliminando la necesidad de mantener manuales separados que rápidamente quedan
-obsoletos. Para un colaborador temporal, contar con una interfaz web donde puede
-explorar los endpoints, ver los modelos de datos y ejecutar peticiones de prueba
-reduce drásticamente el tiempo de comprensión del sistema.
-
-\begin{center}
-    \textit{[Placeholder: Figura \ref{fig:github-actions} — Screenshot de la interfaz de GitHub Actions mostrando una pipeline exitosa (checks verdes) con las etapas de compilación, Checkstyle, tests y JaCoCo para un microservicio.]}
-\end{center}
-
-\begin{center}
-    \textit{[Placeholder: Figura \ref{fig:swagger-ui} — Screenshot de la interfaz Swagger UI generada por SpringDoc OpenAPI, mostrando los endpoints de un microservicio con sus modelos de datos y opción de ejecutar peticiones de prueba.]}
-\end{center}
-
-\begin{center}
-    \textit{[Placeholder: Figura \ref{fig:grafana-dashboard} — Screenshot de un dashboard de Grafana unificando métricas de Prometheus (gráficos de latencia, throughput, uso de CPU) y logs de Loki para un microservicio específico.]}
-\end{center}
+El stack de observabilidad se configuró con \textbf{Prometheus} para métricas,
+\textbf{Loki} para agregación de logs y \textbf{Grafana} para visualización unificada.
+Estas herramientas se definieron en el Marco Teórico (Sección 2.3.5) y se integraron
+en cada microservicio mediante el artefacto \texttt{core-lib}. \textbf{SpringDoc
+OpenAPI} genera documentación interactiva de los endpoints REST a partir de las
+anotaciones de los controladores, eliminando la necesidad de mantener manuales
+separados.
 
 \subsection{Despliegue, Gestión y Migración de Datos}
 
-\textbf{Orquestación local.} Para la gestión del ecosistema completo en entornos de
-desarrollo, se seleccionó \textbf{Docker Compose} como orquestador de contenedores.
-Aunque existen plataformas de orquestación más sofisticadas como Kubernetes, estas
-requieren la configuración de un cluster con múltiples nodos, la definición de
-\textit{manifests} YAML complejos y la gestión de un plano de control que monitorea el
-estado de los contenedores. Docker Compose, en cambio, permite describir todo el
-ecosistema —bases de datos, microservicios, componentes de observabilidad y frontend—
-en un único archivo declarativo, y levantarlo mediante un único comando. Dado que
-PortalAsig opera en servidores universitarios on-premise sin arquitectura de
-clusterización, la adopción de Kubernetes habría añadido una complejidad operativa
-insostenible para un equipo sin personal de operaciones dedicado.
+Para la gestión del ecosistema en entornos de desarrollo se seleccionó
+\textbf{Docker Compose}, que permite describir todo el ecosistema ---bases de datos,
+microservicios, componentes de observabilidad y frontend--- en un único archivo
+declarativo y levantarlo mediante un comando único. Frente a alternativas como
+Kubernetes, Docker Compose ofrece simplicidad operativa para entornos sin
+requisitos de autoescalado ni alta disponibilidad multi-nodo, lo cual resulta
+adecuado para el contexto de servidores universitarios \textit{on-premise}. Se desarrolló el
+script \texttt{portalasig-cli} para encapsular las operaciones más frecuentes:
+preparación inicial del entorno (\texttt{bootstrap}), levantamiento (\texttt{up}),
+detención ordenada (\texttt{down}) y visualización de logs por servicio
+(\texttt{logs}).
 
-Para optimizar los flujos de despliegue, se desarrolló el script
-\texttt{portalasig-cli}, que encapsula las operaciones más frecuentes: preparación
-inicial del entorno (\texttt{bootstrap}), que descarga y cachea las dependencias de
-Maven en un volumen compartido para permitir compilaciones desconectadas; levantamiento del
-ecosistema (\texttt{up}); detención ordenada (\texttt{down}); y visualización de logs
-por servicio (\texttt{logs}). Este script reduce la curva de aprendizaje para nuevos
-colaboradores, quienes no necesitan memorizar los comandos de Docker Compose ni la
-secuencia de dependencias entre servicios.
+El monolito original utiliza una única base de datos PostgreSQL con un schema
+centralizado donde la tabla \texttt{site} actúa como núcleo con relaciones hacia más
+de quince entidades. En la arquitectura de microservicios se adoptó el principio de
+un schema aislado por servicio: UAA gestiona identidades y roles; Site administra
+cursos, semestres, participantes y contenidos académicos; Notify registra eventos de
+correo; y PAIMA almacena alertas y decisiones de incidentes. Esta redistribución
+elimina el acoplamiento referencial y permite que cada servicio evolucione su modelo
+de forma independiente mediante \textbf{Flyway}.
 
-\begin{center}
-    \textit{[Placeholder: Figura \ref{fig:portalasig-cli-help} — Screenshot de una
-    terminal ejecutando \texttt{portalasig-cli help}, mostrando la lista de comandos
-    disponibles (\texttt{bootstrap}, \texttt{up}, \texttt{down}, \texttt{logs}) con sus
-    descripciones y la sintaxis de uso.]}
-\end{center}
-
-La Figura \ref{fig:docker-compose-ps} muestra el estado de los contenedores del
-ecosistema en funcionamiento, donde cada servicio resuelve sus dependencias mediante
-la red interna de Docker, utilizando el nombre del contenedor como host.
-
-\begin{figure}[htbp]
-\begin{lstlisting}
-frank-ponte@trabajo-de-grado:~/infra/stack$ docker compose ps
-NAME                       SERVICE         STATUS                    PORTS
-portalasig-config-server   config-server   Up 42 minutes             5859->5859/tcp
-portalasig-fe              frontend        Up 42 minutes             8080->8080/tcp
-portalasig-grafana         grafana         Up 42 minutes             3000->3000/tcp
-portalasig-loki            loki            Up 42 minutes             3100->3100/tcp
-portalasig-ms-notify       ms-notify       Up 42 minutes             5862->5862/tcp
-portalasig-ms-site         ms-site         Up 1 minute               5861->5861/tcp
-portalasig-ms-uaa          ms-uaa          Up 42 minutes (healthy)   5860->5860/tcp
-portalasig-mysql-notify    mysql-notify    Up 42 minutes (healthy)   11020->3306/tcp
-portalasig-mysql-paware    mysql-paware    Up 42 minutes (healthy)   11200->3306/tcp
-portalasig-mysql-site      mysql-site      Up 42 minutes (healthy)   11019->3306/tcp
-portalasig-mysql-uaa       mysql-uaa       Up 42 minutes (healthy)   11110->3306/tcp
-portalasig-nginx           nginx           Up 42 minutes             80->80/tcp
-portalasig-paware          paware          Up 42 minutes             8085->8080/tcp
-portalasig-prometheus      prometheus      Up 42 minutes             9090->9090/tcp
-\end{lstlisting}
-\caption{Estado de los contenedores Docker orquestados mediante Docker Compose.}
-\label{fig:docker-compose-ps}
-\end{figure}
-
-\textbf{Migración del modelo de datos.} El monolito original utiliza una única base
-de datos PostgreSQL con un schema centralizado que alberga todas las entidades del
-sistema. La tabla \texttt{site} actúa como núcleo del modelo, manteniendo relaciones
-directas con más de quince entidades: objetivos, bibliografías, contenidos temáticos,
-grupo docente, estudiantes, horarios, evaluaciones, calificaciones, foros, comentarios,
-entregas, archivos, vídeos, enlaces, planificaciones, noticias y encuestas. Esta
-densidad de relaciones en un único schema implica que cualquier modificación en una
-entidad puede afectar indirectamente a múltiples tablas, y que la eliminación de un
-registro principal requiere la gestión manual de cascadas que, si fallan, dejan la
-base de datos en un estado inconsistente.
-
-En la arquitectura de microservicios se adoptó el principio de un schema aislado por
-servicio. El modelo de datos se redistribuyó de la siguiente forma:
-
-\begin{itemize}
-    \item \textbf{UAA:} tablas \texttt{user}, \texttt{role}, \texttt{user\_role} y
-    \texttt{client}, gestionando identidades, roles y clientes OAuth2.
-    \item \textbf{Site:} tablas de dominio académico: \texttt{course},
-    \texttt{semester}, \texttt{site}, \texttt{site\_party}, \texttt{site\_section},
-    \texttt{site\_schedule}, \texttt{site\_course\_topic},
-    \texttt{site\_evaluation}, \texttt{site\_objective} y \texttt{reference}.
-    \item \textbf{Notify:} tablas \texttt{email\_event} y
-    \texttt{email\_template}, responsables del registro y envío de
-    notificaciones.
-    \item \textbf{PAWARE:} tablas \texttt{paware\_alert} y
-    \texttt{paware\_alert\_feedback}, que registran incidentes detectados y las
-    decisiones humanas sobre ellos.
-\end{itemize}
-
-Esta redistribución elimina el acoplamiento referencial del modelo monolítico. Un
-cambio en la estructura de evaluaciones, por ejemplo, solo afecta al schema de
-\texttt{ms-site}, sin riesgo de impactar la autenticación o el servicio de
-notificaciones. Además, cada schema es versionado de forma independiente mediante
-\textbf{Flyway}, lo que permite que un servicio evolucione su modelo sin coordinar
-con los demás.
-
-\textbf{Estrategia de \textit{seeding}.} Para facilitar el desarrollo, las pruebas de
-integración y los escenarios de benchmarking, se diseñó el repositorio
-\texttt{portalasig-seeding}, que centraliza los mecanismos de carga de datos de
-prueba. A diferencia de una estrategia basada en scripts SQL estáticos, el
-\textit{seeding} se realiza mediante invocación de endpoints REST de carga masiva
-expuestos por cada microservicio, lo que permite construir datos de prueba
-consistentes respetando las reglas de negocio, validaciones y relaciones del
-sistema. Los endpoints de carga implementados son los siguientes:
-
-\begin{itemize}
-    \item \textbf{UAA — \texttt{POST /v1/user/\_import}}: Carga masiva de usuarios
-    desde archivo CSV, incluyendo estudiantes, docentes y administradores con sus
-    roles asignados.
-    \item \textbf{Site — \texttt{POST /v1/course/csv}}: Importación masiva de
-    asignaturas académicas desde archivo CSV.
-    \item \textbf{Site — \texttt{POST /v1/site/\{siteId\}/party/student/csv}}: Carga masiva
-    de estudiantes inscritos en un sitio de asignatura específico desde archivo CSV, garantizando que la operación se realiza sobre un sitio existente.
-\end{itemize}
-
-Adicionalmente, se contemplan los siguientes endpoints de carga que se encuentran
-pendientes de implementación para completar la cobertura de datos de prueba:
-
-\begin{itemize}
-    \item[\textbf{Pendiente.}] \textbf{Site — \texttt{POST /v1/semester/csv}}:
-    Importación masiva de períodos académicos (semestres).
-    \item[\textbf{Pendiente.}] \textbf{Site — \texttt{POST /v1/site/csv}}:
-    Importación masiva de sitios de asignatura completos, incluyendo sus
-    participantes, secciones, horarios, evaluaciones, objetivos y contenidos
-    temáticos.
-\end{itemize}
-
-La invocación de estos endpoints se orquesta desde \texttt{portalasig-seeding},
-garantizando que cada instancia del ecosistema comience con un estado conocido y
-reproducible. Como fuente de verdad, el módulo utiliza una migración anonimizada
-de la base de datos de producción, en la cual los campos sensibles —como cédulas
-de identidad, correos electrónicos y nombres completos— se sustituyen por valores
-aleatorios que preservan el formato y la cardinalidad originales. Esta estrategia
-permite que los datos de prueba conserven la forma, las distribuciones y las
-relaciones del entorno real, facilitando la validación de flujos de negocio bajo
-condiciones que emulan fielmente la operación en producción, sin exponer
-información personal de los usuarios.
-
-\begin{center}
-    \textit{[Placeholder: Figura \ref{fig:modelo-datos-distribuido} — Diagrama entidad-relación del modelo de datos distribuido, mostrando los cuatro schemas aislados (UAA, Site, Notify, PAWARE) con sus tablas respectivas, sin relaciones cruzadas entre schemas.]}
-\end{center}
+Para facilitar el desarrollo y las pruebas se diseñó el repositorio
+\texttt{portalasig-seeding}, que orquesta la carga de datos de prueba mediante
+invocación de endpoints REST de carga masiva expuestos por cada microservicio. El
+módulo utiliza una migración anonimizada de la base de datos de producción, donde
+los campos sensibles se sustituyen por valores aleatorios que preservan el formato y
+la cardinalidad originales. Esta estrategia garantiza que cada instancia del
+ecosistema comience con un estado conocido y reproducible, facilitando la validación
+de flujos de negocio bajo condiciones que emulan la operación real sin exponer
+información personal.
 
 \subsection{Comparativa Cualitativa: Monolito vs. Microservicios}
 
@@ -570,7 +403,7 @@ estabilidad de toda la aplicación. & Un servicio caído aísla el fallo al domi
 que gestiona. El resto del ecosistema continúa operativo. \\
 \hline
 \textbf{Observabilidad} & Logs básicos del proceso Node.js consultables mediante
-\texttt{pm2}, sin métricas estructuradas, sin agregación centralizada de logs ni
+\texttt{pm2}\footnote{PM2: gestor de procesos para Node.js que permite mantener aplicaciones activas, recargarlas sin detener el servicio y monitorear su consumo de recursos.}, sin métricas estructuradas, sin agregación centralizada de logs ni
 trazabilidad distribuida. El diagnóstico es reactivo y manual. & Stack completo:
 Prometheus recolecta métricas, Loki agrega logs, Grafana visualiza correlaciones.
 El diagnóstico es proactivo y centralizado. \\
@@ -599,10 +432,10 @@ circular: la misma arquitectura distribuida que genera el problema —múltiples
 servicios que pueden fallar de forma independiente— proporciona también los
 instrumentos para resolverlo. El stack de observabilidad (Prometheus, Loki, Grafana)
 instalado para monitorear los microservicios no es un fin en sí mismo: constituye la
-infraestructura sensorial sobre la cual opera el servicio PAWARE, que asume la función
+infraestructura sensorial sobre la cual opera el servicio PAIMA, que asume la función
 de operador autónomo y reduce la carga cognitiva sobre el colaborador temporal.
 
-De este modo, PAWARE no es un componente aislado ni una funcionalidad adicional
+De este modo, PAIMA no es un componente aislado ni una funcionalidad adicional
 disponible sobre cualquier arquitectura: es un caso de uso directo y consecuencia
 lógica de la migración a microservicios. En el monolito, un único proceso con un
 único log impide cualquier forma de observabilidad distribuida; sin métricas por
@@ -611,7 +444,19 @@ sistema de autogestión pueda razonar. La descomposición en dominios independie
 junto con la instrumentación de cada nodo, habilita por primera vez la posibilidad de
 detectar, diagnosticar y actuar sobre fallas de forma automatizada.
 
-\section{Servicio PAWARE — Autogestión del Mantenimiento Asistido por IA}
+Estas tres capacidades ---distribuci\'{o}n arquitect\'{o}nica, observabilidad
+instrumentada y acci\'{o}n aut\'{o}noma--- constituyen las propiedades convergentes
+del paradigma de la Web 3.0 tal como se defini\'{o} en el Marco Te\'{o}rico. El
+monolito de PortalAsig, concebido bajo los principios de la Web 2.0, pod\'{i}a
+procesar informaci\'{o}n y facilitar la interacci\'{o}n entre usuarios, pero carec\'{i}a
+de los mecanismos necesarios para adaptarse, auto-diagnosticarse o incorporar
+capacidades inteligentes. La arquitectura de microservicios documentada en esta
+secci\'{o}n no resuelve \'{u}nicamente los problemas de acoplamiento y mantenibilidad:
+establece la infraestructura material sobre la cual el sistema puede evolucionar
+hacia un modelo distribuido, observable y autogestionado, alineado con las
+exigencias de la Web 3.0.
+
+\section{Servicio PAIMA — Autogestión del Mantenimiento Asistido por IA}
 
 \subsection{Motivación y Contexto}
 
@@ -625,23 +470,26 @@ deben dividir su atención entre el desarrollo de nuevas funcionalidades y la
 resolución de incidencias, esta complejidad puede convertirse en un cuello de botella
 crítico. Frente a esta situación, la arquitectura misma suministra la solución: el
 stack de observabilidad instalado para monitorear los microservicios se convierte en
-la base sobre la cual PAWARE ejecuta su ciclo de control.
+la base sobre la cual PAIMA ejecuta su ciclo de control.
 
-Este servicio, denominado \textbf{PAWARE} (PortalAsig Autonomous Watcher and
-REsponder), implementa un ciclo de autogestión del mantenimiento inspirado en el
+Este servicio, denominado \textbf{PAIMA} (\textbf{P}ortal\textbf{A}sig \textbf{I}ntelligent \textbf{MA}PE-K \textbf{A}gent), implementa un ciclo de autogestión del mantenimiento inspirado en el
 modelo MAPE-K, pero con la diferencia crítica de que las fases de Análisis y
-Planificación se delegan a un modelo de inteligencia artificial externo. PAWARE no
-opera sobre una infraestructura abstracta: sus conectores de monitoreo apuntan
-específicamente a las instancias de Prometheus y Loki desplegadas junto a los
-microservicios documentados en la Sección 3.1.2, y sus acciones de remediación
-invocan directamente los contenedores gestionados por Docker Compose descritos en la
-Sección 3.1.5. En este sentido, PAWARE es un caso de uso directo de la arquitectura de
-microservicios: solo la existencia de un ecosistema distribuido e instrumentado hace
-posible su implementación.
+Planificación se delegan a un modelo de inteligencia artificial externo. Tal como se
+documentó en el Marco Teórico (Sección 2.6.2), esta decisión se alinea con la
+dirección de investigación que integra MAPE-K con inteligencia artificial para la
+gestión autónoma de microservicios, tal como la proponen Esposito et al.
+\cite{esposito2025mapek}. PAIMA constituye una implementación práctica de este
+framework adaptada a las limitantes operativas del contexto de PortalAsig. PAIMA no opera sobre una infraestructura
+abstracta: sus conectores de monitoreo apuntan específicamente a las instancias de
+Prometheus y Loki desplegadas junto a los microservicios documentados en la
+Sección 3.1.2, y sus acciones de remediación invocan directamente los contenedores
+gestionados por Docker Compose descritos en la Sección 3.1.5. En este sentido,
+PAIMA es un caso de uso directo de la arquitectura de microservicios: solo la
+existencia de un ecosistema distribuido e instrumentado hace posible su implementación.
 
-\subsection{Arquitectura Interna de PAWARE}
+\subsection{Arquitectura Interna de PAIMA}
 
-PAWARE se implementó como un microservicio Spring Boot con un scheduler
+PAIMA se implementó como un microservicio Spring Boot con un \textit{scheduler}\footnote{\textit{Scheduler}: componente que programa y ejecuta tareas de forma periódica o programada en el tiempo.}
 periódico que ejecuta el ciclo MAPE-K definido en el Marco Teórico. La
 arquitectura de clases se organiza en cinco paquetes que reflejan las fases del
 ciclo: \texttt{monitor}, \texttt{analyze}, \texttt{plan}, \texttt{execute} y
@@ -649,34 +497,33 @@ ciclo: \texttt{monitor}, \texttt{analyze}, \texttt{plan}, \texttt{execute} y
 permiten sustituir implementaciones sin afectar al resto del sistema —por
 ejemplo, el proveedor de IA puede cambiarse de un modelo local (como Llama o
 Mistral ejecutado mediante Ollama) a uno remoto (como OpenAI o Gemini) modificando
-únicamente la clase que implementa \texttt{AwareAiProvider} y registrando el bean
+únicamente la clase que implementa \texttt{AwareAiProvider} y registrando el \textit{bean}\footnote{\textit{Bean}: en el contexto de Spring, objeto gestionado por el contenedor de inversión de control, cuyo ciclo de vida y dependencias son administrados por el framework.}
 correspondiente en la configuración del Config Server. La orquestación del
 ciclo completo la coordina la clase \texttt{AwareScheduler}, invocada mediante la
 anotación \texttt{@Scheduled} de Spring con una frecuencia configurable a través
-del Config Server. Adicionalmente, PAWARE expone endpoints REST bajo el prefijo
+del Config Server. Adicionalmente, PAIMA expone endpoints REST bajo el prefijo
 \texttt{/v1/alert} que permiten a la interfaz de usuario consultar alertas
 activas, registrar decisiones humanas y auditar el historial de incidentes.
 
 Un aspecto distintivo de la arquitectura es la persistencia del conocimiento
 generado en cada iteración del ciclo. No basta con almacenar la alerta y su
-resolución: el sistema conserva el \texttt{MonitoringSnapshot} completo, el plan de
+resolución: el sistema conserva el \texttt{MonitoringSnapshot}\footnote{\textit{Snapshot}: captura instantánea del estado de un sistema en un momento determinado, utilizada para análisis posterior o restauración.} completo, el plan de
 acción propuesto por el modelo de IA, la decisión humana (aprobación o rechazo) y
 los comentarios asociados. Este registro acumulativo, almacenado en las tablas
-\texttt{paware\_alert} y \texttt{paware\_alert\_feedback}, constituye una base de
+\texttt{paima\_alert} y \texttt{paima\_alert\_feedback}, constituye una base de
 conocimiento operativo que puede compactarse y reinyectarse en iteraciones futuras.
 A medida que el sistema opera, el historial de incidentes resueltos permite ajustar
-los umbrales de detección, refinar los prompts enviados al modelo de IA e
+los umbrales de detección, refinar los \textit{prompts}\footnote{\textit{Prompt}: instrucción de texto que se proporciona a un modelo de inteligencia artificial para guiar su respuesta o comportamiento.} enviados al modelo de IA e
 identificar patrones recurrentes de fallo, transformando la fase Knowledge de un
 simple repositorio de registros en un mecanismo de mejora continua del propio
 servicio de autogestión.
 
-\begin{center}
-    \textit{[Placeholder: Figura \ref{fig:paware-clases} — Diagrama de clases de
-    PAWARE mostrando los paquetes \texttt{monitor}, \texttt{analyze}, \texttt{plan},
-    \texttt{execute}, \texttt{knowledge}, las interfaces principales
-    (\texttt{AwareAiProvider}, \texttt{MonitoringConnector}, \texttt{ActionExecutor})
-    y la clase \texttt{AwareScheduler} que orquesta el ciclo.]}
-\end{center}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[draft,width=0.85\textwidth]{graphics/paima-clases.png}
+    \caption{Diagrama de clases de PAIMA mostrando los paquetes del ciclo MAPE-K.}
+    \label{fig:paima-clases}
+\end{figure}
 
 \subsection{Fase Monitor: Recolección de Datos Operativos}
 
@@ -691,7 +538,7 @@ de total portabilidad e independencia de infraestructura específica.
 \subsection{Fase Analyze y Plan: Asistencia con Inteligencia Artificial}
 
 Una vez consolidadas las métricas y los logs de todas las fuentes de monitoreo,
-PAWARE evalúa si las condiciones del ecosistema indican una anomalía que requiera
+PAIMA evalúa si las condiciones del ecosistema indican una anomalía que requiera
 intervención. Los criterios de detección incluyen servicios sin respuesta
 (\texttt{DOWN}), latencias superiores a los umbrales configurados en Prometheus, o
 un volumen inusual de excepciones registradas en Loki. Cuando se supera alguno de
@@ -711,27 +558,27 @@ notificar a los administradores del sistema.
 
 \subsection{Fase Execute: Automatización y Notificación}
 
-En la fase de ejecución, PAWARE procesa las acciones recomendadas por el modelo de
+En la fase de ejecución, PAIMA procesa las acciones recomendadas por el modelo de
 IA. Las acciones pueden ser de dos tipos principales:
 \begin{itemize}
-    \item \textbf{Acciones Automáticas:} PAWARE puede ejecutar comandos
+    \item \textbf{Acciones Automáticas:} PAIMA puede ejecutar comandos
 directamente sobre el entorno Docker. Por ejemplo, para un reinicio de servicio
 (\texttt{AUTOMATED\_RESTART}), invoca el script \texttt{portalasig-cli} con el
 comando \texttt{restart} para el microservicio objetivo.
     \item \textbf{Notificaciones:} Para acciones que requieren intervención humana
-o simplemente informar, PAWARE interactúa con el microservicio
+o simplemente informar, PAIMA interactúa con el microservicio
 \texttt{ms-notify} para enviar alertas por correo electrónico a los
 administradores del sistema, incluyendo detalles del incidente y las
 recomendaciones de la IA.
 \end{itemize}
 Cada acción, ya sea automática o de notificación, es registrada en la base de datos
-de PAWARE, manteniendo un historial completo.
+de PAIMA, manteniendo un historial completo.
 
 \subsection{Fase Knowledge: Registro de Incidentes y Feedback}
 
 Todo el estado, los planes propuestos por la IA y la evidencia de las fallas se
-almacenan en una base de datos relacional (tablas \texttt{paware\_alert} y
-\texttt{paware\_alert\_feedback}). Esta persistencia actúa como la base de
+almacenan en una base de datos relacional (tablas \texttt{paima\_alert} y
+\texttt{paima\_alert\_feedback}). Esta persistencia actúa como la base de
 Conocimiento (Knowledge) del modelo MAPE-K. Los administradores interactúan con
 estas alertas para aprobar o rechazar acciones. Estas decisiones humanas,
 acompañadas de comentarios, se retroalimentan en el sistema. A futuro, este registro
@@ -741,7 +588,7 @@ autónomo y robusto.
 
 \subsection{Interfaz de Gestión de Incidentes (Frontend)}
 
-Se incorporó un módulo dedicado denominado ``Alertas PAWARE'' dentro de la
+Se incorporó un módulo dedicado denominado ``Alertas PAIMA'' dentro de la
 aplicación frontend en Vue.js. La interfaz se organiza en cuatro vistas que cubren
 el ciclo completo de atención de incidentes: un panel de control general, un listado
 de alertas por estado, una vista de detalle individual y un asistente conversacional.
@@ -752,11 +599,12 @@ estado saludable vs. degradado, y gráficos de evolución temporal de incidentes
 Este dashboard permite al administrador evaluar la situación global antes de
 adentrarse en casos específicos.
 
-\begin{center}
-    \textit{[Placeholder: Figura \ref{fig:paware-dashboard} — Screenshot del panel de
-    control de PAWARE mostrando contadores de alertas por severidad, indicadores de
-    estado de servicios y gráfico de tendencia de incidentes en las últimas 24 horas.]}
-\end{center}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[draft,width=0.9\textwidth]{graphics/paima-dashboard.png}
+    \caption{Screenshot del panel de control de PAIMA.}
+    \label{fig:paima-dashboard}
+\end{figure}
 
 \textbf{Listado de alertas.} Esta vista divide las incidencias en dos pestañas:
 ``Pendientes de Acción'' y ``Completadas / Gestionadas''. Cada fila muestra la
@@ -768,7 +616,7 @@ con códigos de color (rojo para P1, amarillo para P2).
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/paware-alerts-list.png}
     \caption{Listado de alertas autonómicas priorizadas visibles para el administrador.}
-    \label{fig:paware-alerts-list}
+    \label{fig:paima-alerts-list}
 \end{figure}
 
 \textbf{Detalle del incidente.} Al seleccionar una alerta, el administrador accede a
@@ -777,11 +625,12 @@ momento del evento, fragmentos de log de Loki, la recomendación estructurada
 producida por el modelo de IA y los controles para aprobar, rechazar o comentar la
 acción propuesta.
 
-\begin{center}
-    \textit{[Placeholder: Figura \ref{fig:paware-incident-detail} — Screenshot de la
-    vista de detalle de un incidente P1, mostrando métricas de latencia, logs de error,
-    recomendación de la IA y botones de acción (Aprobar, Rechazar, Comentar).]}
-\end{center}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[draft,width=0.9\textwidth]{graphics/paima-incident-detail.png}
+    \caption{Screenshot de la vista de detalle de un incidente P1 en PAIMA.}
+    \label{fig:paima-incident-detail}
+\end{figure}
 
 \textbf{Asistente conversacional.} Antes de ejecutar cualquier acción sobre una alerta,
 el administrador puede abrir un chat contextual para interrogar a la IA sobre la
@@ -794,5 +643,5 @@ decisiones.
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/paware-chat.png}
     \caption{Interacción del administrador con el agente de IA para refinar el diagnóstico antes de ejecutar una acción sobre la alerta.}
-    \label{fig:paware-chat}
+    \label{fig:paima-chat}
 \end{figure}

@@ -4,10 +4,50 @@
 
 \chapter*{Resumen}
 \addcontentsline{toc}{chapter}{Resumen}
-\textit{[Placeholder: Escribir aquí un resumen formal (máx. 300 palabras). Debe mencionar el problema del monolito legado, la migración a microservicios, la incorporación del modelo autonómico AWARE (PAWARE) para mantenimiento asistido por IA, y la validación exitosa del sistema mediante simulaciones de caos.]}
+
+El sistema PortalAsig, desarrollado para la gesti\'{o}n acad\'{e}mica de la Facultad de
+Ciencias de la Universidad Central de Venezuela, opera desde el a\~{n}o 2016 sobre
+una arquitectura monol\'{i}tica que acumul\'{o} seis a\~{n}os de deuda t\'{e}cnica sin
+proceso sistem\'{a}tico de mantenimiento. Esta situaci\'{o}n, agravada por un contexto
+operativo sin equipo de desarrollo de tiempo completo y con colaboradores
+acad\'{e}micos temporales, gener\'{o} un grado de acoplamiento que dificultaba cualquier
+intervenci\'{o}n y hac\'{i}a depender el sistema del conocimiento t\'{a}cito de cada
+mantenedor.
+
+El presente trabajo documenta el redise\~{n}o del backend de PortalAsig hacia una
+arquitectura de microservicios que descompone el sistema en dominios acotados e
+independientes ---UAA (gesti\'{o}n de identidad), Site (sitios acad\'{e}micos) y Notify
+(notificaciones)--- cada uno con su propia base de datos, su esquema de
+versionado y su ciclo de despliegue aut\'{o}nomo. Sobre esta arquitectura se
+implementaron t\'{e}cnicas sistem\'{a}ticas de mantenimiento de software que abarcan
+todo el ciclo de vida del c\'{o}digo: integraci\'{o}n continua con validaci\'{o}n
+automatizada, an\'{a}lisis est\'{a}tico de c\'{o}digo, pruebas de integraci\'{o}n sobre bases de
+datos reales, pruebas end-to-end y medici\'{o}n de cobertura. Se instrumentaron
+adem\'{a}s mecanismos de observabilidad distribuida que recolectan m\'{e}tricas,
+agregan registros de ejecuci\'{o}n y visualizan correlaciones entre eventos del
+ecosistema.
+
+Sobre esta infraestructura sensorial se construy\'{o} el servicio PAIMA (PortalAsig
+Intelligent MAPE-K Agent), que ejecuta un ciclo de autogesti\'{o}n del mantenimiento
+mediante el modelo MAPE-K, donde las fases de An\'{a}lisis y Planificaci\'{o}n se
+delegan a un modelo de inteligencia artificial. PAIMA monitorea el ecosistema,
+detecta anomal\'{i}as, diagnostica causas, clasifica incidencias, notifica al
+administrador y propone acciones de remediaci\'{o}n que el operador humano eval\'{u}a y
+aprueba.
+
+La validaci\'{o}n mediante pruebas de integraci\'{o}n, validaci\'{o}n end-to-end y
+simulaci\'{o}n de caos demostr\'{o} que el ecosistema a\'{\i}sala fallos, mantiene m\'{e}tricas
+objetivas de calidad y reduce la carga cognitiva del mantenedor. El resultado es
+un sistema desacoplado, observable y autogestionado que puede ser mantenido por
+colaboradores acad\'{e}micos temporales sin depender del conocimiento t\'{a}cito.
+
+\vspace{1em}
+\noindent\textbf{Palabras clave:} arquitectura de microservicios, mantenimiento de
+software, integraci\'{o}n continua, observabilidad distribuida, computaci\'{o}n auton\'{o}mica,
+MAPE-K, inteligencia artificial, autogesti\'{o}n del mantenimiento.
 
 \newpage
 \tableofcontents
 \newpage
-\listoffigures
+% \listoffigures  % TODO: habilitar cuando todas las figuras sean reales
 \newpage

@@ -2,20 +2,193 @@
 \pagestyle{fancy}
 
 \section{Conclusiones}
-La evolución del sistema de gestión académica hacia una arquitectura orientada a microservicios permitió resolver satisfactoriamente las carencias de escalabilidad, acoplamiento y despliegue que afectaban al monolito original. La segregación de responsabilidades en dominios independientes —tales como identidad, lógica académica y notificaciones— simplificó la comprensión del sistema, redujo el riesgo de fallas en cascada y permitió adoptar tecnologías modernas adaptadas a las necesidades específicas de cada módulo.
 
-En paralelo, la incorporación de un modelo de auto-mantenimiento demostró ser una solución pragmática e innovadora frente a la escasez de recursos humanos dedicados a la administración operativa. El sistema desarrollado no solo logró consolidar las métricas de rendimiento y los registros de error dispersos, sino que fue capaz de inferir proactivamente soluciones mediante la integración de capacidades de Inteligencia Artificial (LLMs). Las pruebas de caos demostraron que el sistema es capaz de detectar la caída de servicios, alertar inmediatamente a las partes interesadas mediante notificaciones institucionalizadas y proveer al operador un entorno de diagnóstico asistido e inmediato.
+El presente trabajo documentó la migración del backend monolítico de PortalAsig
+hacia una arquitectura de microservicios, la implementación de técnicas sistemáticas
+de mantenimiento de software sobre el nuevo ecosistema, y el diseño del servicio
+PAIMA como mecanismo de autogestión del mantenimiento asistido por inteligencia
+artificial. El hilo conductor que atraviesa los capítulos anteriores puede sintetizarse
+en tres transformaciones interdependientes: una transformación arquitectónica que
+desacopla el sistema en dominios independientes, una transformación metodológica
+que introduce validación automatizada en cada cambio de código, y una transformación
+operativa que delega el diagnóstico y la remediación de incidentes a un ciclo de control
+autónomo.
 
-En definitiva, se comprobó empíricamente que la observabilidad distribuida, combinada con algoritmos generativos orientados a infraestructura (AIOps), acelera drásticamente el diagnóstico de fallas (Root Cause Analysis), reduciendo los tiempos de recuperación (MTTR) e incrementando la disponibilidad del sistema.
+En la dimensión arquitectónica, se demostró que el monolito legacy de PortalAsig
+acumulaba seis años de deuda técnica en un único proceso Node.js donde un
+controlador de 3.629 líneas gestionaba quince dominios de negocio distintos, sin
+mecanismo de aislamiento de fallos ni pruebas automatizadas. La migración a
+microservicios descompuso este sistema en cuatro dominios acotados ---UAA, Site,
+Notify y PAIMA--- cada uno con su propia base de datos MySQL, su esquema de
+versionado independiente mediante Flyway y su ciclo de despliegue autónomo. La
+Tabla \ref{tab:comparativa-monolito-ms} del Capítulo 3 evidenció que esta
+descomposición eliminó el acoplamiento referencial del modelo monolítico y habilitó
+el aislamiento de fallos, de modo que la caída de un servicio ya no compromete la
+estabilidad del ecosistema completo.
 
-\section{Trabajo Futuro y Recomendaciones}
-Para potenciar el alcance y la autonomía del modelo implementado, se sugieren las siguientes vías de desarrollo futuro. La visión a largo plazo es dotar a PAWARE de un contexto mucho más profundo y herramientas de acción avanzadas, evolucionándolo de un asistente de diagnóstico a un agente de ingeniería de software completamente autónomo:
+En la dimensión de mantenimiento, se implementó un pipeline de integración continua
+mediante GitHub Actions que ejecuta análisis estático con Checkstyle, pruebas de
+integración sobre bases de datos reales con Testcontainers, y medición de cobertura
+con JaCoCo en cada \textit{pull request}. Las reglas de protección de ramas bloquean la
+fusión de código si cualquiera de estos checks falla, transformando la validación de
+un proceso manual y dependiente del conocimiento tácito en un mecanismo sistemático
+y reproducible. Los resultados documentados en el Capítulo 4 muestran coberturas de
+código entre el 65\% y el 82\% por microservicio, cifras inexistentes en el monolito
+original. Asimismo, se diseñó una suite de pruebas end-to-end con Cypress que
+simula flujos completos de usuario sobre el frontend Vue.js, verificando que la
+capas de presentación, aplicación y persistencia operen de forma coordinada.
 
-\begin{itemize}
-    \item \textbf{Integración Profunda con el Código Fuente (Control de Versiones):} Ampliar las capacidades de la IA para que pueda conectarse a los repositorios del proyecto (ej. GitHub/GitLab). Esto le permitiría, ante una alerta, clonar el código, auditar la lógica, encontrar el segmento defectuoso y sugerir —o incluso generar automáticamente— \textit{Pull Requests} con la refactorización o corrección (auto-mejora del código).
-    \item \textbf{Interacción Activa con Servicios y Datos:} Evolucionar a PAWARE para que no solo consuma métricas pasivas de observabilidad, sino que pueda ejecutar consultas a través de las APIs internas o inspeccionar el estado de las bases de datos de forma segura. Si un operador consulta: \textit{``¿Cómo podemos mejorar el rendimiento del módulo de asignaturas?''}, la IA podría contrastar la telemetría con los volúmenes de datos reales y emitir recomendaciones de índices de base de datos o rediseño de queries.
-    \item \textbf{Tareas Programadas y Auditorías Predictivas:} Habilitar a PAWARE para ejecutar ciclos de revisión preventiva programados (cron jobs de auditoría). En lugar de reaccionar a incidentes, la IA simularía flujos de carga internamente, evaluaría la deuda técnica o los cuellos de botella latentes, y emitiría informes periódicos de mejora continua antes de que los usuarios experimenten lentitud.
-    \item \textbf{Ejecución Autónoma en Orquestadores:} Avanzar del estado de "recomendación" a la acción directa sobre la infraestructura (Kubernetes o Docker Swarm), otorgando permisos controlados a la IA para reiniciar, apagar o escalar instancias horizontalmente sin confirmación humana explícita, completando la visión de un sistema auto-reparable (Self-healing).
-    \item \textbf{Modelos Específicos y Soberanía Tecnológica (SLMs):} Recopilar progresivamente las resoluciones aprobadas en la base de datos de conocimiento para entrenar modelos de lenguaje de menor escala (Small Language Models). Esto lograría que el asistente capture la terminología exclusiva de la Universidad Central de Venezuela y opere localmente, reduciendo costos y dependencia de APIs de terceros.
-\end{itemize}
+En la dimensión de autogestión, se implementó el servicio PAIMA como un caso de uso
+directo de la observabilidad distribuida instalada para monitorear los
+microservicios. PAIMA ejecuta un ciclo MAPE-K donde las fases de Análisis y
+Planificación se delegan a un modelo de lenguaje de gran escala, configurado como
+proveedor configurable con fallback determinista. Esta decisión se alinea con la
+dirección de investigación que integra MAPE-K con inteligencia artificial para la
+gestión autónoma de microservicios, tal como la proponen Esposito et al.
+\cite{esposito2025mapek}. La simulación de caos documentada en el Capítulo 4
+validó que PAIMA detecta la caída de un servicio, clasifica la incidencia con
+prioridad P1, notifica al administrador vía correo electrónico, consolida métricas
+y logs en un panel de gestión, y propone una acción de reinicio que el operador
+humano evalúa y aprueba mediante un asistente conversacional. Este flujo reduce la
+carga cognitiva del mantenedor y acelera la recuperación sin requerir intervención
+manual en las fases de detección y diagnóstico.
 
+La contribución original de este trabajo reside en haber implementado de forma
+práctica el framework de Esposito et al. (2025) en un contexto académico con
+recursos limitados, donde no existe equipo de operaciones dedicado ni
+infraestructura cloud. PAIMA no es una arquitectura abstracta: sus conectores de
+monitoreo apuntan a instancias concretas de Prometheus y Loki desplegadas junto a
+los microservicios, y sus acciones de remediación invocan contenedores gestionados
+por Docker Compose. Esta materialización demuestra que la convergencia de
+distribución arquitectónica, observabilidad instrumentada e inteligencia artificial
+---las propiedades definidas en el Marco Teórico como tendencias convergentes de la
+Web 3.0--- no es una proyección teórica, sino una transformación operativa alcanzable
+en entornos con restricciones de personal y presupuesto.
+
+\section{Recomendaciones y Trabajo Futuro}
+
+A partir de los resultados obtenidos y las limitaciones observadas durante el
+desarrollo y la validación, se identifican las siguientes líneas de evolución para
+el ecosistema PortalAsig.
+
+\textbf{Soberanía tecnológica mediante modelos locales.} PAIMA actualmente delega
+las fases de Análisis y Planificación a proveedores de inteligencia artificial
+remotos (APIs compatibles con OpenAI). Como línea de trabajo futuro, se recomienda
+la integración de modelos de lenguaje ejecutados localmente mediante Ollama, lo que
+eliminaría la dependencia de conectividad externa y de costos por token, al tiempo
+que preservaría la confidencialidad de la telemetría operativa dentro de la
+infraestructura universitaria. Esta transición requeriría ajustar los \textit{prompts}
+y evaluar la calidad del razonamiento de modelos locales frente a los proveedores
+cloud actuales.
+
+\textbf{Centralización del routing y la autenticación.} Se recomienda evaluar la
+introducción de un gateway ---ya sea una extensión de Nginx o un componente
+dedicado como Spring Cloud Gateway--- para simplificar la seguridad perimetral y
+reducir la complejidad de configuración de CORS en cada microservicio.
+
+\textbf{Evolución de PAIMA hacia un agente semi-integrado de desarrollo.} En su
+configuración actual, PAIMA opera como un agente de operaciones que monitorea
+métricas y logs del ecosistema en ejecución. Como línea de evolución, se propone
+extender su alcance hacia el código fuente mismo, transformándolo en un agente
+semi-integrado que asista al mantenedor en tareas de ingeniería de software más
+amplia. Esta evolución contemplaría tres capacidades adicionales.
+
+En primer lugar, la integración con los repositorios de código alojados en GitHub
+mediante la API oficial del servicio. PAIMA podría leer el historial de
+\textit{commits}, analizar \textit{pull requests} abiertos, inspeccionar reportes de
+issues y correlacionar alertas operativas con cambios recientes en el código. Por
+ejemplo, un pico de latencia en el servicio Site podría asociarse automáticamente
+con un \textit{merge} reciente que modificó la capa de persistencia, reduciendo el
+tiempo de diagnóstico desde minutos a segundos.
+
+En segundo lugar, el análisis estático del código fuente combinado con el
+conocimiento operativo ya acumulado en la base de datos de PAIMA. Mediante la
+lectura periódica de los repositorios, el agente podría identificar \textit{code
+smells}, deuda técnica acumulada, inconsistencias en convenciones de nomenclatura
+y oportunidades de refactorización que escapan a las reglas rígidas de Checkstyle.
+Esta capacidad trasciende la detección de errores: permite realizar \textit{discovery
+\& improve} sobre el repositorio, sugiriendo extracciones de métodos,
+simplificaciones de clases complejas o eliminación de dependencias circularizadas
+que degradan la mantenibilidad del sistema.
+
+En tercer lugar, una interfaz conversacional extendida que permita al
+administrador no solo consultar sobre incidentes activos, sino también solicitar
+acciones de mejora continua y asistencia en el desarrollo de nuevas
+funcionalidades. El administrador podría formular consultas del tipo ``¿qué
+servicio presenta mayor deuda técnica este mes?'', ``genera un resumen de los
+\textit{commits} relacionados con la caída de ayer'' o ``propón una
+implementación para el endpoint de importación masiva de semestres que está
+pendiente''. El agente respondería generando fragmentos de código, diagramas de
+secuencia o planes de implementación basados en el conocimiento del dominio y del
+código existente, manteniendo siempre un ciclo de aprobación humana antes de
+cualquier modificación efectiva.
+
+Esta visión de PAIMA como agente semi-integrado ---semi porque opera con
+supervisión humana, integrado porque conecta operaciones, código y desarrollo en
+un único ciclo de retroalimentación--- representa un paso hacia la
+autogestión del mantenimiento en su acepción más completa. No se trata de
+sustituir al ingeniero de software, sino de reducir la fricción entre la
+observación del sistema, la comprensión de su código y la ejecución de mejoras,
+especialmente crítico en un contexto donde los colaboradores académicos temporales
+deben asumir tareas de operación y desarrollo simultáneamente.
+
+\textbf{Modelos de lenguaje especializados con habilidades operativas.} Más allá
+del análisis y la recomendación, se propone investigar el entrenamiento de un
+modelo de lenguaje de pequeña escala (SLM, \textit{Small Language Model}) sobre
+el dominio académico de PortalAsig, combinado con un sistema de \textit{skills}
+o herramientas invocables. El objetivo es que el agente no solo converse con el
+administrador, sino que ejecute directamente operaciones de negocio sobre los
+microservicios mediante llamadas a sus APIs REST.
+
+Esta arquitectura requeriría definir un catálogo de habilidades estructuradas que
+cubran las operaciones más frecuentes del sistema: creación de sitios académicos,
+alta de asignaturas, inscripción masiva de estudiantes mediante archivos CSV,
+generación de períodos semestrales, configuración de evaluaciones con pesos, y
+envío de notificaciones institucionales. Cada habilidad se implementaría como una
+función con esquema de entrada validado (nombre del curso, código, período
+académico, lista de correos), que el modelo invoca una vez que ha interpretado la
+intención del usuario a partir de un prompt en lenguaje natural. Por ejemplo, la
+orden ``abre el sitio de Cálculo I para el semestre 2025-1 e inscribe a los
+estudiantes del listado adjunto'' se traduciría en una secuencia de tres llamadas
+API ---creación del sitio, vinculación de la asignatura, carga masiva de
+participantes--- ejecutadas de forma atómica y supervisada.
+
+Para garantizar la seguridad y la trazabilidad, cada invocación de habilidad
+debería someterse a un ciclo de confirmación humana: el agente presentaría un
+resumen de las acciones propuestas, los datos afectados y las APIs involucradas,
+permitiendo al administrador aprobar, modificar o cancelar la operación antes de
+su ejecución. Este patrón mantiene el principio de autogestión asistida que
+caracteriza a PAIMA: la inteligencia artificial reduce la carga cognitiva y
+elimina la necesidad de conocer los endpoints técnicos, pero la autoridad final
+reside en el operador humano.
+
+El impacto de esta evolución trasciende la comodidad del administrador. En el
+contexto operativo de PortalAsig, donde los colaboradores académicos temporales
+deben alternar entre desarrollo de nuevas funcionalidades y operación del sistema
+en producción, una interfaz conversacional que permita gestionar el dominio
+académico sin escribir código ni recordar rutas de API desacopla la operación del
+conocimiento técnico profundo. Un coordinador de asignatura con permisos
+administrativos podría crear sitios, configurar evaluaciones y enviar
+notificaciones sin intervención de un ingeniero de software, acelerando los
+ciclos administrativos del semestre y reduciendo los cuellos de botella que
+actualmente dependen de la disponibilidad del mantenedor.
+
+\textbf{Evolución hacia una arquitectura multi-agente distribuida.} PAIMA
+implementa actualmente un ciclo MAPE-K centralizado: un único agente monitorea
+el ecosistema completo y ejecuta acciones de remediación. Como trabajo futuro de
+investigación, se propone explorar la evolución hacia una arquitectura tipo AWARE,
+donde múltiples agentes de inteligencia artificial colaboran entre nodos del
+ecosistema de forma distribuida \cite{sanwouo2025aware}. Esta transición
+representaría un salto desde la autogestión asistida centralizada hacia una
+computación autonómica plena, donde cada microservicio podría incorporar
+capacidades de auto-diagnóstico y auto-remediación local, coordinándose con los
+demás mediante protocolos de consenso multi-agente.
+
+\textbf{Alcance explícito fuera del trabajo.} Es importante precisar que el
+presente trabajo se centra en la integración continua (CI) como técnica de
+aseguramiento de calidad. La entrega continua (CD, \textit{Continuous Delivery}),
+que automatiza el despliegue de artefactos validados hacia entornos de
+producción, queda fuera del alcance documentado. La implementación de pipelines
+de CD requeriría infraestructura adicional de despliegue automatizado sobre los
+servidores universitarios, lo cual constituye un proyecto independiente de
+significativa complejidad operativa.
