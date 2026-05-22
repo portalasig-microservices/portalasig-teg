@@ -672,9 +672,9 @@ La estructura de carpetas era plana: componentes genéricos (\texttt{TheHeader.v
 (\texttt{HomePage.vue}, \texttt{SitePage.vue}) sin jerarquía de dominio. No existía
 configuración de linting ni formateo automatizado, lo que generaba inconsistencias
 de estilo y dificultaba la lectura del código para nuevos colaboradores.
-Finalmente, el router carecía de guards de navegación: cualquier usuario podía
-acceder a rutas administrativas mediante la URL directa, delegando la autorización
-exclusivamente al backend.
+Finalmente, el router definía guards de navegación con siete niveles de
+permisos pero se encontraba acoplado en un único archivo monolítico junto a
+todas las rutas de la aplicación, dificultando su mantenimiento y extensión.
 
 \subsection{Reestructuración Arquitectónica}
 
@@ -690,13 +690,14 @@ provocaba efectos colaterales en el store monolítico.
 
 \textbf{Router modular con guards de navegación.} Las rutas se organizaron en
 archivos separados por dominio (\texttt{home.js}, \texttt{login.js}, \texttt{admin.js},
-\texttt{site.js}, \texttt{userSettings.js}) y se implementaron siete niveles de guards:
-\texttt{requiresAuth}, \texttt{requiresAnonymous}, \texttt{requiresStudentOrBetter},
-\texttt{requiresTeachingStaffPermission}, \texttt{requiresStudentTeacherOrBetter},
-\texttt{requiresCoordOrBetter} y \texttt{requiresAdmin}. Estos guards evalúan el
-estado de autenticación y los roles del usuario antes de permitir la navegación,
-previniendo el acceso no autorizado a vistas administrativas y de gestión de
-contenidos.
+\texttt{site.js}, \texttt{userSettings.js}), manteniendo los siete niveles de guards
+existentes (\texttt{requiresAuth}, \texttt{requiresAnonymous},
+\texttt{requiresStudentOrBetter}, \texttt{requiresTeachingStaffPermission},
+\texttt{requiresStudentTeacherOrBetter}, \texttt{requiresCoordOrBetter} y
+\texttt{requiresAdmin}). Esta descomposición eliminó el acoplamiento del router
+monolítico y permitió que cada guard evolucionara de forma aislada en el
+módulo de su dominio, preservando la autorización por rol sin depender de un
+único archivo centralizado.
 
 \textbf{Múltiples instancias de Axios.} Se reemplazó la instancia única de Axios
 por tres clientes independientes en \texttt{src/config/global-axios.js}:
@@ -766,7 +767,7 @@ actúa como proxy inverso y centraliza el punto de entrada del ecosistema.
 \hline
 \textbf{Autenticación} & Sesiones propietarias en \texttt{localStorage}. & OAuth2/JWT con cookies y refresh token. \\
 \hline
-\textbf{Autorización} & Sin guards; validación solo en backend. & Siete niveles de guards de navegación en router. \\
+\textbf{Autorización} & Router monolítico con guards acoplados. & Router modular con guards desacoplados por dominio. \\
 \hline
 \textbf{Calidad de código} & Sin linting ni formateo. & ESLint + Prettier con verificación automática. \\
 \hline
