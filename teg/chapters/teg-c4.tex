@@ -145,6 +145,15 @@ que cada test parte de un estado limpio sin depender del orden de ejecución.
     \label{fig:jacoco-report}
 \end{figure}
 
+\textbf{Documentación de APIs.} Como parte del pipeline de integración continua, cada microservicio expone su documentación interactiva mediante Swagger UI, generada automáticamente a partir de las anotaciones presentes en los controladores REST. Esta interfaz viva describe los endpoints disponibles, los esquemas de request/response y los códigos de estado posibles, eliminando la necesidad de mantener manuales separados. La validez de la documentación se verifica visualmente en cada despliegue, constituyendo una evidencia complementaria de que la interfaz REST del servicio está correctamente especificada y accesible.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[draft,width=0.85\textwidth]{graphics/swagger-ui.png}
+    \caption{Interfaz Swagger UI del servicio Site, mostrando los endpoints REST documentados automáticamente.}
+    \label{fig:swagger-ui}
+\end{figure}
+
 \section{Pruebas End-to-End}
 
 \subsection{Selección de Herramienta y Diseño de Flujos}
