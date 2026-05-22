@@ -196,6 +196,20 @@ Bootstrap-Vue) y reescribir los componentes de clase a la sintaxis de
 \texttt{script setup}, pero preservaría la arquitectura modular y los flujos de
 autenticación ya establecidos.
 
+\textbf{Cobertura de código y pruebas de integración en el frontend.} El
+backend cuenta con medición sistemática de cobertura mediante JaCoCo, umbral
+de aceptación en pipeline y pruebas de integración sobre bases de datos reales.
+El frontend, por su parte, carece de un equivalente: no se instrumenta cobertura
+de código JavaScript ni se ejecutan pruebas de integración de componentes Vue.js
+como parte del proceso de validación. Como línea de trabajo futuro, se
+recomienda incorporar Istanbul/nyc para medir la cobertura de código del
+frontend, establecer un umbral mínimo en GitHub Actions y complementar las
+pruebas end-to-end de Cypress con pruebas de integración de componentes
+mediante Vue Test Utils y Jest. Esta práctica cerraría la brecha de calidad
+entre la capa de presentación y la capa de aplicación, garantizando que los
+refactors del store Vuex, los guards del router y los formularios reactivos
+conserven su comportamiento ante modificaciones.
+
 \textbf{Alcance explícito fuera del trabajo.} Es importante precisar que el
 presente trabajo se centra en la integración continua (CI) como técnica de
 aseguramiento de calidad. La entrega continua (CD, \textit{Continuous Delivery}),
