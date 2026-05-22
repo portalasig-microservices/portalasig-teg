@@ -365,8 +365,8 @@ El monolito original utiliza una única base de datos PostgreSQL con un schema
 centralizado donde la tabla \texttt{site} actúa como núcleo con relaciones hacia más
 de quince entidades. En la arquitectura de microservicios se adoptó el principio de
 un schema aislado por servicio: UAA gestiona identidades y roles; Site administra
-cursos, semestres, participantes y contenidos académicos; Notify registra eventos de
-correo; y PAIMA almacena alertas y decisiones de incidentes. Esta redistribución
+cursos, semestres, participantes y contenidos académicos; y Notify registra eventos de
+correo. Esta redistribución
 elimina el acoplamiento referencial y permite que cada servicio evolucione su modelo
 de forma independiente mediante \textbf{Flyway}.
 
