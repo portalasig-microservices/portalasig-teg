@@ -14,16 +14,19 @@ orientado a la mantenibilidad. Este redise\~{n}o mejor\'{o} sustancialmente la
 organizaci\'{o}n del c\'{o}digo cliente, sent\'{o} las bases para una evoluci\'{o}n
 controlada de la capa de presentaci\'{o}n y demostr\'{o} que un redise\~{n}o
 arquitect\'{o}nico bien planificado puede extender la vida \'{u}til de un sistema sin
-reescribirlo por completo. En el presente trabajo, el frontend heredado fue
-adaptado para operar como cliente de la nueva arquitectura distribuida:
-se reestructur\'{o} el store Vuex en m\'{o}dulos por dominio, se implementaron
-guards de navegaci\'{o}n con siete niveles de permisos, se reemplaz\'{o} la
-autenticaci\'{o}n propietaria por un flujo OAuth2/JWT con cookies y refresh token,
-y se configuraron m\'{u}ltiples instancias de Axios que reflejan la topolog\'{i}a
-de microservicios (UAA, Site, Notify). No obstante, el backend del sistema
-permaneci\'{o} basado en una arquitectura monol\'{i}tica que acumul\'{o}, durante
-seis a\~{n}os consecutivos, una deuda t\'{e}cnica creciente sin proceso
-sistem\'{a}tico de mantenimiento.
+reescribirlo por completo.
+
+En el presente trabajo, ese frontend heredado fue adaptado para operar como
+cliente de la nueva arquitectura distribuida: se reestructur\'{o} el store Vuex en
+m\'{o}dulos por dominio, se implementaron guards de navegaci\'{o}n con siete niveles
+de permisos, se reemplaz\'{o} la autenticaci\'{o}n propietaria por un flujo
+OAuth2/JWT con cookies y refresh token, y se configuraron m\'{u}ltiples
+instancias de Axios que reflejan la topolog\'{i}a de los microservicios (UAA,
+Site, Notify).
+
+Mientras tanto, el backend del sistema permaneci\'{o} basado en una arquitectura
+monol\'{i}tica que acumul\'{o}, durante seis a\~{n}os consecutivos, una deuda
+ t\'{e}cnica creciente sin proceso sistem\'{a}tico de mantenimiento.
 
 En el caso de PortalAsig, el desarrollo del backend recay\'{o} en colaboradores
 acad\'{e}micos temporales que conclu\'{i}an sus per\'{i}odos sin dejar documentaci\'{o}n
