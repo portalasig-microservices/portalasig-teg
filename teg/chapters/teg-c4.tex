@@ -478,7 +478,7 @@ las ventajas de especialización en escenarios de baja concurrencia.
 
 Para comprobar la resiliencia del ecosistema y el funcionamiento del modelo de
 auto-mantenimiento se diseñó un experimento de ingeniería del caos siguiendo la
-metodología descrita en el Marco Teórico. El escenario consistió en detener de
+metodología descrita en el Marco Teórico \cite{brendan2011chaos}. El escenario consistió en detener de
 forma intencional el contenedor del servicio de sitios académicos
 (\texttt{ms-site}), emulando una caída catastrófica en un entorno de producción.
 
@@ -569,10 +569,10 @@ registrado en cada iteración fue el siguiente:
 
 La simulación de caos validó tres hipótesis fundamentales del trabajo. Primera: la
 arquitectura de microservicios aísla efectivamente los fallos, permitiendo que el
-frontend y los demás servicios continúen operativos aun cuando un nodo cae.
+frontend y los demás servicios continúen operativos aun cuando un nodo cae \cite{richardson2018microservices}.
 Segunda: el stack de observabilidad (Prometheus + Loki + Grafana) proporciona datos
 suficientes para que PAIMA detecte, clasifique y notifique incidentes sin
-intervención humana en las fases iniciales. Tercera: la interfaz de gestión de
+intervención humana en las fases iniciales \cite{sridharan2018distributed}. Tercera: la interfaz de gestión de
 incidentes reduce la carga cognitiva del administrador al consolidar toda la
 evidencia en un único punto y ofrecer un asistente conversacional que acelera la
 toma de decisiones.

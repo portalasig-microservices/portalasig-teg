@@ -189,7 +189,7 @@ utiliza Node.js y Express.js, el ecosistema Spring Boot ofrece de forma nativa
 (\textit{out-of-the-box})\footnote{\textit{Out-of-the-box}: expresión que indica que una funcionalidad está disponible de forma inmediata, sin requerir configuración adicional.} soporte para seguridad (OAuth2 y JWT), observabilidad
 (Micrometer, Actuator), comunicación entre servicios (WebClient) y configuración
 centralizada (Config Client), lo que elimina la dependencia de bibliotecas de terceros
-para funcionalidades críticas del ecosistema. La tipificación fuerte de Java
+para funcionalidades críticas del ecosistema \cite{newman2015building}. La tipificación fuerte de Java
 facilita la detección temprana de errores en tiempo de compilación —como incompatibilidades
 de tipos en parámetros de métodos o acceso a propiedades inexistentes— que en JavaScript
 suelen pasar inadvertidos hasta la ejecución en producción.
@@ -258,7 +258,7 @@ de dialecto entre motores de base de datos. La migración de datos se gestiona m
 servicio, garantizando que el schema de la base de datos esté siempre alineado con la
 versión del código desplegado. Este enfoque elimina la necesidad de ejecutar migraciones
 manuales y permite reproducir el estado de la base de datos en cualquier entorno a
-partir del repositorio de código fuente. Los scripts se organizan en el directorio
+partir del repositorio de código fuente \cite{flyway2024}. Los scripts se organizan en el directorio
 \texttt{src/main/resources/db/migration/} con el prefijo de versión obligatorio
 (\texttt{V1\_\_}, \texttt{V2\_\_}), lo que permite a Flyway determinar el orden de
 ejecución y detectar conflictos si dos colaboradores intentan crear una migración con
@@ -324,7 +324,7 @@ Las pruebas de integración se implementaron con \textbf{Testcontainers}, que le
 contenedores Docker efímeros de MySQL 8 durante la fase de pruebas de Maven. La clase
 base \texttt{AbstractMysqlIntegrationTest} instancia la base de datos, ejecuta las
 migraciones Flyway y destruye el contenedor al finalizar, garantizando que las
-pruebas validen el comportamiento real sobre un motor idéntico al de producción.
+pruebas validen el comportamiento real sobre un motor idéntico al de producción \cite{testcontainers2024}.
 La evolución de la suite de integración, los escenarios cubiertos y las lecciones
 aprendidas se presentan en el Capítulo \ref{ch:pruebas}.
 
@@ -332,12 +332,12 @@ Se creó el repositorio \texttt{portalasig-e2e} con \textbf{Cypress} para prueba
 interfaz que simulan flujos completos del usuario ---inicio de sesión, navegación por
 sitios de asignatura, gestión de contenidos--- ejecutándose dentro del mismo ciclo de
 vida del navegador. Los tests realizan peticiones directas de login contra el
-servicio UAA para obtener el token JWT, inyectándolo en las peticiones subsecuentes.
+servicio UAA para obtener el token JWT, inyectándolo en las peticiones subsecuentes \cite{cypress2024}.
 La suite completa, los resultados de ejecución y el análisis de estabilidad se
 documentan en el Capítulo \ref{ch:pruebas}.
 
 El stack de observabilidad se configuró con \textbf{Prometheus} para métricas,
-\textbf{Loki} para agregación de logs y \textbf{Grafana} para visualización unificada.
+\textbf{Loki} para agregación de logs y \textbf{Grafana} para visualización unificada \cite{prometheus2024,grafana2024}.
 Estas herramientas se definieron en el Marco Teórico (Sección 2.3.5) y se integraron
 en cada microservicio mediante el artefacto \texttt{core-lib}. \textbf{SpringDoc
 OpenAPI} genera documentación interactiva de los endpoints REST a partir de las
@@ -352,7 +352,7 @@ microservicios, componentes de observabilidad y frontend--- en un único archivo
 declarativo y levantarlo mediante un comando único. Frente a alternativas como
 Kubernetes, Docker Compose ofrece simplicidad operativa para entornos sin
 requisitos de autoescalado ni alta disponibilidad multi-nodo, lo cual resulta
-adecuado para el contexto de servidores universitarios \textit{on-premise}. Se desarrolló el
+adecuado para el contexto de servidores universitarios \textit{on-premise} \cite{docker2024compose}. Se desarrolló el
 script \texttt{portalasig-cli} para encapsular las operaciones más frecuentes:
 preparación inicial del entorno (\texttt{bootstrap}), levantamiento (\texttt{up}),
 detención ordenada (\texttt{down}) y visualización de logs por servicio
@@ -726,7 +726,7 @@ OAuth2/JWT implementado por el servicio UAA. El frontend ahora ejecuta un flujo 
 dos pasos: primero obtiene un token de cliente mediante \texttt{client\_credentials}
 (anónimo) para operaciones públicas; luego, tras el login del usuario, intercambia
 las credenciales por un token de acceso JWT con tiempo de expiración y un
-\texttt{refresh\_token}.
+\texttt{refresh\_token} \cite{rfc6749,rfc7519}.
 
 Los tokens se almacenan en cookies (mediante \texttt{js-cookie}) en lugar de
 \texttt{localStorage}, mejorando la seguridad contra ataques XSS y permitiendo que el
