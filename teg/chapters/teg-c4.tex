@@ -214,7 +214,7 @@ suite E2E fue el manejo de la autenticación distribuida entre el frontend Vue.j
 el servicio UAA. Dado que el frontend redirige al usuario hacia UAA para obtener el
 token JWT y luego almacena el token en \texttt{localStorage}, los tests debían
 replicar este flujo completo sin depender de la interfaz de login de UAA, que
-podría cambiar de forma independiente. La solución consistió en implementar un
+puede cambiar de forma independiente. La solución consistió en implementar un
 comando personalizado de Cypress \texttt{cy.loginViaApi()} que realiza la petición
 \texttt{POST /oauth/token} directamente contra UAA, almacena el token en
 \texttt{localStorage} y refresca la página para que el frontend lo reconozca. Este
@@ -456,14 +456,14 @@ inferior y en una degradación gradual en lugar de una caída catastrófica.
 
 \textbf{Limitaciones del diseño.} Es importante reconocer que el monolito legacy
 no puede ser benchmarkado directamente en producción sin afectar a usuarios
-reales. Se propone levantar una instancia local del monolito con datos de
-\textit{seeding} para comparar bajo condiciones controladas. Sin embargo, esta
-instancia local no reproduce fielmente las condiciones de producción (caché del
-sistema operativo, conexiones persistentes, cargas de fondo), por lo que los
-resultados deberán interpretarse como indicativos y no como medidas absolutas.
-Asimismo, el ecosistema de microservicios introduce un overhead de red interna
-entre servicios que el monolito no tiene, lo que podría compensar parcialmente
-las ventajas de especialización en escenarios de baja concurrencia.
+reales. Una instancia local del monolito con datos de
+\textit{seeding} permitiría comparar bajo condiciones controladas, pero no reproduce
+fielmente las condiciones de producción (caché del sistema operativo, conexiones
+persistentes, cargas de fondo). Por esta razón, cualquier comparación de rendimiento
+debe interpretarse como un análisis de diseño orientado por hipótesis, no como
+medición empírica absoluta. Asimismo, el ecosistema de microservicios introduce un
+overhead de red interna entre servicios que el monolito no tiene, lo que compensa
+parcialmente las ventajas de especialización en escenarios de baja concurrencia.
 
 \begin{figure}[htbp]
     \centering
