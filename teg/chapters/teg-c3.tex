@@ -12,7 +12,11 @@ conocimiento tácito. Sobre este ecosistema distribuido se construyó el servici
 PAIMA, que asume la función de operador autónomo mediante un ciclo de control
 MAPE-K asistido por inteligencia artificial, monitoreando métricas y logs,
 diagnosticando anomalías y proponiendo acciones de remediación que mitigan la
-carga cognitiva sobre el mantenedor humano.
+carga cognitiva sobre el mantenedor humano. Paralelamente, el frontend
+heredado fue adaptado para operar como cliente de la arquitectura distribuida,
+reestructurando el estado por dominio, migrando la autenticación a OAuth2/JWT
+y configurando múltiples instancias de comunicación con los microservicios
+backend.
 
 \section{Migración del Backend a una Arquitectura de Microservicios}
 
