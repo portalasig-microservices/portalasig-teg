@@ -125,16 +125,16 @@ procesos de despliegue.
     \item Dise\~{n}ar una arquitectura de microservicios que desacople el backend en
 dominios independientes (UAA, Site, Notify), cada uno con su propia base de datos,
 su esquema de versionado y su ciclo de despliegue aut\'{o}nomo.
-    \item Implementar t\'{e}cnicas de mantenimiento de software que incluyan an\'{a}lisis
-est\'{a}tico con Checkstyle, pruebas de integraci\'{o}n con Testcontainers, medici\'{o}n de
-cobertura con JaCoCo, pruebas end-to-end con Cypress, e integraci\'{o}n continua con
-GitHub Actions.
+    \item Implementar t\'{e}cnicas sistem\'{a}ticas de aseguramiento de calidad que abarquen
+an\'{a}lisis est\'{a}tico, pruebas de integraci\'{o}n sobre bases de datos reales, medici\'{o}n de
+cobertura de c\'{o}digo, validaci\'{o}n end-to-end de la interfaz y automatizaci\'{o}n del
+pipeline de integraci\'{o}n continua.
     \item Dise\~{n}ar e implementar el servicio PAIMA, que ejecute un ciclo MAPE-K
 donde las fases de An\'{a}lisis y Planificaci\'{o}n se deleguen a un modelo de inteligencia
 artificial, configurado con proveedores intercambiables y fallback determinista.
-    \item Instrumentar mecanismos de observabilidad distribuida ---m\'{e}tricas con
-Prometheus, agregaci\'{o}n de logs con Loki, visualizaci\'{o}n con Grafana--- que
-constituyan la base sensorial sobre la cual PAIMA opere.
+    \item Instrumentar mecanismos de observabilidad distribuida para la recolecci\'{o}n
+de m\'{e}tricas, agregaci\'{o}n de logs y visualizaci\'{o}n centralizada, que constituyan la
+base sensorial sobre la cual PAIMA opere.
     \item Evaluar el ecosistema resultante mediante pruebas de integraci\'{o}n,
 validaci\'{o}n end-to-end, simulaci\'{o}n de caos con PAIMA y an\'{a}lisis comparativo
 cualitativo frente al monolito legacy.
