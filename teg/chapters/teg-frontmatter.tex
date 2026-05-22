@@ -16,11 +16,16 @@ mantenedor.
 
 El presente trabajo documenta el redise\~{n}o del backend de PortalAsig hacia una
 arquitectura de microservicios que descompone el sistema en dominios acotados e
-independientes ---UAA (gesti\'{o}n de identidad), Site (sitios acad\'{e}micos) y Notify
-(notificaciones)--- cada uno con su propia base de datos, su esquema de
-versionado y su ciclo de despliegue aut\'{o}nomo. Sobre esta arquitectura se
-implementaron t\'{e}cnicas sistem\'{a}ticas de mantenimiento de software que abarcan
-todo el ciclo de vida del c\'{o}digo: integraci\'{o}n continua con validaci\'{o}n
+independientes ---UAA (gesti\'{o}n de identidad), Site (sitios acad\'{e}micos), Notify
+(notificaciones) y PAIMA (autogesti\'{o}n del mantenimiento)--- cada uno con su
+propia base de datos, su esquema de versionado y su ciclo de despliegue aut\'{o}nomo.
+El frontend heredado, desarrollado en Vue.js~2, fue adaptado para operar como
+cliente distribuido: se reestructur\'{o} el store Vuex en m\'{o}dulos por dominio, se
+implementaron guards de navegaci\'{o}n con siete niveles de permisos, se migr\'{o} la
+autenticaci\'{o}n a OAuth2/JWT con cookies y refresh token, y se configuraron tres
+instancias de Axios que reflejan la topolog\'{i}a de los microservicios. Sobre esta
+arquitectura se implementaron t\'{e}cnicas sistem\'{a}ticas de mantenimiento de software
+que abarcan todo el ciclo de vida del c\'{o}digo: integraci\'{o}n continua con validaci\'{o}n
 automatizada, an\'{a}lisis est\'{a}tico de c\'{o}digo, pruebas de integraci\'{o}n sobre bases de
 datos reales, pruebas end-to-end y medici\'{o}n de cobertura. Se instrumentaron
 adem\'{a}s mecanismos de observabilidad distribuida que recolectan m\'{e}tricas,
@@ -28,7 +33,7 @@ agregan registros de ejecuci\'{o}n y visualizan correlaciones entre eventos del
 ecosistema.
 
 Sobre esta infraestructura sensorial se construy\'{o} el servicio PAIMA (PortalAsig
-Intelligent MAPE-K Agent), que ejecuta un ciclo de autogesti\'{o}n del mantenimiento
+Intelligent MAPE-K), que ejecuta un ciclo de autogesti\'{o}n del mantenimiento
 mediante el modelo MAPE-K, donde las fases de An\'{a}lisis y Planificaci\'{o}n se
 delegan a un modelo de inteligencia artificial. PAIMA monitorea el ecosistema,
 detecta anomal\'{i}as, diagnostica causas, clasifica incidencias, notifica al

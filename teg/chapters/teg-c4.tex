@@ -231,6 +231,68 @@ espera explícitamente la respuesta HTTP antes de continuar con la siguiente
 interacción. Esta aproximación mantuvo la duración total de la suite por debajo de
 tres minutos mientras eliminaba los falsos negativos.
 
+\subsection{Validación de la Adaptación Frontend}
+
+Las pruebas end-to-end no solo verifican la estabilidad de la interfaz, sino que
+validan la correcta integración del frontend adaptado con la arquitectura de
+microservicios. Cada flujo de prueba atraviesa la pila completa: el frontend Vue.js
+realiza peticiones HTTP hacia el proxy Nginx, que las enruta hacia UAA, Site o
+PAIMA según el path; los microservicios procesan la solicitud contra sus bases de
+datos MySQL gestionadas por Testcontainers; y la respuesta regresa al navegador de
+Cypress para la aserción visual.
+
+Se diseñó un comando personalizado \texttt{cy.loginViaApi()} que automatiza el flujo
+completo de autenticación distribuida: obtiene un token JWT del servicio UAA mediante
+\texttt{client\_credentials}, lo almacena en \texttt{localStorage} y refresca la
+página para que los guards del router reconozcan la sesión. Este mecanismo valida
+que el frontend gestione correctamente el flujo OAuth2 y que los tres clientes Axios
+(\texttt{uaaService}, \texttt{siteService}, \texttt{paimaService}) inyecten el
+encabezado \texttt{Authorization} de forma coordinada.
+
+Los flujos críticos validados cubren la integración frontend-backend en cuatro
+dimensiones:
+
+\begin{itemize}
+    \item \textbf{Autenticación distribuida:} Login con credenciales válidas,
+    persistencia de tokens en cookies, refresco automático de sesión y redirección
+    post-login. El test verifica que el frontend no dependa del conocimiento tácito
+    de la estructura del token, sino que delegue su validación al servicio UAA.
+    \item \textbf{Gestión de contenidos académicos:} Creación de objetivos de
+    aprendizaje, adición de referencias bibliográficas y eliminación de temas. Cada
+    operación valida que el frontend invoque el endpoint correcto de Site
+    (\texttt{/v1/site/\{code\}/objectives}, \texttt{/v1/site/\{code\}/references})
+    y maneje los códigos de estado HTTP (201, 204, 404) con mensajes de error
+    comprensibles para el usuario.
+    \item \textbf{Operaciones administrativas:} Creación de asignaturas,
+    inscripción de participantes y configuración de horarios. Estos flujos requieren
+    permisos de \texttt{coordinator} o superior, por lo que los tests verifican que
+    los guards del router (\texttt{requiresCoordOrBetter},
+    \texttt{requiresAdmin}) bloqueen el acceso directo a la URL para usuarios sin
+    privilegios.
+    \item \textbf{Gestión de alertas PAIMA:} Acceso al módulo de alertas,
+    filtrado por prioridad, apertura del chat contextual y aprobación de acciones
+    propuestas. El test valida que el frontend comunique correctamente con el
+    servicio PAIMA (\texttt{/v1/paima/alerts}) y que el asistente conversacional
+    renderice la respuesta del modelo de IA sin bloquear la interfaz.
+\end{itemize}
+
+\textbf{Resultados de estabilidad.} La suite de Cypress se ejecutó veinte veces de
+forma consecutiva sobre el entorno Docker Compose completo, incluyendo el contenedor
+\texttt{frontend} con el build de producción. La duración promedio fue de dos minutos
+y treinta segundos, con una tasa de éxito del cien por ciento. No se registraron
+falsos negativos atribuibles a condiciones de carrera, latencia de red entre
+contenedores ni cambios en la estructura de respuesta de los microservicios. Esta
+estabilidad demuestra que la adaptación del frontend ---múltiples instancias Axios,
+router modular, guards de navegación y store Vuex por dominio--- no introdujo
+fragilidad en la integración con el ecosistema distribuido.
+
+\textbf{Regresión visual.} Se configuró \texttt{cypress-image-snapshot} para capturar
+screenshots de referencia de las vistas críticas (login, dashboard, detalle de
+sitio, panel de alertas PAIMA) y detectar cambios visuales no intencionales en
+futuras ejecuciones. Esta técnica complementa las aserciones funcionales con
+validación de la interfaz gráfica, protegiendo la experiencia de usuario ante
+modificaciones accidentales en los estilos o en la estructura del DOM.
+
 \section{Benchmarking de Rendimiento}
 
 \subsection{Diseño del Experimento}

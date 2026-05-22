@@ -13,10 +13,16 @@ orientado a la mantenibilidad. Este redise\~{n}o mejor\'{o} sustancialmente la
 organizaci\'{o}n del c\'{o}digo cliente, sent\'{o} las bases para una evoluci\'{o}n
 controlada de la capa de presentaci\'{o}n y demostr\'{o} que un redise\~{n}o
 arquitect\'{o}nico bien planificado puede extender la vida \'{u}til de un sistema sin
-reescribirlo por completo. No obstante, el backend del sistema permaneci\'{o}
-basado en una arquitectura monol\'{i}tica que acumul\'{o}, durante seis a\~{n}os
-consecutivos, una deuda t\'{e}cnica creciente sin proceso sistem\'{a}tico de
-mantenimiento.
+reescribirlo por completo. En el presente trabajo, el frontend heredado fue
+adaptado para operar como cliente de la nueva arquitectura distribuida:
+se reestructur\'{o} el store Vuex en m\'{o}dulos por dominio, se implementaron
+guards de navegaci\'{o}n con siete niveles de permisos, se reemplaz\'{o} la
+autenticaci\'{o}n propietaria por un flujo OAuth2/JWT con cookies y refresh token,
+y se configuraron m\'{u}ltiples instancias de Axios que reflejan la topolog\'{i}a
+de microservicios (UAA, Site, PAIMA). No obstante, el backend del sistema
+permaneci\'{o} basado en una arquitectura monol\'{i}tica que acumul\'{o}, durante
+seis a\~{n}os consecutivos, una deuda t\'{e}cnica creciente sin proceso
+sistem\'{a}tico de mantenimiento.
 
 Esta situaci\'{o}n no es exclusiva de PortalAsig. Los sistemas de software
 acad\'{e}mico frecuentemente se desarrollan como proyectos de estudiantes que
@@ -86,7 +92,7 @@ anomal\'{i}as antes de que afecten a los usuarios y realizar cambios con confian
 reduciendo la dependencia del conocimiento t\'{a}cito.
 
 Sobre este ecosistema distribuido e instrumentado se construy\'{o} el servicio
-PAIMA (PortalAsig Intelligent MAPE-K Agent), que asume la funci\'{o}n de operador
+PAIMA (PortalAsig Intelligent MAPE-K), que asume la funci\'{o}n de operador
 aut\'{o}nomo mediante un ciclo de control MAPE-K donde las fases de An\'{a}lisis y
 Planificaci\'{o}n se delegan a un modelo de inteligencia artificial. PAIMA monitorea
 las m\'{e}tricas y logs del ecosistema, detecta anomal\'{i}as, diagnostica causas,

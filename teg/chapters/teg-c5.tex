@@ -184,6 +184,18 @@ computación autonómica plena, donde cada microservicio podría incorporar
 capacidades de auto-diagnóstico y auto-remediación local, coordinándose con los
 demás mediante protocolos de consenso multi-agente.
 
+\textbf{Migración del frontend a Vue.js~3.} El frontend actual opera sobre
+Vue.js~2, versión que alcanzó fin de vida a finales de 2023 y no recibe
+actualizaciones de seguridad ni correcciones. Como línea de trabajo futuro, se
+recomienda la migración a Vue.js~3, que introduce la Composition API, una
+reactividad más eficiente basada en Proxies, mejoras de rendimiento en el
+renderizado y compatibilidad con herramientas modernas como Vite. Esta
+migración requeriría actualizar las dependencias principales (Vuex a Pinia o
+Vue~3 Composition API, Vue Router~4, adaptación de componentes de
+Bootstrap-Vue) y reescribir los componentes de clase a la sintaxis de
+\texttt{script setup}, pero preservaría la arquitectura modular y los flujos de
+autenticación ya establecidos.
+
 \textbf{Alcance explícito fuera del trabajo.} Es importante precisar que el
 presente trabajo se centra en la integración continua (CI) como técnica de
 aseguramiento de calidad. La entrega continua (CD, \textit{Continuous Delivery}),

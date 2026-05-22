@@ -645,3 +645,139 @@ decisiones.
     \caption{Interacción del administrador con el agente de IA para refinar el diagnóstico antes de ejecutar una acción sobre la alerta.}
     \label{fig:paima-chat}
 \end{figure}
+
+\section{Adaptación del Frontend a la Arquitectura Distribuida}
+
+El frontend de PortalAsig, desarrollado originalmente en Vue.js~2 y rediseñado
+por Vásquez Balza \cite{teg_rafael}, operaba como cliente de un único backend
+monolítico. Con la migración a microservicios, la capa de presentación
+requirió una reestructuración arquitectónica para comunicarse con múltiples
+servicios independientes, gestionar la autenticación JWT/OAuth2 y mantener la
+coherencia de la interfaz de usuario sin incrementar la complejidad cognitiva del
+desarrollador.
+
+\subsection{Diagnóstico del Frontend Legacy}
+
+El código heredado presentaba una arquitectura de store monolítica: un único
+archivo \texttt{store.js} concentraba todo el estado de la aplicación ---usuarios,
+cursos, sitios, configuración de administración--- sin separación por dominio.
+La comunicación con el backend se realizaba mediante una única instancia de
+Axios apuntando a un endpoint \texttt{VUE\_APP\_API\_URL}, lo que asumió un backend
+único y centralizado. La autenticación empleaba un mecanismo propietario basado
+en \texttt{localStorage}, almacenando un token de sesión generado por el monolito e
+inyectándolo en cada petición mediante un encabezado con nombre custom.
+
+La estructura de carpetas era plana: componentes genéricos (\texttt{TheHeader.vue},
+\texttt{TheFooter.vue}) convivían con vistas de páginas completas
+(\texttt{HomePage.vue}, \texttt{SitePage.vue}) sin jerarquía de dominio. No existía
+configuración de linting ni formateo automatizado, lo que generaba inconsistencias
+de estilo y dificultaba la lectura del código para nuevos colaboradores.
+Finalmente, el router carecía de guards de navegación: cualquier usuario podía
+acceder a rutas administrativas mediante la URL directa, delegando la autorización
+exclusivamente al backend.
+
+\subsection{Reestructuración Arquitectónica}
+
+Se realizó un refactor progresivo que preservó la funcionalidad existente
+mientras se adaptaba la base de código a estándares de calidad y modularidad.
+
+\textbf{Modularización del store Vuex.} El estado se descompuso en cinco módulos
+independientes: \texttt{base} (configuración global), \texttt{course} (asignaturas),
+\texttt{session} (autenticación y tokens), \texttt{site} (sitios académicos) y
+\texttt{user} (perfiles y permisos). Cada módulo encapsula su propio estado,
+mutaciones, acciones y getters, eliminando el acoplamiento entre dominios que
+provocaba efectos colaterales en el store monolítico.
+
+\textbf{Router modular con guards de navegación.} Las rutas se organizaron en
+archivos separados por dominio (\texttt{home.js}, \texttt{login.js}, \texttt{admin.js},
+\texttt{site.js}, \texttt{userSettings.js}) y se implementaron siete niveles de guards:
+\texttt{requiresAuth}, \texttt{requiresAnonymous}, \texttt{requiresStudentOrBetter},
+\texttt{requiresTeachingStaffPermission}, \texttt{requiresStudentTeacherOrBetter},
+\texttt{requiresCoordOrBetter} y \texttt{requiresAdmin}. Estos guards evalúan el
+estado de autenticación y los roles del usuario antes de permitir la navegación,
+previniendo el acceso no autorizado a vistas administrativas y de gestión de
+contenidos.
+
+\textbf{Múltiples instancias de Axios.} Se reemplazó la instancia única de Axios
+por tres clientes independientes en \texttt{src/config/global-axios.js}:
+\texttt{uaaService}, \texttt{siteService} y \texttt{paimaService}. Cada uno apunta a la
+URL base de su microservicio correspondiente y gestiona el encabezado
+\texttt{Authorization} de forma aislada. Este diseño refleja directamente la
+topología del backend distribuido en el frontend.
+
+\textbf{Organización de componentes por dominio.} Los componentes se agruparon en
+carpetas funcionales: \texttt{base/} (TheHeader, TheFooter), \texttt{course/}
+(formularios de asignatura), \texttt{user/} (perfil, preferencias) y
+\texttt{ValidationFeedback.vue} como componente reusable de validación de
+formularios. Las vistas pasaron de nombres genéricos (\texttt{HomePage.vue}) a
+nombres descriptivos por función (\texttt{home/Home.vue}, \texttt{site/Site.vue}).
+
+\textbf{Estándar de calidad de código.} Se incorporaron ESLint~7, Prettier y
+\texttt{vue-eslint-parser} como dependencias de desarrollo. El script \texttt{serve}
+ejecuta linting antes de levantar el servidor de desarrollo, y \texttt{npm run format}
+aplica correcciones automáticas. Esta configuración eliminó las inconsistencias
+de estilo y estableció un estándar reproducible para futuros colaboradores.
+
+\subsection{Migración de Autenticación}
+
+La autenticación se migró del mecanismo propietario del monolito al flujo
+OAuth2/JWT implementado por el servicio UAA. El frontend ahora ejecuta un flujo de
+dos pasos: primero obtiene un token de cliente mediante \texttt{client\_credentials}
+(anónimo) para operaciones públicas; luego, tras el login del usuario, intercambia
+las credenciales por un token de acceso JWT con tiempo de expiración y un
+\texttt{refresh\_token}.
+
+Los tokens se almacenan en cookies (mediante \texttt{js-cookie}) en lugar de
+\texttt{localStorage}, mejorando la seguridad contra ataques XSS y permitiendo que el
+navegador gestione la expiración de forma declarativa. El módulo \texttt{session}
+implementa un mecanismo automático de refresco: antes de que expire el token de
+acceso, el frontend solicita un nuevo par de tokens al endpoint
+\texttt{/v1/auth/refresh-token}, evitando que el usuario pierda su sesión durante la
+navegación.
+
+\subsection{Integración con los Microservicios}
+
+La migración de endpoints implicó mapear cada operación del frontend hacia el
+servicio correspondiente: autenticación y gestión de usuarios hacia UAA
+(\texttt{/v1/user/}, \texttt{/v1/auth/}), operaciones de sitios académicos hacia Site
+(\texttt{/v1/site/}, \texttt{/v1/semester/}), y alertas de mantenimiento hacia PAIMA
+(\texttt{/v1/paima/}). El router se configuró en modo \texttt{history}, eliminando el
+prefijo \texttt{/#/} de las URLs y produciendo rutas limpias compatibles con el proxy
+inverso de Nginx.
+
+La configuración de CORS en cada microservicio permite que el frontend Vue.js,
+servido desde el contenedor \texttt{frontend} de Docker Compose, realice peticiones
+cruzadas hacia \texttt{ms-uaa}, \texttt{ms-site} y \texttt{paima}. La comunicación
+interna entre el frontend y los microservicios se enruta a través de Nginx, que
+actúa como proxy inverso y centraliza el punto de entrada del ecosistema.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparativa cualitativa: frontend monolítico vs. frontend adaptado}
+\label{tab:comparativa-frontend}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|p{3.2cm}|p{5.5cm}|p{5.5cm}|}
+\hline
+\textbf{Dimensión} & \textbf{Frontend Legacy} & \textbf{Frontend Adaptado} \\
+\hline
+\textbf{Arquitectura de estado} & Store Vuex monolítico, un único archivo. & Store modular por dominio (5 módulos independientes). \\
+\hline
+\textbf{Comunicación backend} & Única instancia Axios a un endpoint. & Tres instancias Axios (UAA, Site, PAIMA). \\
+\hline
+\textbf{Autenticación} & Sesiones propietarias en \texttt{localStorage}. & OAuth2/JWT con cookies y refresh token. \\
+\hline
+\textbf{Autorización} & Sin guards; validación solo en backend. & Siete niveles de guards de navegación en router. \\
+\hline
+\textbf{Calidad de código} & Sin linting ni formateo. & ESLint + Prettier con verificación automática. \\
+\hline
+\textbf{Estructura} & Carpetas planas, nombres genéricos. & Componentes por dominio, vistas descriptivas. \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+La Tabla~\ref{tab:comparativa-frontend} resume las transformaciones principales.
+Esta adaptación no alteró la experiencia visual del usuario final ---la interfaz
+conserva el diseño institucional y los flujos de navegación establecidos--- pero
+cambió radicalmente su arquitectura interna, alineándola con la topología
+distribuida del nuevo backend.
