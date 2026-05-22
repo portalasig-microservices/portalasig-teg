@@ -5,43 +5,35 @@
 \chapter*{Resumen}
 \addcontentsline{toc}{chapter}{Resumen}
 
-El sistema PortalAsig, desarrollado para la gesti\'{o}n acad\'{e}mica de la Facultad de
-Ciencias de la Universidad Central de Venezuela, opera desde el a\~{n}o 2016 sobre
-una arquitectura monol\'{i}tica que acumul\'{o} seis a\~{n}os de deuda t\'{e}cnica sin
-proceso sistem\'{a}tico de mantenimiento. Esta situaci\'{o}n, agravada por un contexto
-operativo sin equipo de desarrollo de tiempo completo y con colaboradores
-acad\'{e}micos temporales, gener\'{o} un grado de acoplamiento que dificultaba cualquier
-intervenci\'{o}n y hac\'{i}a depender el sistema del conocimiento t\'{a}cito de cada
-mantenedor.
+El sistema PortalAsig opera desde el a\~{n}o 2016 sobre una arquitectura monol\'{i}tica
+que acumul\'{o} seis a\~{n}os de deuda t\'{e}cnica sin proceso sistem\'{a}tico de
+mantenimiento, en un contexto sin equipo de desarrollo de tiempo completo y con
+colaboradores acad\'{e}micos temporales. Esta situaci\'{o}n gener\'{o} un grado de
+acoplamiento que dificultaba cualquier intervenci\'{o}n y hac\'{i}a depender el sistema
+del conocimiento t\'{a}cito de cada mantenedor.
 
-El presente trabajo documenta el redise\~{n}o del backend de PortalAsig hacia una
-arquitectura de microservicios que descompone el sistema en dominios acotados e
-independientes ---UAA (gesti\'{o}n de identidad), Site (sitios acad\'{e}micos), Notify
-(notificaciones) y PAIMA (autogesti\'{o}n del mantenimiento)--- cada uno con su
-propia base de datos, su esquema de versionado y su ciclo de despliegue aut\'{o}nomo.
-El frontend heredado, desarrollado en Vue.js~2, fue adaptado para operar como
-cliente distribuido: se reestructur\'{o} el store Vuex en m\'{o}dulos por dominio, se
-implementaron guards de navegaci\'{o}n con siete niveles de permisos, se migr\'{o} la
-autenticaci\'{o}n a OAuth2/JWT con cookies y refresh token, y se configuraron tres
-instancias de Axios que reflejan la topolog\'{i}a de los microservicios. Sobre esta
-arquitectura se implementaron t\'{e}cnicas sistem\'{a}ticas de mantenimiento de software
-que abarcan todo el ciclo de vida del c\'{o}digo: integraci\'{o}n continua con validaci\'{o}n
-automatizada, an\'{a}lisis est\'{a}tico de c\'{o}digo, pruebas de integraci\'{o}n sobre bases de
-datos reales, pruebas end-to-end y medici\'{o}n de cobertura. Se instrumentaron
-adem\'{a}s mecanismos de observabilidad distribuida que recolectan m\'{e}tricas,
-agregan registros de ejecuci\'{o}n y visualizan correlaciones entre eventos del
-ecosistema.
+El presente trabajo documenta el redise\~{n}o del backend hacia una arquitectura de
+microservicios que descompone el sistema en dominios acotados e independientes
+---UAA (gesti\'{o}n de identidad), Site (sitios acad\'{e}micos), Notify (notificaciones)
+y PAIMA (autogesti\'{o}n del mantenimiento)--- cada uno con base de datos propia y
+ciclo de despliegue aut\'{o}nomo. El frontend heredado fue adaptado para operar como
+cliente distribuido mediante Vuex modular, guards de navegaci\'{o}n, autenticaci\'{o}n
+OAuth2/JWT y clientes Axios multi-servicio. Sobre este ecosistema se implementaron
+t\'{e}cnicas sistem\'{a}ticas de aseguramiento de calidad que abarcan todo el ciclo
+de vida del c\'{o}digo ---desde el an\'{a}lisis est\'{a}tico y la integraci\'{o}n continua
+hasta las pruebas end-to-end y la medici\'{o}n de cobertura--- y se instrument\'{o}
+observabilidad distribuida para consolidar m\'{e}tricas, logs y trazas en un panel
+centralizado.
 
 Sobre esta infraestructura sensorial se construy\'{o} el servicio PAIMA (PortalAsig
-Intelligent MAPE-K), que ejecuta un ciclo de autogesti\'{o}n del mantenimiento
-mediante el modelo MAPE-K, donde las fases de An\'{a}lisis y Planificaci\'{o}n se
-delegan a un modelo de inteligencia artificial. PAIMA monitorea el ecosistema,
-detecta anomal\'{i}as, diagnostica causas, clasifica incidencias, notifica al
-administrador y propone acciones de remediaci\'{o}n que el operador humano eval\'{u}a y
+Intelligent MAPE-K), que ejecuta un ciclo de autogesti\'{o}n del mantenimiento donde
+las fases de An\'{a}lisis y Planificaci\'{o}n se delegan a un modelo de inteligencia
+artificial. PAIMA monitorea el ecosistema, detecta anomal\'{i}as, clasifica
+incidencias y propone acciones de remediaci\'{o}n que el operador humano eval\'{u}a y
 aprueba.
 
 La validaci\'{o}n mediante pruebas de integraci\'{o}n, validaci\'{o}n end-to-end y
-simulaci\'{o}n de caos demostr\'{o} que el ecosistema a\'{\i}sala fallos, mantiene m\'{e}tricas
+simulaci\'{o}n de caos demostr\'{o} que el ecosistema a\'isla fallos, mantiene m\'{e}tricas
 objetivas de calidad y reduce la carga cognitiva del mantenedor. El resultado es
 un sistema desacoplado, observable y autogestionado que puede ser mantenido por
 colaboradores acad\'{e}micos temporales sin depender del conocimiento t\'{a}cito.
