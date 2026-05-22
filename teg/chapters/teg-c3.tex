@@ -495,8 +495,8 @@ arquitectura de clases se organiza en cinco paquetes que reflejan las fases del
 ciclo: \texttt{monitor}, \texttt{analyze}, \texttt{plan}, \texttt{execute} y
 \texttt{knowledge}. Cada paquete encapsula las interfaces y servicios que
 permiten sustituir implementaciones sin afectar al resto del sistema —por
-ejemplo, el proveedor de IA puede cambiarse de un modelo local (como Llama o
-Mistral ejecutado mediante Ollama) a uno remoto (como OpenAI o Gemini) modificando
+ejemplo, el proveedor de IA puede cambiarse de un modelo local (como Llama
+u otro modelo ejecutado mediante Ollama) a uno remoto (como OpenAI o Gemini) modificando
 únicamente la clase que implementa \texttt{AwareAiProvider} y registrando el \textit{bean}\footnote{\textit{Bean}: en el contexto de Spring, objeto gestionado por el contenedor de inversión de control, cuyo ciclo de vida y dependencias son administrados por el framework.}
 correspondiente en la configuración del Config Server. La orquestación del
 ciclo completo la coordina la clase \texttt{AwareScheduler}, invocada mediante la
