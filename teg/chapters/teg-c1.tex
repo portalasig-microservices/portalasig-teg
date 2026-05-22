@@ -125,6 +125,10 @@ procesos de despliegue.
     \item Dise\~{n}ar una arquitectura de microservicios que desacople el backend en
 dominios independientes (UAA, Site, Notify), cada uno con su propia base de datos,
 su esquema de versionado y su ciclo de despliegue aut\'{o}nomo.
+    \item Adaptar el frontend heredado para operar como cliente de la nueva
+arquitectura distribuida, reestructurando el estado por dominio, migrando la
+autenticaci\'{o}n a est\'{a}ndares OAuth2/JWT e implementando mecanismos de
+comunicaci\'{o}n con los microservicios backend.
     \item Implementar t\'{e}cnicas sistem\'{a}ticas de aseguramiento de calidad que abarquen
 an\'{a}lisis est\'{a}tico, pruebas de integraci\'{o}n sobre bases de datos reales, medici\'{o}n de
 cobertura de c\'{o}digo, validaci\'{o}n end-to-end de la interfaz y automatizaci\'{o}n del
