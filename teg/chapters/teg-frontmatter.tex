@@ -1,6 +1,6 @@
 \chapter*{Agradecimientos}
 \addcontentsline{toc}{chapter}{Agradecimientos}
-\textit{[Placeholder: Escribir aquí los agradecimientos a familiares, amigos, tutor (Prof. Walter Hernández) y la Ilustre Universidad Central de Venezuela]}
+\textit{[Placeholder: Escribir aquí los agradecimientos ]}
 
 \chapter*{Resumen}
 \addcontentsline{toc}{chapter}{Resumen}
@@ -14,9 +14,8 @@ del conocimiento t\'{a}cito de cada mantenedor.
 
 El presente trabajo documenta el redise\~{n}o del backend hacia una arquitectura de
 microservicios que descompone el sistema en dominios acotados e independientes
----UAA (gesti\'{o}n de identidad), Site (sitios acad\'{e}micos), Notify (notificaciones)
-y PAIMA (autogesti\'{o}n del mantenimiento)--- cada uno con base de datos propia y
-ciclo de despliegue aut\'{o}nomo. El frontend heredado fue adaptado para operar como
+---UAA (gesti\'{o}n de identidad), Site (sitios acad\'{e}micos) y Notify (notificaciones)---
+cada uno con base de datos propia y ciclo de despliegue aut\'{o}nomo. El frontend heredado fue adaptado para operar como
 cliente distribuido mediante Vuex modular, guards de navegaci\'{o}n, autenticaci\'{o}n
 OAuth2/JWT y clientes Axios multi-servicio. Sobre este ecosistema se implementaron
 t\'{e}cnicas sistem\'{a}ticas de aseguramiento de calidad que abarcan todo el ciclo
@@ -25,7 +24,7 @@ hasta las pruebas end-to-end y la medici\'{o}n de cobertura--- y se instrument\'
 observabilidad distribuida para consolidar m\'{e}tricas, logs y trazas en un panel
 centralizado.
 
-Sobre esta infraestructura sensorial se construy\'{o} el servicio PAIMA (PortalAsig
+Sobre esta infraestructura se construy\'{o} el servicio PAIMA (PortalAsig
 Intelligent MAPE-K), que ejecuta un ciclo de autogesti\'{o}n del mantenimiento donde
 las fases de An\'{a}lisis y Planificaci\'{o}n se delegan a un modelo de inteligencia
 artificial. PAIMA monitorea el ecosistema, detecta anomal\'{i}as, clasifica
