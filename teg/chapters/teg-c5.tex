@@ -44,8 +44,7 @@ microservicios. PAIMA ejecuta un ciclo MAPE-K donde las fases de Análisis y
 Planificación se delegan a un modelo de lenguaje de gran escala, configurado como
 proveedor configurable con fallback determinista. Esta decisión se alinea con la
 dirección de investigación que integra MAPE-K con inteligencia artificial para la
-gestión autónoma de microservicios, tal como la proponen Esposito et al.
-\cite{esposito2025mapek}. La simulación de caos documentada en el Capítulo 4
+gestión autónoma de microservicios \cite{esposito2025mapek}. La simulación de caos documentada en el Capítulo 4
 validó que PAIMA detecta la caída de un servicio, clasifica la incidencia con
 prioridad P1, notifica al administrador vía correo electrónico, consolida métricas
 y logs en un panel de gestión, y propone una acción de reinicio que el operador
@@ -54,7 +53,7 @@ carga cognitiva del mantenedor y acelera la recuperación sin requerir intervenc
 manual en las fases de detección y diagnóstico.
 
 La contribución original de este trabajo reside en haber implementado de forma
-práctica el framework de Esposito et al. (2025) en un contexto académico con
+práctica el framework de \cite{esposito2025mapek} en un contexto académico con
 recursos limitados, donde no existe equipo de operaciones dedicado ni
 infraestructura cloud. PAIMA no es una arquitectura abstracta: sus conectores de
 monitoreo apuntan a instancias concretas de Prometheus y Loki desplegadas junto a
