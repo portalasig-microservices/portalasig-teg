@@ -19,22 +19,21 @@ basado en una arquitectura monol\'{i}tica que acumul\'{o}, durante seis a\~{n}os
 consecutivos, una deuda t\'{e}cnica creciente sin proceso sistem\'{a}tico de
 mantenimiento.
 
-En el caso de PortalAsig, el desarrollo del backend recay\'{o} en colaboradores
-acad\'{e}micos temporales que conclu\'{i}an sus per\'{i}odos sin dejar documentaci\'{o}n
-exhaustiva ni procesos de transferencia de conocimiento. Cuando un nuevo
-colaborador asume el mantenimiento, debe reconstruir el modelo mental del
-sistema desde el c\'{o}digo fuente, una tarea cuya dificultad aumenta
-progresivamente a medida que la base de c\'{o}digo crece sin l\'{i}mites
-arquitect\'{o}nicos. El backend monol\'{i}tico concentra todas las responsabilidades del
+El backend de PortalAsig permanece tecnol\'{o}gicamente estancado en una
+arquitectura monol\'{i}tica que concentra todas las responsabilidades del
 negocio ---autenticaci\'{o}n de usuarios, gesti\'{o}n de asignaturas, creaci\'{o}n de
 sitios acad\'{e}micos, administraci\'{o}n de evaluaciones, foros, entregas de
 archivos, env\'{i}o de correos y encuestas--- dentro de un \'{u}nico proceso
-desplegable. A medida que el sistema creci\'{o} en funcionalidad, la base de
-c\'{o}digo se densific\'{o} progresivamente, generando acoplamiento entre dominios que
-originalmente eran independientes. La ausencia de pruebas automatizadas, de
-mecanismos de validaci\'{o}n de cambios y de herramientas de observabilidad
-convirti\'{o} cada modificaci\'{o}n en un ejercicio de alto riesgo, donde la
-introducci\'{o}n de un cambio local pod\'{i}a afectar funcionalidades aparentemente no
+desplegable. La ausencia de personal de desarrollo de tiempo completo dedicado
+al sistema impide actualizar esta arquitectura: los colaboradores acad\'{e}micos
+temporales que asumen el mantenimiento deben operar sobre una base de c\'{o}digo de
+dif\'{i}cil comprensi\'{o}n, sin documentaci\'{o}n exhaustiva ni procesos formales de
+transferencia de conocimiento. A medida que el sistema creci\'{o} en funcionalidad,
+la base de c\'{o}digo se densific\'{o} progresivamente, generando acoplamiento entre
+dominios que originalmente eran independientes. La ausencia de pruebas
+automatizadas, de mecanismos de validaci\'{o}n de cambios y de herramientas de
+observabilidad convirti\'{o} cada modificaci\'{o}n en un ejercicio de alto riesgo, donde
+la introducci\'{o}n de un cambio local pod\'{i}a afectar funcionalidades aparentemente no
 relacionadas.
 
 El contexto operativo agrava esta problem\'{a}tica. El sistema carece de un equipo
