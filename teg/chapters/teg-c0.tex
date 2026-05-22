@@ -14,19 +14,10 @@ orientado a la mantenibilidad. Este redise\~{n}o mejor\'{o} sustancialmente la
 organizaci\'{o}n del c\'{o}digo cliente, sent\'{o} las bases para una evoluci\'{o}n
 controlada de la capa de presentaci\'{o}n y demostr\'{o} que un redise\~{n}o
 arquitect\'{o}nico bien planificado puede extender la vida \'{u}til de un sistema sin
-reescribirlo por completo.
-
-En el presente trabajo, ese frontend heredado fue adaptado para operar como
-cliente de la nueva arquitectura distribuida: se reestructur\'{o} el store Vuex en
-m\'{o}dulos por dominio, se implementaron guards de navegaci\'{o}n con siete niveles
-de permisos, se reemplaz\'{o} la autenticaci\'{o}n propietaria por un flujo
-OAuth2/JWT con cookies y refresh token, y se configuraron m\'{u}ltiples
-instancias de Axios que reflejan la topolog\'{i}a de los microservicios (UAA,
-Site, Notify).
-
-Mientras tanto, el backend del sistema permaneci\'{o} basado en una arquitectura
-monol\'{i}tica que acumul\'{o}, durante seis a\~{n}os consecutivos, una deuda
- t\'{e}cnica creciente sin proceso sistem\'{a}tico de mantenimiento.
+reescribirlo por completo. No obstante, el backend del sistema permaneci\'{o}
+basado en una arquitectura monol\'{i}tica que acumul\'{o}, durante seis a\~{n}os
+consecutivos, una deuda t\'{e}cnica creciente sin proceso sistem\'{a}tico de
+mantenimiento.
 
 En el caso de PortalAsig, el desarrollo del backend recay\'{o} en colaboradores
 acad\'{e}micos temporales que conclu\'{i}an sus per\'{i}odos sin dejar documentaci\'{o}n
@@ -34,8 +25,7 @@ exhaustiva ni procesos de transferencia de conocimiento. Cuando un nuevo
 colaborador asume el mantenimiento, debe reconstruir el modelo mental del
 sistema desde el c\'{o}digo fuente, una tarea cuya dificultad aumenta
 progresivamente a medida que la base de c\'{o}digo crece sin l\'{i}mites
-arquitect\'{o}nicos. En el caso de
-PortalAsig, el backend monol\'{i}tico concentra todas las responsabilidades del
+arquitect\'{o}nicos. El backend monol\'{i}tico concentra todas las responsabilidades del
 negocio ---autenticaci\'{o}n de usuarios, gesti\'{o}n de asignaturas, creaci\'{o}n de
 sitios acad\'{e}micos, administraci\'{o}n de evaluaciones, foros, entregas de
 archivos, env\'{i}o de correos y encuestas--- dentro de un \'{u}nico proceso
@@ -45,9 +35,7 @@ originalmente eran independientes. La ausencia de pruebas automatizadas, de
 mecanismos de validaci\'{o}n de cambios y de herramientas de observabilidad
 convirti\'{o} cada modificaci\'{o}n en un ejercicio de alto riesgo, donde la
 introducci\'{o}n de un cambio local pod\'{i}a afectar funcionalidades aparentemente no
-relacionadas. El despliegue en producci\'{o}n se realiza de forma manual mediante
-conexi\'{o}n directa al servidor, sin mecanismos que verifiquen el comportamiento del
-sistema despu\'{e}s de cada cambio.
+relacionadas.
 
 El contexto operativo agrava esta problem\'{a}tica. El sistema carece de un equipo
 de desarrollo y operaciones de tiempo completo; el soporte t\'{e}cnico recurrente
@@ -68,8 +56,9 @@ propia, configuraci\'{o}n compleja o mantenimiento continuo constituye un pasivo
 t\'{e}cnico que el siguiente colaborador deber\'{a} asumir sin garant\'{i}a de
 transferencia de conocimiento.
 
-Frente a esta situaci\'{o}n, se decidi\'{o} dise\~{n}ar e implementar una arquitectura de
-microservicios que descompusiera el backend en dominios acotados e
+Frente a esta situaci\'{o}n, se dise\~{n}aron e implementaron dos l\'{i}neas de
+transformaci\'{o}n. La primera consisti\'{o} en el redise\~{n}o del backend hacia una
+arquitectura de microservicios que descompone el sistema en dominios acotados e
 independientes ---UAA (gesti\'{o}n de identidad), Site (sitios acad\'{e}micos) y
 Notify (notificaciones)--- cada uno con su propia base de datos, su esquema de
 versionado y su ciclo de despliegue aut\'{o}nomo. Esta transformaci\'{o}n elimina el
@@ -78,37 +67,41 @@ fallos, de modo que la ca\'{i}da de un servicio no compromete la estabilidad del
 ecosistema completo. Sin embargo, la migraci\'{o}n a microservicios introduce una
 complejidad operativa inherente a los sistemas distribuidos: m\'{u}ltiples
 procesos, m\'{u}ltiples bases de datos, latencia de red, tolerancia a fallos y
-monitoreo distribuido. En un entorno donde no existen operadores dedicados las
-veinticuatro horas del d\'{i}a, esta complejidad puede convertirse en un cuello de
-botella cr\'{i}tico si no se acompa\~{n}a de mecanismos automatizados de validaci\'{o}n,
-observabilidad y autogesti\'{o}n.
+monitoreo distribuido.
 
-Para afrontar esta complejidad, se implementaron t\'{e}cnicas sistem\'{a}ticas de
-mantenimiento de software que abarcan todo el ciclo de vida del c\'{o}digo. Se
-incorporaron mecanismos de validaci\'{o}n automatizada que analizan el estilo del
-c\'{o}digo antes de su fusi\'{o}n, ejecutan pruebas sobre bases de datos reales y miden
-la cobertura de las mismas. Se dise\~{n}aron pruebas que simulan flujos completos del
-usuario final sobre la interfaz, verificando que las capas de presentaci\'{o}n,
-aplicaci\'{o}n y persistencia operen de forma coordinada. Asimismo, se instrumentaron
-mecanismos de observabilidad distribuida que recolectan m\'{e}tricas de rendimiento,
-agregan registros de ejecuci\'{o}n y visualizan correlaciones entre eventos. Estas
-t\'{e}cnicas no son complementos optativos: son la condici\'{o}n previa que permite a un
-colaborador acad\'{e}mico temporal comprender el estado del sistema, detectar
+La segunda l\'{i}nea de transformaci\'{o}n adapt\'{o} el frontend heredado para operar
+como cliente de esa nueva arquitectura distribuida: se reestructur\'{o} el store Vuex
+en m\'{o}dulos por dominio, se implementaron guards de navegaci\'{o}n con siete niveles
+de permisos, se reemplaz\'{o} la autenticaci\'{o}n propietaria por un flujo
+OAuth2/JWT con cookies y refresh token, y se configuraron m\'{u}ltiples
+instancias de Axios que reflejan la topolog\'{i}a de los microservicios (UAA,
+Site, Notify).
+
+Para afrontar la complejidad operativa del ecosistema distribuido, se
+implementaron t\'{e}cnicas sistem\'{a}ticas de mantenimiento de software que abarcan
+todo el ciclo de vida del c\'{o}digo. Se incorporaron mecanismos de validaci\'{o}n
+automatizada que analizan el estilo del c\'{o}digo antes de su fusi\'{o}n, ejecutan
+pruebas sobre bases de datos reales y miden la cobertura de las mismas. Se
+dise\~{n}aron pruebas que simulan flujos completos del usuario final sobre la
+interfaz, verificando que las capas de presentaci\'{o}n, aplicaci\'{o}n y persistencia
+operen de forma coordinada. Asimismo, se instrumentaron mecanismos de
+observabilidad distribuida que recolectan m\'{e}tricas de rendimiento, agregan
+registros de ejecuci\'{o}n y visualizan correlaciones entre eventos. Estas
+t\'{e}cnicas no son complementos optativos: son la condici\'{o}n previa que permite a
+un colaborador acad\'{e}mico temporal comprender el estado del sistema, detectar
 anomal\'{i}as antes de que afecten a los usuarios y realizar cambios con confianza,
 reduciendo la dependencia del conocimiento t\'{a}cito.
 
-Sobre este ecosistema distribuido e instrumentado se construy\'{o} el servicio
-PAIMA (PortalAsig Intelligent MAPE-K), que asume la funci\'{o}n de operador
-aut\'{o}nomo mediante un ciclo de control MAPE-K donde las fases de An\'{a}lisis y
-Planificaci\'{o}n se delegan a un modelo de inteligencia artificial. PAIMA monitorea
-las m\'{e}tricas y logs del ecosistema, detecta anomal\'{i}as, diagnostica causas,
-clasifica incidencias por severidad, notifica al administrador y propone acciones
-de remediaci\'{o}n que el operador humano eval\'{u}a y aprueba. La simulaci\'{o}n de caos
-ejecutada sobre el ecosistema valid\'{o} que PAIMA detecta la ca\'{i}da de un servicio,
-consolida la evidencia en un panel de gesti\'{o}n y asiste en la recuperaci\'{o}n sin
-requerir intervenci\'{o}n manual en las fases de detecci\'{o}n y diagn\'{o}stico. Este flujo
-reduce la carga cognitiva del mantenedor y acelera la respuesta ante fallas en un
-contexto donde los recursos humanos son limitados y rotativos.
+Sobre esta infraestructura se construy\'{o} el servicio PAIMA (PortalAsig
+Intelligent MAPE-K), que ejecuta un ciclo de autogesti\'{o}n del mantenimiento donde
+las fases de An\'{a}lisis y Planificaci\'{o}n se delegan a un modelo de inteligencia
+artificial. PAIMA monitorea el ecosistema, detecta anomal\'{i}as, clasifica
+incidencias y propone acciones de remediaci\'{o}n que el operador humano eval\'{u}a y
+aprueba. La validaci\'{o}n mediante pruebas de integraci\'{o}n, validaci\'{o}n end-to-end y
+simulaci\'{o}n de caos demostr\'{o} que el ecosistema a\'{i}sola fallos, mantiene m\'{e}tricas
+objetivas de calidad y reduce la carga cognitiva del mantenedor. El resultado es
+un sistema desacoplado, observable y autogestionado que puede ser mantenido por
+colaboradores acad\'{e}micos temporales sin depender del conocimiento t\'{a}cito.
 
 El presente documento se organiza en cinco cap\'{i}tulos. El Cap\'{i}tulo 1 plantea el
 problema, justifica la necesidad de transformaci\'{o}n y establece los objetivos
