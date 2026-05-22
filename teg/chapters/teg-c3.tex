@@ -743,7 +743,7 @@ servicio correspondiente: autenticación y gestión de usuarios hacia UAA
 (\texttt{/v1/user/}, \texttt{/v1/auth/}), operaciones de sitios académicos hacia Site
 (\texttt{/v1/site/}, \texttt{/v1/semester/}), y alertas de mantenimiento hacia PAIMA
 (\texttt{/v1/paima/}). El router se configuró en modo \texttt{history}, eliminando el
-prefijo \texttt{/#/} de las URLs y produciendo rutas limpias compatibles con el proxy
+prefijo \texttt{/\#/} de las URLs y produciendo rutas limpias compatibles con el proxy
 inverso de Nginx.
 
 La configuración de CORS en cada microservicio permite que el frontend Vue.js,

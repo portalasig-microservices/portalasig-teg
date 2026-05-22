@@ -231,32 +231,109 @@ espera explícitamente la respuesta HTTP antes de continuar con la siguiente
 interacción. Esta aproximación mantuvo la duración total de la suite por debajo de
 tres minutos mientras eliminaba los falsos negativos.
 
-\subsection{Validación de la Adaptación Frontend}
+\subsection{Validación de la Arquitectura Frontend Adaptada}
 
-Las pruebas end-to-end no solo verifican la estabilidad de la interfaz, sino que
-validan la correcta integración del frontend adaptado con la arquitectura de
-microservicios. Cada flujo de prueba atraviesa la pila completa: el frontend Vue.js
-realiza peticiones HTTP hacia el proxy Nginx, que las enruta hacia UAA, Site o
-PAIMA según el path; los microservicios procesan la solicitud contra sus bases de
-datos MySQL gestionadas por Testcontainers; y la respuesta regresa al navegador de
-Cypress para la aserción visual.
+Las pruebas end-to-end verifican no solo la estabilidad de la interfaz, sino que
+cada cambio arquitectónico introducido en la adaptación del frontend (Sección~3.3)
+tiene una contraparte validable en el suite de Cypress. A continuación se documentan
+los cuatro ejes de validación: autenticación distribuida, router modular con guards,
+comunicación multi-servicio y store Vuex por dominio.
 
-Se diseñó un comando personalizado \texttt{cy.loginViaApi()} que automatiza el flujo
-completo de autenticación distribuida: obtiene un token JWT del servicio UAA mediante
-\texttt{client\_credentials}, lo almacena en \texttt{localStorage} y refresca la
-página para que los guards del router reconozcan la sesión. Este mecanismo valida
-que el frontend gestione correctamente el flujo OAuth2 y que los tres clientes Axios
-(\texttt{uaaService}, \texttt{siteService}, \texttt{paimaService}) inyecten el
-encabezado \texttt{Authorization} de forma coordinada.
+\subsubsection{Autenticación OAuth2/JWT}
 
-Los flujos críticos validados cubren la integración frontend-backend en cuatro
-dimensiones:
+El test \texttt{auth/oauth2-flow.spec.js} replica el flujo completo de inicio de
+sesión en cinco pasos: (1) el usuario accede a \texttt{/ingresar}, (2) el frontend
+obtiene un token anónimo mediante \texttt{client\_credentials} contra UAA,
+(3) el usuario ingresa credenciales y el frontend intercambia el token anónimo por
+uno de usuario con \texttt{refresh\_token}, (4) el frontend almacena el par de
+tokens en cookies y redirige al \texttt{dashboard}, y (5) al expirar el token de
+acceso, el frontend solicita automáticamente un nuevo par mediante
+\texttt{POST /v1/auth/refresh-token} sin interrumpir la navegación. Cada paso se
+aserta visualmente (URL, estado del botón, mensaje de bienvenida) y a nivel de red
+(inspección de cabeceras \texttt{Authorization} y cookies \texttt{exchange\_session}).
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[draft,width=0.9\textwidth]{graphics/cypress-oauth2-flow.png}
+    \caption{Secuencia de pasos del flujo de autenticación OAuth2/JWT validada
+    mediante Cypress: obtención de token anónimo, login con credenciales,
+    persistencia en cookies y refresco automático.}
+    \label{fig:cypress-oauth2-flow}
+\end{figure}
+
+\subsubsection{Router Modular y Guards de Autorización}
+
+El test \texttt{router/guards.spec.js} valida los siete niveles de guards mediante
+escenarios de acceso directo a URL. Para cada guard se ejecutan dos casos: un
+usuario sin el rol requerido intenta acceder a la ruta protegida (por ejemplo,
+\texttt{/administracion} como \texttt{student}) y el router redirige a
+\texttt{/home}; el mismo usuario con el rol adecuado accede sin redirección. Los
+guards validados incluyen \texttt{requiresAuth}, \texttt{requiresAnonymous},
+\texttt{requiresStudentOrBetter}, \texttt{requiresTeachingStaffPermission},
+\texttt{requiresStudentTeacherOrBetter}, \texttt{requiresCoordOrBetter} y
+\texttt{requiresAdmin}. Adicionalmente, el test verifica que el router modular
+cargue únicamente el \textit{chunk} de la ruta solicitada (code splitting),
+reduciendo el tiempo de carga inicial de la aplicación.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[draft,width=0.9\textwidth]{graphics/cypress-guards.png}
+    \caption{Validación de guards de navegación: intento de acceso a vista
+    administrativa con rol de estudiante (izquierda) y redirección automática a
+    \texttt{/home} (derecha).}
+    \label{fig:cypress-guards}
+\end{figure}
+
+\subsubsection{Comunicación Multi-Servicio}
+
+El test \texttt{network/multi-axios.spec.js} inspecciona las peticiones HTTP
+realizadas durante un flujo completo de creación de sitio académico. El test
+verifica que: (a) las peticiones de autenticación y gestión de usuarios se dirijan
+a \texttt{ms-uaa:5860}, (b) las operaciones de sitio, asignatura y semestre se
+envíen a \texttt{ms-site:5861}, (c) las alertas de mantenimiento se consulten en
+\texttt{paima:8085}, y (d) el proxy Nginx enrute cada petición al servicio correcto
+según el path. Esta validación confirma que los tres clientes Axios
+(\texttt{uaaService}, \texttt{siteService}, \texttt{paimaService}) operan de forma
+aislada y que el frontend no depende de un endpoint backend único.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[draft,width=0.9\textwidth]{graphics/cypress-multiaxios.png}
+    \caption{Inspección de red durante flujo de creación de sitio: peticiones a
+    UAA (autenticación), Site (contenido) y PAIMA (alertas) desde instancias
+    Axios independientes.}
+    \label{fig:cypress-multiaxios}
+\end{figure}
+
+\subsubsection{Store Vuex Modular}
+
+El test \texttt{store/vuex-modules.spec.js} valida que cada módulo del store
+gestione su estado de forma aislada. El test simula: (1) un cambio en el módulo
+\texttt{course} (selección de asignatura) que no afecta el estado de
+\texttt{site}, (2) una mutación en \texttt{session} (cierre de sesión) que
+limpia todos los tokens sin alterar \texttt{user} ni \texttt{base}, y (3) una
+acción asíncrona en \texttt{site} (carga de participantes) que activa el
+indicador \texttt{loadingComponent} únicamente durante la petición a
+\texttt{ms-site}. El test utiliza \texttt{cy.window()} para acceder al store
+Vuex expuesto y asertar los valores de estado antes y después de cada operación,
+confirmando que la modularización eliminó el acoplamiento entre dominios que
+provocaba efectos colaterales en el store monolítico.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[draft,width=0.9\textwidth]{graphics/cypress-vuex.png}
+    \caption{Estado del store Vuex modular durante flujo de selección de
+    asignatura: el módulo \texttt{course} se actualiza sin modificar
+    \texttt{site} ni \texttt{session}.}
+    \label{fig:cypress-vuex}
+\end{figure}
+
+\subsubsection{Flujos de Negocio Integrales}
+
+Además de los ejes arquitectónicos, se validaron flujos de negocio completos que
+atraviesan múltiples módulos y microservicios:
 
 \begin{itemize}
-    \item \textbf{Autenticación distribuida:} Login con credenciales válidas,
-    persistencia de tokens en cookies, refresco automático de sesión y redirección
-    post-login. El test verifica que el frontend no dependa del conocimiento tácito
-    de la estructura del token, sino que delegue su validación al servicio UAA.
     \item \textbf{Gestión de contenidos académicos:} Creación de objetivos de
     aprendizaje, adición de referencias bibliográficas y eliminación de temas. Cada
     operación valida que el frontend invoque el endpoint correcto de Site
