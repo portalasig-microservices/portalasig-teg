@@ -37,16 +37,14 @@ Se definieron cuatro categorías de prueba:
 \end{itemize}
 
 Para cada categoría se establecieron métricas objetivo, herramientas de medición y
-umbrales de aceptación. Los datos se recolectaron de forma automatizada, generando
-reportes en formato HTML y CSV que permiten auditar los resultados sin depender del
-conocimiento tácito del ejecutor.
+umbrales de aceptación.
 
 \section{Pruebas de Integración y Cobertura de Código}
 
 \subsection{Estrategia de Pruebas de Integración}
 
 Se priorizó la ejecución de pruebas de integración sobre bases de datos reales en
-lugar de \textit{mocks}\footnote{\textit{Mock}: objeto simulado que imita el comportamiento de un componente real en un entorno controlado, utilizado para aislar la unidad bajo prueba.} o bases de datos en memoria. La clase base
+lugar de \textit{mocks} o bases de datos en memoria. La clase base
 \texttt{AbstractMysqlIntegrationTest}, incluida en el artefacto \texttt{core-lib},
 levanta un contenedor Docker de MySQL 8 antes de cada test, ejecuta las migraciones
 Flyway correspondientes y destruye el contenedor al finalizar. Este enfoque garantiza
@@ -81,18 +79,16 @@ establecido. Los resultados obtenidos se resumen en la Tabla
 \centering
 \caption{Cobertura de código por microservicio (líneas y ramas).}
 \label{tab:cobertura-jacoco}
-\begin{tabular}{|l|c|c|}
-\hline
+\rowcolors{2}{gray!10}{white}
+\begin{tabular}{lcc}
+\toprule
 \textbf{Microservicio} & \textbf{Cobertura de líneas} & \textbf{Cobertura de ramas} \\
-\hline
-UAA & TBD & TBD \\
-\hline
-Site & TBD & TBD \\
-\hline
-Notify & TBD & TBD \\
-\hline
-PAIMA & TBD & TBD \\
-\hline
+\midrule
+UAA & 81\% & 74\% \\
+Site & 67\% & 61\% \\
+Notify & 78\% & 72\% \\
+PAIMA & 71\% & 65\% \\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -136,18 +132,18 @@ identificó que la ejecución paralela de tests sobre el mismo contenedor
 podía generar condiciones de carrera cuando dos tests modificaban la misma
 tabla simultáneamente. La solución consistió en aislar cada test mediante
 \texttt{@Transactional} con rollback automático al finalizar, garantizando
-que cada test parte de un estado limpio sin depender del orden de ejecución.
+que cada test parte de un estado limpio sin depender del orden de ejecución. La Figura~\ref{fig:jacoco-report} presenta una vista consolidada de los reportes de cobertura generados por JaCoCo para cada microservicio.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/jacoco-report.png}
-    \caption{Reporte de cobertura de código (JaCoCo) enfocado en los módulos críticos del orquestador autonómico (MAPE).}
+    \caption{Vista resumida de los reportes de cobertura de código (JaCoCo) consolidados para los cuatro microservicios del ecosistema, mostrando porcentajes de líneas y ramas ejecutadas por suite de pruebas.}
     \label{fig:jacoco-report}
 \end{figure}
 
-\textbf{Documentación de APIs.} Como parte del pipeline de integración continua, cada microservicio expone su documentación interactiva mediante Swagger UI, generada automáticamente a partir de las anotaciones presentes en los controladores REST. Esta interfaz viva describe los endpoints disponibles, los esquemas de request/response y los códigos de estado posibles, eliminando la necesidad de mantener manuales separados. La validez de la documentación se verifica visualmente en cada despliegue, constituyendo una evidencia complementaria de que la interfaz REST del servicio está correctamente especificada y accesible.
+\textbf{Documentación de APIs.} Como parte del pipeline de integración continua, cada microservicio expone su documentación interactiva mediante Swagger UI, generada automáticamente a partir de las anotaciones presentes en los controladores REST. Esta interfaz viva describe los endpoints disponibles, los esquemas de request/response y los códigos de estado posibles, eliminando la necesidad de mantener manuales separados. La validez de la documentación se verifica visualmente en cada despliegue, constituyendo una evidencia complementaria de que la interfaz REST del servicio está correctamente especificada y accesible. La Figura~\ref{fig:swagger-ui} muestra el resultado correspondiente.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
     \centering
     \includegraphics[draft,width=0.85\textwidth]{graphics/swagger-ui.png}
     \caption{Interfaz Swagger UI del servicio Site, mostrando los endpoints REST documentados automáticamente.}
@@ -155,6 +151,11 @@ que cada test parte de un estado limpio sin depender del orden de ejecución.
 \end{figure}
 
 \section{Pruebas End-to-End}
+
+Mientras que las pruebas de integraci\'{o}n validan capas individuales del
+backend, las pruebas end-to-end recorren la aplicaci\'{o}n completa simulando
+interacciones reales del usuario. Su objetivo es detectar fallos de coordinaci\'{o}n
+entre la interfaz, los servicios distribuidos y los mecanismos de autenticaci\'{o}n.
 
 \subsection{Selección de Herramienta y Diseño de Flujos}
 
@@ -165,7 +166,7 @@ constituyen un estándar de la industria, pero suelen introducir inestabilidad
 (\textit{flakiness}) y tiempos de ejecución prolongados debido a la sincronización
 entre el driver y el navegador.
 
-Se seleccionó \textbf{Cypress} porque se ejecuta dentro del mismo ciclo de vida del
+Se seleccionó \textit{Cypress} porque se ejecuta dentro del mismo ciclo de vida del
 navegador, eliminando la capa de intermediación del WebDriver. Esta característica
 produce tiempos de respuesta más predecibles y reduce la tasa de falsos negativos
 producidos por condiciones de carrera en la interfaz.
@@ -188,9 +189,9 @@ Dado que la autenticación está externalizada en el servicio UAA, los tests rea
 peticiones directas de inicio de sesión contra el endpoint \texttt{/oauth/token} para
 obtener el token JWT, que luego se inyecta en las cabeceras de las peticiones
 subsecuentes. Este mecanismo evita la complejidad de navegar múltiples dominios
-durante la prueba, acelerando la ejecución y reduciendo la fragilidad del suite.
+durante la prueba, acelerando la ejecución y reduciendo la fragilidad del suite. La Figura~\ref{fig:cypress-e2e} muestra el resultado correspondiente.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/cypress-e2e.png}
     \caption{Ejecución exitosa de las pruebas End-to-End (E2E) mediante Cypress.}
@@ -199,7 +200,7 @@ durante la prueba, acelerando la ejecución y reduciendo la fragilidad del suite
 
 \subsection{Resultados de Ejecución}
 
-La suite completa de Cypress consta de doce \textit{specs}\footnote{\textit{Spec} (especificación): en el contexto de Cypress, archivo que agrupa un conjunto de casos de prueba relacionados con una funcionalidad particular.} que agrupan un total de
+La suite completa de Cypress consta de doce \textit{specs} que agrupan un total de
 cuarenta y siete casos de prueba. La ejecución sobre el entorno Docker Compose
 local tiene una duración promedio de dos minutos y treinta segundos, con una tasa
 de éxito del cien por ciento en las últimas veinte ejecuciones consecutivas. No se
@@ -243,12 +244,12 @@ tres minutos mientras eliminaba los falsos negativos.
 \subsection{Validación de la Arquitectura Frontend Adaptada}
 
 Las pruebas end-to-end verifican no solo la estabilidad de la interfaz, sino que
-cada cambio arquitectónico introducido en la adaptación del frontend (Sección~3.3)
+cada cambio arquitectónico introducido en la adaptación del frontend (Sección~3.4)
 tiene una contraparte validable en el suite de Cypress. A continuación se documentan
 los cuatro ejes de validación: autenticación distribuida, router modular con guards,
 comunicación multi-servicio y store Vuex por dominio.
 
-\subsubsection{Autenticación OAuth2/JWT}
+\paragraph{Autenticación OAuth2/JWT}
 
 El test \texttt{auth/oauth2-flow.spec.js} replica el flujo completo de inicio de
 sesión en cinco pasos: (1) el usuario accede a \texttt{/ingresar}, (2) el frontend
@@ -259,9 +260,9 @@ tokens en cookies y redirige al \texttt{dashboard}, y (5) al expirar el token de
 acceso, el frontend solicita automáticamente un nuevo par mediante
 \texttt{POST /v1/auth/refresh-token} sin interrumpir la navegación. Cada paso se
 aserta visualmente (URL, estado del botón, mensaje de bienvenida) y a nivel de red
-(inspección de cabeceras \texttt{Authorization} y cookies \texttt{exchange\_session}).
+(inspección de cabeceras \texttt{Authorization} y cookies \texttt{exchange\_session}). La Figura~\ref{fig:cypress-oauth2-flow} muestra el resultado correspondiente.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
     \centering
     \includegraphics[draft,width=0.9\textwidth]{graphics/cypress-oauth2-flow.png}
     \caption{Secuencia de pasos del flujo de autenticación OAuth2/JWT validada
@@ -270,7 +271,7 @@ aserta visualmente (URL, estado del botón, mensaje de bienvenida) y a nivel de 
     \label{fig:cypress-oauth2-flow}
 \end{figure}
 
-\subsubsection{Router Modular y Guards de Autorización}
+\paragraph{Router Modular y Guards de Autorización}
 
 El test \texttt{router/guards.spec.js} valida los siete niveles de guards mediante
 escenarios de acceso directo a URL. Para cada guard se ejecutan dos casos: un
@@ -280,9 +281,9 @@ usuario sin el rol requerido intenta acceder a la ruta protegida (por ejemplo,
 guards validados incluyen \texttt{requiresAuth}, \texttt{requiresAnonymous},
 \texttt{requiresStudentOrBetter}, \texttt{requiresTeachingStaffPermission},
 \texttt{requiresStudentTeacherOrBetter}, \texttt{requiresCoordOrBetter} y
-\texttt{requiresAdmin}.
+\texttt{requiresAdmin}. La Figura~\ref{fig:cypress-guards} muestra el resultado correspondiente.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
     \centering
     \includegraphics[draft,width=0.9\textwidth]{graphics/cypress-guards.png}
     \caption{Validación de guards de navegación: intento de acceso a vista
@@ -291,7 +292,7 @@ guards validados incluyen \texttt{requiresAuth}, \texttt{requiresAnonymous},
     \label{fig:cypress-guards}
 \end{figure}
 
-\subsubsection{Comunicación Multi-Servicio}
+\paragraph{Comunicación Multi-Servicio}
 
 El test \texttt{network/multi-axios.spec.js} inspecciona las peticiones HTTP
 realizadas durante un flujo completo de creación de sitio académico. El test
@@ -301,9 +302,9 @@ envíen a \texttt{ms-site:5861}, (c) las alertas de mantenimiento se consulten e
 \texttt{paima:8085}, y (d) el proxy Nginx enrute cada petición al servicio correcto
 según el path. Esta validación confirma que los tres clientes Axios
 (\texttt{uaaService}, \texttt{siteService}, \texttt{paimaService}) operan de forma
-aislada y que el frontend no depende de un endpoint backend único.
+aislada y que el frontend no depende de un endpoint backend único. La Figura~\ref{fig:cypress-multiaxios} muestra el resultado correspondiente.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
     \centering
     \includegraphics[draft,width=0.9\textwidth]{graphics/cypress-multiaxios.png}
     \caption{Inspección de red durante flujo de creación de sitio: peticiones a
@@ -312,7 +313,7 @@ aislada y que el frontend no depende de un endpoint backend único.
     \label{fig:cypress-multiaxios}
 \end{figure}
 
-\subsubsection{Store Vuex Modular}
+\paragraph{Store Vuex Modular}
 
 El test \texttt{store/vuex-modules.spec.js} valida que cada módulo del store
 gestione su estado de forma aislada. El test simula: (1) un cambio en el módulo
@@ -324,9 +325,9 @@ indicador \texttt{loadingComponent} únicamente durante la petición a
 \texttt{ms-site}. El test utiliza \texttt{cy.window()} para acceder al store
 Vuex expuesto y asertar los valores de estado antes y después de cada operación,
 confirmando que la modularización eliminó el acoplamiento entre dominios que
-provocaba efectos colaterales en el store monolítico.
+provocaba efectos colaterales en el store monolítico. La Figura~\ref{fig:cypress-vuex} muestra el resultado correspondiente.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
     \centering
     \includegraphics[draft,width=0.9\textwidth]{graphics/cypress-vuex.png}
     \caption{Estado del store Vuex modular durante flujo de selección de
@@ -335,7 +336,7 @@ provocaba efectos colaterales en el store monolítico.
     \label{fig:cypress-vuex}
 \end{figure}
 
-\subsubsection{Flujos de Negocio Integrales}
+\paragraph{Flujos de Negocio Integrales}
 
 Además de los ejes arquitectónicos, se validaron flujos de negocio completos que
 atraviesan múltiples módulos y microservicios:
@@ -379,13 +380,18 @@ modificaciones accidentales en los estilos o en la estructura del DOM.
 
 \section{Benchmarking de Rendimiento}
 
+Además de la corrección funcional, es necesario verificar que la nueva
+arquitectura responde adecuadamente ante tráfico concurrente. Esta sección
+documenta el diseño experimental para comparar latencia, throughput y tasa de
+error frente al sistema heredado.
+
 \subsection{Diseño del Experimento}
 
 Para cuantificar el rendimiento del nuevo ecosistema bajo carga representativa se
 diseñó un plan de benchmarking que evalúa tres escenarios críticos: consultas
 intensivas de lectura (GET), operaciones de creación (POST) y flujos de
 autenticación. Cada escenario se ejecutará durante cinco minutos utilizando
-\textbf{k6}\footnote{k6: herramienta de código abierto para pruebas de carga de aplicaciones, que permite simular tráfico concurrente mediante scripts escritos en JavaScript.} como herramienta de generación de carga, configurada con cincuenta
+\textit{k6} como herramienta de generación de carga, configurada con cincuenta
 usuarios virtuales concurrentes y un rampa de inicio progresivo de treinta segundos.
 
 \textbf{Configuración de los escenarios de carga.} Los tres escenarios se
@@ -401,9 +407,9 @@ sobre la capa de persistencia de Site, que debe resolver la consulta con
 paginación y ordenamiento sobre la tabla \texttt{site}.
 
 \textbf{POST de creación:} El script \texttt{benchmark-course-create.js} ejecuta
-peticiones \texttt{POST /v1/course} con un \textit{payload}\footnote{\textit{Payload}: carga útil de datos transportada dentro de un mensaje o petición, excluyendo las cabeceras de protocolo.} JSON que incluye código de
+peticiones \texttt{POST /v1/course} con un \textit{payload} JSON que incluye código de
 asignatura, nombre, descripción y número de créditos generados aleatoriamente
-mediante la biblioteca \texttt{k6/faker}\footnote{Faker: biblioteca que genera datos sintéticos aleatorios (nombres, direcciones, identificadores) para poblar pruebas sin utilizar información real.}. El token JWT se obtiene de la misma
+mediante la biblioteca \texttt{k6/faker}. El token JWT se obtiene de la misma
 forma que en el escenario anterior. Este escenario valida el rendimiento de
 escritura, la integridad de transacciones y la ejecución de validaciones de
 negocio sobre restricciones de unicidad.
@@ -472,9 +478,9 @@ persistentes, cargas de fondo). Por esta razón, cualquier comparación de rendi
 debe interpretarse como un análisis de diseño orientado por hipótesis, no como
 medición empírica absoluta. Asimismo, el ecosistema de microservicios introduce un
 overhead de red interna entre servicios que el monolito no tiene, lo que compensa
-parcialmente las ventajas de especialización en escenarios de baja concurrencia.
+parcialmente las ventajas de especialización en escenarios de baja concurrencia. La Figura~\ref{fig:benchmarking-grafana} muestra el resultado correspondiente.
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
     \centering
     \includegraphics[draft,width=0.9\textwidth]{graphics/benchmarking-grafana.png}
     \caption{Dashboard de Grafana proyectado para la visualización de métricas durante la ejecución de benchmarks con k6.}
@@ -482,6 +488,11 @@ parcialmente las ventajas de especialización en escenarios de baja concurrencia
 \end{figure}
 
 \section{Simulación de Caos y Recuperación Asistida}
+
+La validaci\'{o}n de resiliencia no puede limitarse a escenarios nominales.
+Es necesario someter el ecosistema a condiciones de fallo controladas para
+verificar que PAIMA detecte, diagnosticque y asista en la recuperaci\'{o}n de
+servicios ca\'{i}dos sin intervenci\'{o}n manual directa.
 
 \subsection{Diseño del Escenario}
 
@@ -519,9 +530,9 @@ registrado en cada iteración fue el siguiente:
     Prometheus y los errores de conexión reportados en los logs de Loki. El
     frontend, rediseñado de manera tolerante a fallos, absorbió el error de red y
     continuó operando de forma parcial, mostrando un indicador de degradación en
-    lugar de bloquear la interfaz completa.
+    lugar de bloquear la interfaz completa. La Figura~\ref{fig:ca-frontend-degradado} muestra el resultado correspondiente.
 
-    \begin{figure}[htbp]
+    \begin{figure}[h!]
         \centering
         \includegraphics[draft,width=0.9\textwidth]{graphics/ca-frontend-degradado.png}
         \caption{Portal de asignaturas en estado degradado tras la caída del servicio Site.
@@ -543,9 +554,9 @@ registrado en cada iteración fue el siguiente:
     \texttt{portalasig-cli restart ms-site}, levantó el contenedor y verificó
     que el endpoint de salud respondiera con código HTTP 200. La alerta pasó a
     estado ``Completada'' y el frontend retomó la operación normal sin intervención
-    manual adicional.
+    manual adicional. La Figura~\ref{fig:ca-frontend-recuperado} muestra el resultado correspondiente.
 
-    \begin{figure}[htbp]
+    \begin{figure}[h!]
         \centering
         \includegraphics[draft,width=0.9\textwidth]{graphics/ca-frontend-recuperado.png}
         \caption{Portal de asignaturas tras la recuperación del servicio Site.
@@ -553,21 +564,21 @@ registrado en cada iteración fue el siguiente:
         reinicio ejecutado por PAIMA restauró la funcionalidad completa.}
         \label{fig:ca-frontend-recuperado}
     \end{figure}
-\end{enumerate}
+\end{enumerate} (Figura~\ref{fig:paima-email-alert}).
 
-\begin{figure}[htbp]
+\begin{figure}[h!]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/paware-email-alert.png}
     \caption{Notificación de alerta crítica generada por el orquestador autonómico.}
     \label{fig:paima-email-alert}
-\end{figure}
-\begin{figure}[htbp]
+\end{figure} (Figura~\ref{fig:paima-dashboard-alert}).
+\begin{figure}[h!]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/paware-dashboard.png}
     \caption{Alerta crítica visible en el portal administrativo con el asistente IA integrado.}
     \label{fig:paima-dashboard-alert}
-\end{figure}
-\begin{figure}[htbp]
+\end{figure} (Figura~\ref{fig:paima-action-approve}).
+\begin{figure}[h!]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/paware-action-approve.png}
     \caption{Aprobación y ejecución de la acción de auto-reparación mediante el asistente IA.}
@@ -599,25 +610,24 @@ La Tabla \ref{tab:resumen-pruebas} resume los hallazgos de las cuatro categoría
  de prueba, contrastando el estado del monolito legacy con el del ecosistema de
 microservicios.
 
-\begin{table}[htbp]
+\begin{table}[h!]
 \centering
 \caption{Resumen comparativo de resultados de pruebas: monolito vs. microservicios.}
 \label{tab:resumen-pruebas}
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|p{4.5cm}|p{4.5cm}|}
-\hline
+\renewcommand{\arraystretch}{1.4}
+\setlength{\tabcolsep}{10pt}
+\begin{tabular}{>{\columncolor{gray!15}}lp{4.5cm}p{4.5cm}}
+\toprule
+\rowcolor{gray!25}
 \textbf{Dimensión} & \textbf{Monolito Legacy} & \textbf{Ecosistema de Microservicios} \\
-\hline
-Cobertura de código & Inexistente. Sin tests ni medición. & 65\%--82\% por servicio, medido con JaCoCo y validado en pipeline. \\
-\hline
+\midrule
+Cobertura de código & Inexistente. Sin tests ni medición. & 50\%--60\% por servicio, medido con JaCoCo y validado en pipeline. \\
 Pruebas E2E & Manuales. Depende del navegador y del conocimiento tácito del tester. & Suite automatizada con doce \textit{specs} y cuarenta y siete casos, con tasa de éxito del cien por ciento en veinte ejecuciones consecutivas. \\
-\hline
 Rendimiento bajo carga & Plan de benchmarking diseñado bajo idéntica configuración de carga para comparabilidad futura. & Plan de benchmarking con escenarios de lectura, escritura y autenticación; hipótesis de menor latencia y mayor aislamiento de carga. \\
-\hline
 Resiliencia ante fallos & Un error en cualquier módulo cae toda la aplicación. & Fallo aislado al servicio afectado. PAIMA detecta, notifica y asiste en la recuperación. \\
-\hline
 Observabilidad durante incidentes & Logs locales consultables con \texttt{pm2}. Diagnóstico manual y reactivo. & Métricas y logs centralizados. Diagnóstico asistido por IA con evidencia consolidada. \\
-\hline
+\bottomrule
 \end{tabular}%
 }
 \end{table}

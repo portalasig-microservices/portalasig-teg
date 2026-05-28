@@ -1,0 +1,40 @@
+\chapter*{Glosario}
+\addcontentsline{toc}{chapter}{Glosario}
+
+\begin{description}
+    \item[Appender] Componente de un framework de \textit{logging} que define el destino de los registros (consola, archivo, servidor remoto, etc.).
+    \item[Bean] En el contexto de Spring, objeto gestionado por el contenedor de inversión de control, cuyo ciclo de vida y dependencias son administrados por el framework.
+    \item[Bearer token] Tipo de token de seguridad que otorga acceso a quien lo posee, transmitido en la cabecera \texttt{Authorization} de las peticiones HTTP.
+    \item[Bill of Materials (BOM)] En Maven, mecanismo que centraliza y alinea las versiones de un conjunto de dependencias relacionadas.
+    \item[Client credentials] Flujo de autorización OAuth2 donde una aplicación se autentica directamente con sus credenciales, sin intervención de un usuario final.
+    \item[CORS (Cross-Origin Resource Sharing)] Mecanismo de seguridad que permite a un servidor web restringir los recursos que pueden solicitarse desde un dominio diferente al suyo.
+    \item[Faker] Biblioteca que genera datos sintéticos aleatorios (nombres, direcciones, identificadores) para poblar pruebas sin utilizar información real.
+    \item[H2] Motor de base de datos relacional ligero que se ejecuta en memoria dentro del mismo proceso de la aplicación, utilizado frecuentemente en pruebas unitarias por su rapidez de arranque, pero que no reproduce las características de un motor de producción como MySQL.
+    \item[LTS (Long Term Support)] Versión de software que recibe actualizaciones de seguridad y correcciones durante un período extendido, típicamente varios años.
+    \item[Mock] Objeto simulado que imita el comportamiento de un componente real en un entorno controlado, utilizado para aislar la unidad bajo prueba.
+    \item[NoSQL (Not Only SQL)] Categoría de bases de datos que no emplean el modelo relacional tradicional, ofreciendo esquemas flexibles y escalabilidad horizontal.
+    \item[On-premise] Modalidad de despliegue donde la infraestructura de software reside en instalaciones propias de la organización, en contraste con modelos de computación en la nube.
+    \item[Payload] Carga útil de datos transportada dentro de un mensaje o petición, excluyendo las cabeceras de protocolo.
+    \item[PM2] Gestor de procesos para Node.js que permite mantener aplicaciones activas, recargarlas sin detener el servicio y monitorear su consumo de recursos.
+    \item[POM (Project Object Model)] Archivo descriptor XML en Maven que define la configuración, dependencias y ciclo de vida de un proyecto Java.
+    \item[Prompt] Instrucción de texto que se proporciona a un modelo de inteligencia artificial para guiar su respuesta o comportamiento.
+    \item[Proxy inverso] Servidor intermedio que recibe peticiones de clientes externos y las redirige hacia uno o múltiples servidores backend, ocultando la topología interna del ecosistema.
+    \item[Scheduler] Componente que programa y ejecuta tareas de forma periódica o programada en el tiempo.
+    \item[IT] Information Technology (del inglés): conjunto de herramientas, sistemas y prácticas para el procesamiento, almacenamiento y transmisión de datos en organizaciones.
+    \item[Snapshot] Captura instantánea del estado de un sistema en un momento determinado, utilizada para análisis posterior o restauración.
+    \item[Spec (especificación)] En el contexto de Cypress, archivo que agrupa un conjunto de casos de prueba relacionados con una funcionalidad particular.
+    \item[Refresh token] Token de larga duración emitido junto al \textit{access token} en flujos OAuth2. Permite obtener un nuevo par de tokens de acceso cuando el original expire, sin solicitar nuevamente las credenciales del usuario.
+    \item[Branch protection] Regla de configuración en plataformas de control de versiones (como GitHub) que bloquea la fusión directa de código en la rama principal, exigiendo revisión humana y validación automatizada antes de aceptar cambios.
+    \item[Pull request] Solicitud formal para fusionar cambios de una rama secundaria hacia la rama principal de un repositorio. Incluye revisión de código, discusión y ejecución de pipelines de validación antes de la aprobación.
+    \item[Endpoint] URL específica de un servicio web que expone una operación determinada (consulta, creación, actualización o eliminación) y responde mediante un protocolo HTTP.
+    \item[Build] Proceso de compilación, empaquetado y validación de un proyecto de software a partir de su código fuente. Incluye la ejecución de análisis estáticos y pruebas automatizadas.
+    \item[Boilerplate] Código repetitivo y mecánico que debe escribirse en múltiples partes de un proyecto, típicamente automatizado mediante herramientas como Lombok o generadores de código.
+    \item[DTO (Data Transfer Object)] Objeto de transferencia de datos: estructura ligera utilizada para transportar información entre capas de una aplicación (por ejemplo, desde el backend hacia el frontend) sin exponer directamente las entidades de persistencia.
+    \item[Pipeline] Secuencia automatizada de pasos en un proceso de integración continua: compilación, análisis de estilo, ejecución de pruebas y generación de reportes, disparada automáticamente ante cambios en el repositorio.
+    \item[Dashboard] Panel visual que centraliza métricas, gráficos e indicadores de un sistema en un único punto de consulta, facilitando el monitoreo y diagnóstico del estado operativo.
+    \item[Throughput] Métrica de rendimiento que indica la cantidad de peticiones o transacciones que un sistema puede procesar por unidad de tiempo (típicamente por segundo).
+    \item[JVM (Java Virtual Machine)] Máquina virtual de Java: entorno de ejecución que interpreta el \textit{bytecode} compilado de programas Java, proporcionando portabilidad entre sistemas operativos y gestión automática de memoria.
+    \item[Seeding] Carga automatizada de datos de prueba en una base de datos para reproducir un estado conocido del sistema antes de ejecutar pruebas o demostraciones.
+    \item[SPA (Single Page Application)] Aplicación de página única: tipo de interfaz web que carga una sola página HTML y actualiza dinámicamente su contenido mediante JavaScript, sin recargar completamente el navegador en cada navegación.
+    \item[Scraping] Mecanismo de recolección de datos mediante extracción periódica (\textit{scraping}) desde endpoints expuestos por los servicios monitoreados, como el modelo utilizado por Prometheus para obtener métricas.
+\end{description}

@@ -3,6 +3,12 @@
 
 \section{Evoluci\'{o}n de los Paradigmas Web}
 
+Los paradigmas de la Web han evolucionado desde modelos est\'{a}ticos de solo
+lectura hasta arquitecturas distribuidas, aut\'{o}nomas e inteligentes. Esta
+transformaci\'{o}n redefine los requisitos t\'{e}cnicos de los sistemas de software
+y establece el contexto conceptual para la migraci\'{o}n arquitect\'{o}nica
+abordada en este trabajo.
+
 \subsection{De la Web 1.0 a la Web 3.0}
 
 La World Wide Web ha atravesado transformaciones estructurales que definen no solo c\'{o}mo se consume informaci\'{o}n, sino c\'{o}mo se construyen y operan los sistemas de software. La Web 1.0, predominante durante la d\'{e}cada de 1990, operaba bajo un modelo de lectura pasiva: p\'{a}ginas est\'{a}ticas, contenido generado exclusivamente por administradores y una arquitectura cliente-servidor centralizada donde el servidor era el \'{u}nico nodo productor de informaci\'{o}n. El usuario era un consumidor sin capacidad de modificaci\'{o}n.
@@ -15,7 +21,7 @@ El t\'{e}rmino Web 3.0 fue acu\~{n}ado originalmente por Berners-Lee, Hendler y 
 
 La literatura reciente reinterpreta el paradigma de la Web 3.0 desde la perspectiva de la ingenier\'{i}a de software como un espacio donde convergen tres tendencias tecnol\'{o}gicas, cada una con ra\'{i}ces en disciplinas distintas pero complementarias entre s\'{i}.
 
-\textbf{Distribuci\'{o}n arquitect\'{o}nica.} Tanto la acepci\'{o}n blockchain de Web 3.0 como la propuesta de Web Intelligence 3.0 \cite{kuai2025wi30} comparten el principio de que los sistemas deben dejar de depender de un \'{u}nico proceso monol\'{i}tico para descomponerse en componentes independientes que operan sobre una red. Esta propiedad no implica necesariamente una red p\'{u}blica de blockchain, sino una red interna de servicios interconectados mediante protocolos est\'{a}ndar, t\'{i}picamente HTTP/REST o mensajer\'{i}a as\'{i}ncrona. La distribuci\'{o}n habilita la evoluci\'{o}n continua del software sin interrumpir la operaci\'{o}n global y constituye la base material sobre la cual se construyen las dem\'{a}s capacidades.
+\textbf{Distribuci\'{o}n arquitect\'{o}nica.} Tanto la acepci\'{o}n blockchain de Web 3.0 \cite{edelman2021web3} como la propuesta de Web Intelligence 3.0 \cite{kuai2025wi30} comparten el principio de que los sistemas deben dejar de depender de un \'{u}nico proceso monol\'{i}tico para descomponerse en componentes independientes que operan sobre una red. Esta propiedad no implica necesariamente una red p\'{u}blica de blockchain, sino una red interna de servicios interconectados mediante protocolos est\'{a}ndar, t\'{i}picamente HTTP/REST o mensajer\'{i}a as\'{i}ncrona. La distribuci\'{o}n habilita la evoluci\'{o}n continua del software sin interrumpir la operaci\'{o}n global y constituye la base material sobre la cual se construyen las dem\'{a}s capacidades.
 
 \textbf{Observabilidad y auto-gesti\'{o}n.} La complejidad operativa inherente a los sistemas distribuidos exige mecanismos de monitoreo, agregaci\'{o}n de telemetr\'{i}a y toma de decisiones automatizada. Esta necesidad, heredada de la computaci\'{o}n auton\'{o}mica (Secci\'{o}n 2.5), transforma el mantenimiento de software de un proceso reactivo y manual a un ciclo continuo donde el sistema monitorea su propio estado, detecta anomal\'{i}as y propone acciones de correcci\'{o}n. La observabilidad no es un complemento optativo: es la condici\'{o}n previa que permite a los mecanismos de control razonar sobre el estado interno del ecosistema.
 
@@ -24,6 +30,11 @@ La literatura reciente reinterpreta el paradigma de la Web 3.0 desde la perspect
 Es importante aclarar que estas tres tendencias no constituyen una definici\'{o}n normativa de Web 3.0, sino una convergencia observable en la literatura t\'{e}cnica reciente. Para que un sistema heredado pueda incorporar estas capacidades, su arquitectura subyacente debe permitir la distribuci\'{o}n de componentes, la exposici\'{o}n de telemetr\'{i}a y la integraci\'{o}n de m\'{o}dulos inteligentes. Un monolito acoplado, sin instrumentaci\'{o}n ni puntos de extensi\'{o}n, constituye una barrera estructural que impide esta evoluci\'{o}n.
 
 \section{Arquitecturas de Software}
+
+El dise\~{n}o arquitect\'{o}nico constituye la base sobre la cual se construye
+cualquier sistema de información. La elecci\'{o}n entre un monolito y una
+descomposici\'{o}n en servicios independientes define las propiedades de
+escalabilidad, mantenibilidad y resiliencia del ecosistema.
 
 \subsection{Arquitecturas Monol\'{i}ticas}
 
@@ -55,7 +66,7 @@ La migraci\'{o}n a microservicios requiere un ecosistema tecnol\'{o}gico que aba
 
 \textbf{Docker} es una plataforma de contenedores que empaqueta una aplicaci\'{o}n junto con todas sus dependencias ---bibliotecas, configuraciones y variables de entorno--- en una unidad portable e invariante denominada imagen. Un contenedor ejecuta una instancia de esta imagen de forma aislada sobre el kernel del sistema operativo host, sin requerir una m\'{a}quina virtual completa. Esta caracter\'{i}stica reduce dr\'{a}sticamente el consumo de recursos y garantiza que el comportamiento del software sea id\'{e}ntico en los entornos de desarrollo, prueba y producci\'{o}n.
 
-\textbf{Docker Compose} es una herramienta de orquestaci\'{o}n local que permite describir un ecosistema completo de contenedores ---microservicios, bases de datos, proxies, herramientas de observabilidad--- en un \'{u}nico archivo declarativo. Mediante un comando \'{u}nico se levanta toda la red de contenedores con sus dependencias, vol\'{u}menes y configuraciones de red interna. Frente a orquestadores m\'{a}s sofisticados como Kubernetes, Docker Compose ofrece simplicidad operativa para entornos sin requisitos de autoescalado o alta disponibilidad multi-nodo, lo cual resulta adecuado para el contexto de servidores universitarios \textit{on-premise}\footnote{\textit{On-premise}: modalidad de despliegue donde la infraestructura de software reside en instalaciones propias de la organización, en contraste con modelos de computación en la nube donde los recursos son gestionados por un proveedor externo.}.
+\textbf{Docker Compose} es una herramienta de orquestaci\'{o}n local que permite describir un ecosistema completo de contenedores ---microservicios, bases de datos, proxies, herramientas de observabilidad--- en un \'{u}nico archivo declarativo. Mediante un comando \'{u}nico se levanta toda la red de contenedores con sus dependencias, vol\'{u}menes y configuraciones de red interna. Frente a orquestadores m\'{a}s sofisticados como Kubernetes, Docker Compose ofrece simplicidad operativa para entornos sin requisitos de autoescalado o alta disponibilidad multi-nodo, lo cual resulta adecuado para el contexto de servidores universitarios \textit{on-premise}.
 
 \subsection{Framework y Construcci\'{o}n}
 
@@ -65,13 +76,13 @@ La selecci\'{o}n del framework de backend determin\'{o} gran parte del ecosistem
 
 \textbf{Spring Boot} es un framework de desarrollo para la plataforma Java que simplifica la creaci\'{o}n de aplicaciones aut\'{o}nomas y de grado empresarial. Proporciona de forma inmediata soporte para seguridad (OAuth2 y JWT), observabilidad (Micrometer y Actuator), comunicaci\'{o}n entre servicios (WebClient), configuraci\'{o}n centralizada (Config Client) y persistencia (JPA). La tipificaci\'{o}n fuerte de Java facilita la detecci\'{o}n temprana de errores en tiempo de compilaci\'{o}n, en contraste con lenguajes din\'{a}micos donde las incompatibilidades de tipos pueden pasar inadvertidas hasta la ejecuci\'{o}n. Se seleccion\'{o} Spring Boot porque la madurez de su ecosistema para arquitecturas de microservicios, la integraci\'{o}n nativa con herramientas de observabilidad y testing, y la abundancia de documentaci\'{o}n y desarrolladores disponibles lo convierten en la opci\'{o}n m\'{a}s robusta para un sistema enterprise mantenido por colaboradores acad\'{e}micos temporales.
 
-\textbf{Spring Cloud} es un conjunto de herramientas que extienden Spring Boot para escenarios distribuidos. Entre sus componentes destaca \textbf{Spring Cloud Config Server}, que centraliza la gesti\'{o}n de propiedades y secretos en un repositorio Git, permitiendo versionar los cambios de configuraci\'{o}n junto al c\'{o}digo fuente y simplificando la rotaci\'{o}n de credenciales sin requerir redespliegue de los servicios.
+\textbf{Spring Cloud} es un conjunto de herramientas que extienden Spring Boot para escenarios distribuidos. Entre sus componentes destaca \textit{Spring Cloud Config Server}, que centraliza la gesti\'{o}n de propiedades y secretos en un repositorio Git, permitiendo versionar los cambios de configuraci\'{o}n junto al c\'{o}digo fuente y simplificando la rotaci\'{o}n de credenciales sin requerir redespliegue de los servicios.
 
-\textbf{Maven} es una herramienta de gesti\'{o}n de dependencias y construcci\'{o}n para proyectos Java. Organiza el c\'{o}digo mediante un modelo de herencia de proyectos donde un POM padre centraliza las versiones de las dependencias y los plugins. Este mecanismo, denominado \textit{Bill of Materials} (BOM), garantiza consistencia entre los distintos m\'{o}dulos del ecosistema y elimina conflictos de versiones.
+\textbf{Maven} es una herramienta de gesti\'{o}n de dependencias y construcci\'{o}n para proyectos Java. Organiza el c\'{o}digo mediante un modelo de herencia de proyectos donde un POM padre centraliza las versiones de las dependencias y los plugins. Este mecanismo, denominado \textit{Bill of Materials} (BOM), garantiza consistencia entre los distintos m\'{o}dulos del ecosistema y elimina conflictos de versiones. \textit{Gradle} constituye una alternativa moderna que emplea una sintaxis declarativa basada en Kotlin o Groovy y ofrece tiempos de compilaci\'{o}n inferiores gracias a su sistema de cache incremental; no obstante, la madurez del ecosistema de plugins para Spring Boot en Maven determin\'{o} su selecci\'{o}n para este trabajo.
 
 \textbf{Lombok} es una biblioteca de anotaciones que reduce el c\'{o}digo repetitivo en clases Java. Mediante anotaciones como \texttt{@Getter}, \texttt{@Setter}, \texttt{@Builder} y \texttt{@AllArgsConstructor}, Lombok genera autom\'{a}ticamente m\'{e}todos de acceso, constructores y patrones de creaci\'{o}n en tiempo de compilaci\'{o}n, eliminando decenas de l\'{i}neas de c\'{o}digo boilerplate por entidad. Esta reducci\'{o}n mejora la legibilidad y disminuye el riesgo de inconsistencias cuando m\'{u}ltiples colaboradores modifican el mismo modelo de datos.
 
-\textbf{MapStruct} es un generador de c\'{o}digo que automatiza el mapeo entre objetos de dominio (entidades JPA) y objetos de transferencia (DTOs). En lugar de escribir manualmente conversiones campo por campo, el desarrollador define una interfaz anotada y MapStruct genera la implementaci\'{o}n en tiempo de compilaci\'{o}n. Esta pr\'{a}ctica garantiza que cada cambio en la estructura de una entidad se refleje inmediatamente en su DTO correspondiente, evitando errores de sincronizaci\'{o}n entre capas.
+\textbf{MapStruct} es un generador de c\'{o}digo que automatiza el mapeo entre objetos de dominio (entidades JPA) y objetos de transferencia (DTOs). En lugar de escribir manualmente conversiones campo por campo, el desarrollador define una interfaz anotada y MapStruct genera la implementaci\'{o}n en tiempo de compilaci\'{o}n. Esta pr\'{a}ctica garantiza que cada cambio en la estructura de una entidad se refleje inmediatamente en su DTO correspondiente, evitando errores de sincronizaci\'{o}n entre capas. Como alternativa se evalu\'{o} \textit{ModelMapper}, que ofrece configuraci\'{o}n por convenciones sin necesidad de interfaces expl\'{i}citas; sin embargo, MapStruct fue preferido por su menor overhead en tiempo de ejecuci\'{o}n y su integraci\'{o}n nativa con el ciclo de compilaci\'{o}n de Maven.
 
 \subsection{Seguridad y Comunicaci\'{o}n}
 
@@ -79,7 +90,7 @@ La selecci\'{o}n del framework de backend determin\'{o} gran parte del ecosistem
 
 \textbf{OAuth2} es un protocolo de autorizaci\'{o}n que permite a una aplicaci\'{o}n obtener acceso limitado a los recursos de un usuario sin exponer sus credenciales. El flujo \texttt{client\_credentials} permite que un microservicio se autentique directamente con sus propias credenciales para consumir APIs internas, mientras que el flujo de \textit{password} autentica a usuarios finales. Ambos flujos emiten tokens de acceso con tiempo de expiraci\'{o}n limitado que los servicios protegidos validan mediante la firma JWT compartida. Para evitar que el usuario deba iniciar sesi\'{o}n repetidamente, el protocolo define un \textit{refresh token}: un token de mayor duraci\'{o}n que el cliente puede intercambiar por un nuevo par de tokens de acceso cuando el original expire, manteniendo la sesi\'{o}n activa sin requerir credenciales nuevamente.
 
-\textbf{Nginx} es un servidor web de alto rendimiento que en este contexto opera como \textit{proxy inverso}\footnote{\textit{Proxy inverso}: servidor intermedio que recibe peticiones de clientes externos y las redirige hacia uno o m\'{u}ltiples servidores backend, ocultando la topolog\'{i}a interna del ecosistema y centralizando funciones como enrutamiento, balanceo de carga y terminaci\'{o}n SSL.}: recibe las peticiones del navegador, las enruta hacia el microservicio correspondiente y devuelve la respuesta al cliente. Esta capa intermedia permite servir el frontend est\'{a}tico, distribuir la carga entre r\'{e}plicas y centralizar la terminaci\'{o}n SSL.
+\textbf{Nginx} es un servidor web de alto rendimiento que en este contexto opera como \textit{proxy inverso}: recibe las peticiones del navegador, las enruta hacia el microservicio correspondiente y devuelve la respuesta al cliente. Esta capa intermedia permite servir el frontend est\'{a}tico, distribuir la carga entre r\'{e}plicas y centralizar la terminaci\'{o}n SSL.
 
 \textbf{Cross-Origin Resource Sharing (CORS)} es un mecanismo de seguridad que controla qu\'{e} dominios externos pueden realizar peticiones HTTP a un servicio. En una arquitectura de microservicios donde el frontend Vue.js se sirve desde un dominio distinto al de los servicios backend, CORS debe configurarse expl\'{i}citamente en cada microservicio para permitir el intercambio de recursos entre or\'{i}genes autorizados.
 
@@ -97,13 +108,13 @@ La selecci\'{o}n del framework de backend determin\'{o} gran parte del ecosistem
 
 \subsection{Observabilidad Distribuida}
 
-La observabilidad de un sistema distribuido se fundamenta en tres pilares de telemetr\'{i}a: m\'{e}tricas, logs y trazabilidad. Sridharan (2018) \cite{sridharan2018distributed} distingue entre \textit{monitoreo} ---el acto de observar el estado general y predecible de un sistema--- y la \textit{observabilidad} ---la cualidad que permite inferir estados internos bas\'{a}ndose \'{u}nicamente en el conocimiento de sus salidas externas.
+La observabilidad de un sistema distribuido se fundamenta en tres pilares de telemetr\'{i}a: m\'{e}tricas, logs y trazabilidad. Sridharan \cite{sridharan2018distributed} distingue entre \textit{monitoreo} ---el acto de observar el estado general y predecible de un sistema--- y \textit{observabilidad} ---la cualidad que permite inferir estados internos bas\'{a}ndose \'{u}nicamente en el conocimiento de sus salidas externas---.
 
 \textbf{Spring Boot Actuator} expone endpoints de administraci\'{o}n y diagn\'{o}stico sobre cada microservicio, incluyendo \texttt{/actuator/health} para verificar el estado de salud y \texttt{/actuator/prometheus} para exportar m\'{e}tricas en formato compatible con Prometheus. \textbf{Micrometer} es la fachada de instrumentaci\'{o}n que Actuator utiliza internamente para recolectar m\'{e}tricas de JVM, uso de memoria, tiempos de respuesta y contadores de peticiones HTTP.
 
 \textbf{Prometheus} es un sistema de monitoreo y alerta que recolecta m\'{e}tricas mediante un modelo de extracci\'{o}n peri\'{o}dica (\textit{scraping}) sobre los endpoints expuestos por los microservicios. Almacena las series temporales en una base de datos propia y permite consultarlas mediante un lenguaje de expresiones (PromQL).
 
-\textbf{Loki} es un sistema de agregaci\'{o}n de logs dise\~{n}ado espec\'{i}ficamente para entornos distribuidos. A diferencia de soluciones como Elasticsearch, que indexan el contenido completo de cada registro, Loki indexa \'{u}nicamente las etiquetas (\textit{labels}) asociadas a los logs, logrando un consumo de recursos significativamente menor. Los microservicios env\'{i}an sus registros a Loki mediante un \textit{appender}\footnote{\textit{Appender}: componente de un framework de \textit{logging} que define el destino de los registros (consola, archivo, servidor remoto, etc.).} configurado en el framework de logging.
+\textbf{Loki} es un sistema de agregaci\'{o}n de logs dise\~{n}ado espec\'{i}ficamente para entornos distribuidos. A diferencia de soluciones como Elasticsearch, que indexan el contenido completo de cada registro, Loki indexa \'{u}nicamente las etiquetas (\textit{labels}) asociadas a los logs, logrando un consumo de recursos significativamente menor. Los microservicios env\'{i}an sus registros a Loki mediante un \textit{appender} configurado en el framework de logging.
 
 \textbf{Grafana} es una plataforma de visualizaci\'{o}n que unifica m\'{e}tricas de Prometheus y logs de Loki en dashboards interactivos. Permite correlacionar anomal\'{i}as num\'{e}ricas ---como un pico de latencia--- con el contexto textual de los logs en un \'{u}nico punto de consulta, acelerando el diagn\'{o}stico de incidentes.
 
@@ -111,11 +122,11 @@ La observabilidad de un sistema distribuido se fundamenta en tres pilares de tel
 
 La migraci\'{o}n a microservicios no garantiza por s\'{i} sola la mantenibilidad del sistema. Es necesario incorporar pr\'{a}cticas sistem\'{a}ticas de aseguramiento de calidad que detecten problemas antes de que lleguen a producci\'{o}n.
 
-\textbf{Checkstyle} es una herramienta de an\'{a}lisis est\'{a}tico de c\'{o}digo que verifica el cumplimiento de una gu\'{i}a de estilo definida en un archivo de configuraci\'{o}n XML. Se integra en la fase de compilaci\'{o}n de Maven de forma que cualquier violaci\'{o}n ---longitud de l\'{i}nea excedida, convenciones de nombres incorrectas, ausencia de Javadoc--- interrumpe el \textit{build}. Esta decisi\'{o}n prioriza la legibilidad y uniformidad del c\'{o}digo fuente, aspectos cr\'{i}ticos cuando m\'{u}ltiples colaboradores rotativos deben leer y modificar el mismo c\'{o}digo.
+\textbf{Checkstyle} es una herramienta de an\'{a}lisis est\'{a}tico de c\'{o}digo que verifica el cumplimiento de una gu\'{i}a de estilo definida en un archivo de configuraci\'{o}n XML. Se integra en la fase de compilaci\'{o}n de Maven de forma que cualquier violaci\'{o}n ---longitud de l\'{i}nea excedida, convenciones de nombres incorrectas, ausencia de Javadoc--- interrumpe el \textit{build}. \textbf{SpotBugs} es otra herramienta de an\'{a}lisis est\'{a}tico, orientada a la detecci\'{o}n de patrones de bug conocidos (null pointers, fugas de recursos, comparaciones incorrectas) en el bytecode Java. Si bien SpotBugs aporta valor en la detecci\'{o}n de defectos de l\'{o}gica, la prioridad del proyecto fue garantizar primero la legibilidad y uniformidad del c\'{o}digo fuente mediante Checkstyle, dejando la incorporaci\'{o}n de SpotBugs como l\'{i}nea de evoluci\'{o}n futura del pipeline de calidad.
 
 \textbf{JaCoCo} es un plugin de cobertura de c\'{o}digo para Java que instrumenta el \textit{bytecode} durante la ejecuci\'{o}n de las pruebas y genera un reporte detallado del porcentaje de l\'{i}neas y ramas ejecutadas. El reporte se integra con el pipeline de integraci\'{o}n continua para bloquear la fusi\'{o}n de c\'{o}digo que descienda por debajo del umbral establecido.
 
-\textbf{Testcontainers} es una biblioteca que levanta contenedores Docker ef\'{i}meros durante la fase de pruebas de Maven. Permite ejecutar tests de integraci\'{o}n sobre instancias reales de MySQL, aplicar las migraciones Flyway correspondientes y destruir el contenedor al finalizar. Este enfoque garantiza que las pruebas validen comportamientos que dependen del dialecto SQL real, como restricciones de clave for\'{a}nea y transacciones concurrentes, en contraste con bases de datos en memoria como H2\footnote{H2: motor de base de datos relacional ligero que se ejecuta en memoria dentro del mismo proceso de la aplicaci\'{o}n, utilizado frecuentemente en pruebas unitarias por su rapidez de arranque, pero que no reproduce las caracter\'{i}sticas de un motor de producci\'{o}n como MySQL (restricciones de clave for\'{a}nea, transacciones concurrentes, dialecto SQL).}.
+\textbf{Testcontainers} es una biblioteca que levanta contenedores Docker ef\'{i}meros durante la fase de pruebas de Maven. Permite ejecutar tests de integraci\'{o}n sobre instancias reales de MySQL, aplicar las migraciones Flyway correspondientes y destruir el contenedor al finalizar. Este enfoque garantiza que las pruebas validen comportamientos que dependen del dialecto SQL real, como restricciones de clave for\'{a}nea y transacciones concurrentes, en contraste con bases de datos en memoria como H2.
 
 Se evaluaron tres alternativas para la automatizaci\'{o}n de pruebas end-to-end.
 
@@ -155,11 +166,17 @@ Los proveedores de modelos de lenguaje pueden clasificarse en dos categor\'{i}as
 
 \textbf{APIs remotas comerciales.} Servicios como OpenAI (GPT-4, GPT-3.5), Google (Gemini) o Moonshot AI (Kimi) ofrecen acceso a modelos de gran capacidad mediante interfaces de programaci\'{o}n en la nube. Estos modelos han sido entrenados sobre vastos corpus de texto y exhiben un alto rendimiento en tareas de razonamiento, s\'{i}ntesis y generaci\'{o}n de c\'{o}digo. Su principal ventaja es la calidad de respuesta sin requerir infraestructura local de procesamiento. Su principal desventaja es la dependencia de conectividad externa, los costos por token consumido y la transmisi\'{o}n de datos operativos potencialmente sensibles a servidores de terceros.
 
-\textbf{Modelos locales.} \textbf{Ollama} es una plataforma de c\'{o}digo abierto que permite ejecutar modelos de lenguaje de forma local sobre hardware convencional, sin depender de APIs de terceros. Modelos como Llama, Gemma u otros pueden ejecutarse en estaciones de trabajo locales con recursos limitados, garantizando soberan\'{i}a tecnol\'{o}gica y eliminando costos por uso de APIs remotas. Esta capacidad resulta especialmente relevante en entornos institucionales donde la conectividad externa es limitada o donde los datos operativos no pueden transmitirse a servicios en la nube por razones de seguridad. La contraparte es que los modelos locales suelen tener menor capacidad de razonamiento que sus equivalentes comerciales de mayor escala.
+\textbf{Modelos locales.} \textbf{Ollama} es una plataforma de c\'{o}digo abierto que permite ejecutar modelos de lenguaje de forma local sobre hardware convencional, sin depender de APIs de terceros. Modelos como Llama, Gemma u otros pueden ejecutarse en estaciones de trabajo locales con recursos limitados, garantizando soberan\'{i}a tecnol\'{o}gica y eliminando costos por uso de APIs remotas. Esta capacidad resulta especialmente relevante en entornos institucionales donde la conectividad externa es limitada o donde los datos operativos no pueden transmitirse a servicios en la nube por razones de seguridad. La contraparte es que los modelos locales suelen tener menor capacidad de razonamiento que sus equivalentes comerciales de mayor escala, y su ejecuci\'{o}n continua exige recursos computacionales adicionales ---memoria RAM, ciclos de CPU o aceleraci\'{o}n GPU--- que deben mantenerse dedicados al servicio del modelo, incrementando el consumo energ\'{e}tico y el costo de infraestructura respecto a una invocaci\'{o}n espor\'{a}dica a una API remota.
 
 En el contexto de este trabajo, se adopt\'{o} una arquitectura de proveedores configurables que permite alternar entre APIs remotas (para m\'{a}xima calidad de diagn\'{o}stico) y modelos locales (para soberan\'{i}a tecnol\'{o}gica), seleccionable mediante el Config Server sin modificaci\'{o}n del c\'{o}digo.
 
 \section{Mantenimiento de Software}
+
+Tras el despliegue inicial, un sistema de software requiere intervenci\'{o}n
+continua para conservar su utilidad operativa. Las actividades de mantenimiento
+incluyen correcci\'{o}n de defectos detectados en producci\'{o}n, adaptaci\'{o}n
+a cambios en el entorno tecnol\'{o}gico, mejora de rendimiento y prevenci\'{o}n
+de fallos latentes.
 
 \subsection{Tipos de Mantenimiento}
 
@@ -188,6 +205,11 @@ Estas pr\'{a}cticas, en conjunto, transforman el mantenimiento de un proceso art
 
 \section{Computaci\'{o}n Auton\'{o}mica}
 
+Frente a la creciente complejidad operativa de los ecosistemas distribuidos, la
+computaci\'{o}n auton\'{o}mica busca transferir la gesti\'{o}n rutinaria de la
+infraestructura al propio sistema, limitando la intervenci\'{o}n humana a la
+definici\'{o}n de pol\'{i}ticas de gobierno.
+
 \subsection{Concepto y Propiedades Self-CHOP}
 
 Inspirada en el funcionamiento del sistema nervioso aut\'{o}nomo del cuerpo humano, la Computaci\'{o}n Auton\'{o}mica fue propuesta por IBM en 2001 para lidiar con la creciente complejidad de la gesti\'{o}n de sistemas inform\'{a}ticos \cite{kephart2003vision}. El concepto define sistemas inform\'{a}ticos capaces de autogestionarse en base a pol\'{i}ticas de alto nivel establecidas por administradores humanos, ocultando la complejidad subyacente de las operaciones t\'{e}cnicas.
@@ -203,6 +225,11 @@ Un sistema auton\'{o}mico se rige por cuatro propiedades fundamentales, conocida
 
 \section{Modelo MAPE-K}
 
+Para operacionalizar la computaci\'{o}n auton\'{o}mica, IBM propuso un ciclo de
+control organizado en cinco elementos: monitoreo del entorno, an\'{a}lisis del
+estado actual, planificaci\'{o}n de acciones, ejecuci\'{o}n sobre el sistema y
+una base de conocimiento que alimenta cada fase.
+
 \subsection{Componentes del Ciclo}
 
 El modelo MAPE-K (Monitor, Analyze, Plan, Execute, Knowledge) es el marco arquitect\'{o}nico de referencia introducido por IBM en 2003 para construir sistemas auton\'{o}micos \cite{kephart2003vision}. Divide el proceso de auto-gesti\'{o}n en cuatro fases apoyadas sobre una base de conocimiento compartida:
@@ -215,7 +242,7 @@ El modelo MAPE-K (Monitor, Analyze, Plan, Execute, Knowledge) es el marco arquit
     \item \textbf{Knowledge (Conocimiento):} Base de datos o repositorio hist\'{o}rico que nutre y es nutrido por las otras cuatro fases \cite{ibm2006architectural}.
 \end{itemize}
 
-\subsection{De MAPE-K a la Integraci\'{o}n de Inteligencia Artificial}
+\subsection{De MAPE-K a la Integraci\'{o}n de Inteligencia Artificial}\label{sec:mapek-ia}
 
 La implementaci\'{o}n estricta de un \'{u}nico ciclo MAPE-K mediante reglas est\'{a}ticas resulta efectiva en entornos controlados con patrones de fallo predecibles. Sin embargo, la transici\'{o}n hacia microservicios introdujo nuevos niveles de complejidad: m\'{u}ltiples puntos de fallo independientes, interacciones no lineales entre servicios y vol\'{u}menes de telemetr\'{i}a que superan la capacidad de an\'{a}lisis manual.
 
@@ -223,13 +250,13 @@ En este contexto, la literatura reciente ha propuesto enfoques h\'{i}bridos dond
 
 Sanwouo, Quinton y Temple \cite{sanwouo2025aware} extienden esta direcci\'{o}n hacia arquitecturas completamente distribuidas con su marco AWARE (\textit{Assess, Weigh, Act, Reflect, Enrich}), que emplea agentes de IA aut\'{o}nomos capaces de colaboraci\'{o}n entre nodos y aprendizaje continuo. Si bien AWARE representa una evoluci\'{o}n prometedora, su implementaci\'{o}n requiere una infraestructura multi-agente que excede los recursos disponibles en el contexto de este trabajo.
 
-El servicio PAIMA (Secci\'{o}n 3.2) se configura como una \textbf{implementaci\'{o}n pr\'{a}ctica del framework propuesto en \cite{esposito2025mapek}}: mantiene la arquitectura centralizada del ciclo MAPE-K ---un servicio con scheduling peri\'{o}dico que ejecuta Monitor, Analyze, Plan y Execute en secuencia--- pero sustituye las reglas est\'{a}ticas de las fases de An\'{a}lisis y Planificaci\'{o}n por un modelo de lenguaje de gran escala. Esta decisi\'{o}n de dise\~{n}o prioriza la operabilidad en un entorno sin equipo de operaciones dedicado: un servicio centralizado es m\'{a}s simple de desplegar, depurar y mantener que una red distribuida de agentes aut\'{o}nomos, al tiempo que incorpora la capacidad de razonamiento inteligente que caracteriza a la evoluci\'{o}n del MAPE-K hacia la inteligencia artificial.
+El servicio PAIMA (Secci\'{o}n~\ref{sec:paima}) se configura como una \textbf{implementaci\'{o}n pr\'{a}ctica del framework propuesto por Esposito et al. \cite{esposito2025mapek}}, que integra el ciclo MAPE-K con capacidades de inteligencia artificial generativa para la detecci\'{o}n y remediaci\'{o}n aut\'{o}noma de anomal\'{i}as en microservicios. A diferencia del modelo original, donde las fases de An\'{a}lisis y Planificaci\'{o}n operan mediante reglas est\'{a}ticas configuradas por un operador humano, el framework de Esposito delega estas fases a un modelo de lenguaje de gran escala que interpreta telemetr\'{i}a operativa y propone planes de acci\'{o}n adaptados. Esta decisi\'{o}n de dise\~{n}o prioriza la operabilidad en un entorno sin equipo de operaciones dedicado: un servicio centralizado es m\'{a}s simple de desplegar, depurar y mantener que una red distribuida de agentes aut\'{o}nomos, al tiempo que incorpora la capacidad de razonamiento inteligente que caracteriza a la evoluci\'{o}n del MAPE-K hacia la inteligencia artificial.
 
 La fase Knowledge adquiere un rol central en esta implementaci\'{o}n, ya que el historial de incidentes resueltos y las decisiones humanas aprobadas constituyen material de retroalimentaci\'{o}n que permite refinar los \textit{prompts} enviados al modelo de IA y mejorar progresivamente la calidad de los diagn\'{o}sticos.
 
 \section{Sistemas Auto-adaptativos}
 
-Un sistema auto-adaptativo tiene la capacidad de modificar su comportamiento y estructura en tiempo de ejecuci\'{o}n en respuesta a cambios en su entorno u operaciones. Weyns (2019) establece que un sistema verdaderamente auto-adaptativo requiere retroalimentaci\'{o}n constante y mecanismos de toma de decisiones no deterministas que reduzcan la carga cognitiva de los operadores humanos \cite{weyns2019software}.
+Un sistema auto-adaptativo tiene la capacidad de modificar su comportamiento y estructura en tiempo de ejecuci\'{o}n en respuesta a cambios en su entorno u operaciones. Weyns \cite{weyns2013software} establece que un sistema verdaderamente auto-adaptativo requiere \textit{retroalimentaci\'{o}n constante y mecanismos de toma de decisiones no deterministas que reduzcan la carga cognitiva de los operadores humanos}.
 
 Mientras que la computaci\'{o}n auton\'{o}mica abarca la visi\'{o}n completa de sistemas auto-manejables, la auto-adaptaci\'{o}n es el mecanismo de ingenier\'{i}a de software pr\'{a}ctico para implementarla. La auto-adaptaci\'{o}n requiere que el c\'{o}digo alterado mantenga su validez estructural, lo cual hace que las pr\'{a}cticas de aseguramiento de calidad ---cobertura de pruebas, an\'{a}lisis est\'{a}tico, integraci\'{o}n continua--- sean condiciones previas indispensables para cualquier forma de autonom\'{i}a operativa.
 
@@ -237,11 +264,11 @@ Mientras que la computaci\'{o}n auton\'{o}mica abarca la visi\'{o}n completa de 
 
 El uso de algoritmos de aprendizaje autom\'{a}tico e inteligencia artificial permite establecer l\'{i}neas base del comportamiento normal de un sistema: tasa de errores habitual, latencia esperada, picos estacionales de tr\'{a}fico. Cuando los patrones reales se desv\'{i}an de estas l\'{i}neas base predictivas, la IA puede alertar al equipo antes de que ocurra una interrupci\'{o}n total del servicio \cite{notaro2021aiops}.
 
-El advenimiento de los modelos de lenguaje de gran escala ha revolucionado la gesti\'{o}n de operaciones de TI. Al abstraer m\'{e}tricas matem\'{a}ticas, archivos de log crudos y topolog\'{i}a de servicios en representaciones de texto, los LLMs son capaces de sintetizar errores complejos en diagn\'{o}sticos legibles por humanos. Act\'{u}an como asistentes para los ingenieros de operaciones, sugiriendo configuraciones \'{o}ptimas para recuperar o escalar la infraestructura.
+El advenimiento de los modelos de lenguaje de gran escala ha revolucionado la gesti\'{o}n de operaciones de IT. Al abstraer m\'{e}tricas matem\'{a}ticas, archivos de log crudos y topolog\'{i}a de servicios en representaciones de texto, los LLMs son capaces de sintetizar errores complejos en diagn\'{o}sticos legibles por humanos. Act\'{u}an como asistentes para los ingenieros de operaciones, sugiriendo configuraciones \'{o}ptimas para recuperar o escalar la infraestructura.
 
 \section{AIOps y Automatizaci\'{o}n de Operaciones}
 
-El t\'{e}rmino AIOps (Artificial Intelligence for IT Operations) fue acu\~{n}ado por Gartner en 2016 para describir la aplicaci\'{o}n de Big Data, aprendizaje autom\'{a}tico y otras tecnolog\'{i}as avanzadas a los flujos de operaciones de TI. AIOps mejora el monitoreo tradicional al correlacionar eventos ruidosos, encontrar la causa ra\'{i}z con mayor velocidad y proporcionar remediaci\'{o}n predictiva.
+El t\'{e}rmino AIOps (Artificial Intelligence for IT Operations) fue acu\~{n}ado por Gartner en 2016 para describir la aplicaci\'{o}n de Big Data, aprendizaje autom\'{a}tico y otras tecnolog\'{i}as avanzadas a los flujos de operaciones de IT. AIOps mejora el monitoreo tradicional al correlacionar eventos ruidosos, encontrar la causa ra\'{i}z con mayor velocidad y proporcionar remediaci\'{o}n predictiva.
 
 En ecosistemas orquestados por contenedores, AIOps puede predecir cu\'{a}ndo un servicio fallar\'{a} analizando un aumento anormal de la memoria o la latencia. La integraci\'{o}n de AIOps en modelos auton\'{o}micos como MAPE-K representa el estado del arte en ingenier\'{i}a de resiliencia, permitiendo que los sistemas no solo reaccionen ante fallos, sino que anticipen condiciones de riesgo antes de que se materialicen en interrupciones.
 
