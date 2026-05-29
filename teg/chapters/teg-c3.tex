@@ -101,14 +101,12 @@ dependencia de colaboradores académicos temporales, exige un rediseño arquitec
 que descomponga el sistema en dominios independientes, con límites claros y
 mecanismos de validación automatizada.
 
-\begin{center}
-    \begin{figure}[h!]
-        \centering
-        \includegraphics[width=0.85\textwidth]{graphics/modelo-datos-monolito.png}
-        \caption{Diagrama entidad-relación simplificado del modelo de datos monolítico, mostrando la tabla \texttt{site} como núcleo con sus 15+ relaciones hacia entidades dependientes.}
-        \label{fig:modelo-datos-monolito}
-    \end{figure}
-\end{center}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.85\textwidth]{graphics/modelo-datos-monolito.png}
+    \caption{Diagrama entidad-relación simplificado del modelo de datos monolítico, mostrando la tabla \texttt{site} como núcleo con sus 15+ relaciones hacia entidades dependientes.}
+    \label{fig:modelo-datos-monolito}
+\end{figure}
 
 \subsection{Diseño de la Arquitectura de Microservicios}\label{sec:arquitectura-ms}
 
@@ -281,34 +279,28 @@ ejecución y detectar conflictos si dos colaboradores intentan crear una migraci
 el mismo número de versión. La Figura~\ref{fig:flyway-migraciones} ilustra la
 convención de directorios.
 
-\begin{center}
-    \begin{figure}[h!]
-        \centering
-        \includegraphics[width=0.7\textwidth]{graphics/flyway-migraciones.png}
-        \caption{Estructura de directorios de migraciones Flyway en un microservicio.}
-        \label{fig:flyway-migraciones}
-    \end{figure}
-\end{center}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.7\textwidth]{graphics/flyway-migraciones.png}
+    \caption{Estructura de directorios de migraciones Flyway en un microservicio.}
+    \label{fig:flyway-migraciones}
+\end{figure}
 
 La convenci\'{o}n de nomenclatura sigue el formato \texttt{V\{version\}\_\_\{descripci\'{o}n\}.sql}, donde cada archivo contiene sentencias \texttt{DDL} que construyen el esquema progresivamente. La Figura~\ref{fig:flyway-script-ejemplo} muestra un extracto de la migraci\'{o}n inicial del servicio Site, que define las tablas \texttt{course}, \texttt{course\_semester\_link}, \texttt{course\_career\_link} y \texttt{career}, incluyendo comentarios descriptivos en cada columna.
 
-\begin{center}
-    \begin{figure}[h!]
-        \centering
-        \includegraphics[width=0.85\textwidth]{graphics/flyway-script-ejemplo.png}
-        \caption{Extracto del script de migraci\'{o}n inicial \texttt{V1.0.0.00\_\_init.sql} del servicio Site, mostrando la definici\'{o}n de tablas con sentencias \texttt{CREATE TABLE} y comentarios de columnas.}
-        \label{fig:flyway-script-ejemplo}
-    \end{figure}
-\end{center}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.85\textwidth]{graphics/flyway-script-ejemplo.png}
+    \caption{Extracto del script de migraci\'{o}n inicial \texttt{V1.0.0.00\_\_init.sql} del servicio Site, mostrando la definici\'{o}n de tablas con sentencias \texttt{CREATE TABLE} y comentarios de columnas.}
+    \label{fig:flyway-script-ejemplo}
+\end{figure}
 
-\begin{center}
-    \begin{figure}[h!]
-        \centering
-        \includegraphics[width=0.85\textwidth]{graphics/pom-herencia.png}
-        \caption{Diagrama de herencia de dependencias Maven.}
-        \label{fig:pom-herencia}
-    \end{figure}
-\end{center}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.85\textwidth]{graphics/pom-herencia.png}
+    \caption{Diagrama de herencia de dependencias Maven.}
+    \label{fig:pom-herencia}
+\end{figure}
 
 \subsection{Técnicas de Mantenimiento de Software Implementadas}
 
@@ -352,12 +344,13 @@ base \texttt{AbstractMysqlIntegrationTest} instancia la base de datos, ejecuta l
 migraciones Flyway y destruye el contenedor al finalizar, garantizando que las
 pruebas validen el comportamiento real sobre un motor idéntico al de producción \cite{testcontainers2024}.
 La evolución de la suite de integración, los escenarios cubiertos y las lecciones
-interfaz que simulan flujos completos del usuario ---inicio de sesión, navegación por
-sitios de asignatura, gestión de contenidos--- ejecutándose dentro del mismo ciclo de
-vida del navegador. Los tests realizan peticiones directas de login contra el
-servicio UAA para obtener el token JWT, inyectándolo en las peticiones subsecuentes \cite{cypress2024}.
-La suite completa, los resultados de ejecución y el análisis de estabilidad se
-documentan en el Capítulo \ref{ch:pruebas}.
+aprendidas en su construcción se documentan en el Capítulo \ref{ch:pruebas}.
+
+Para las pruebas end-to-end se empleó \textit{Cypress}, que ejecuta los tests
+dentro del mismo ciclo de vida del navegador, simulando flujos completos del usuario:
+inicio de sesión, navegación por sitios de asignatura y gestión de contenidos.
+Los tests realizan peticiones directas de login contra el servicio UAA para obtener
+el token JWT, inyectándolo en las peticiones subsecuentes \cite{cypress2024}.
 
 El stack de observabilidad se configuró con \textit{Prometheus} para métricas,
 \textit{Loki} para agregación de logs y \textit{Grafana} para visualización unificada \cite{prometheus2024,grafana2024}.
@@ -407,12 +400,10 @@ cambios sustanciales en múltiples dimensiones del ciclo de vida del software. A
 continuación se presenta un análisis comparativo cualitativo que contrasta ambos
 enfoques en las dimensiones más relevantes para el contexto operativo de PortalAsig.
 
-\begin{table}[htbp]
+\begin{table}[ht!]
 \centering
-\caption{Comparativa cualitativa: arquitectura monolítica vs. microservicios}
-\label{tab:comparativa-monolito-ms}
 \resizebox{\textwidth}{!}{%
-\renewcommand{\arraystretch}{1.4}
+\renewcommand{\arraystretch}{1.25}
 \setlength{\tabcolsep}{10pt}
 \begin{tabular}{>{\columncolor{gray!15}}p{3.2cm}p{5.5cm}p{5.5cm}}
 \toprule
@@ -443,6 +434,8 @@ orquestación con Docker Compose, resolución de dependencias de red. \\
 \bottomrule
 \end{tabular}%
 }
+\caption{\textit{Comparativa cualitativa: arquitectura monolítica vs. microservicios}}
+\label{tab:comparativa-monolito-ms}
 \end{table}
 
 La Tabla \ref{tab:comparativa-monolito-ms} evidencia que la arquitectura de
@@ -616,65 +609,12 @@ continuo de incidentes y decisiones permitirá perfeccionar los prompts o realiz
 fine-tuning del modelo de IA, logrando un proceso de auto-mantenimiento más
 autónomo y robusto.
 
-\subsection{Interfaz de Gestión de Incidentes (Frontend)}
-
-Se incorporó un módulo dedicado denominado ``Alertas PAIMA'' dentro de la
-aplicación frontend en Vue.js. La interfaz se organiza en cuatro vistas que cubren
-el ciclo completo de atención de incidentes: un panel de control general, un listado
-de alertas por estado, una vista de detalle individual y un asistente conversacional.
-
-\textbf{Panel de control.} La vista principal presenta un resumen del estado del
-ecosistema: cantidad de alertas activas por severidad, servicios monitoreados en
-estado saludable vs. degradado, y gráficos de evolución temporal de incidentes.
-Este dashboard permite al administrador evaluar la situación global antes de
-adentrarse en casos específicos.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.9\textwidth]{graphics/paima-dashboard.png}
-    \caption{Screenshot del panel de control de PAIMA.}
-    \label{fig:paima-dashboard}
-\end{figure}
-
-\textbf{Listado de alertas.} Esta vista divide las incidencias en dos pestañas:
-``Pendientes de Acción'' y ``Completadas / Gestionadas''. Cada fila muestra la
-prioridad (P1, P2, P3), el servicio afectado, la descripción del síntoma detectado
-y la fecha de generación. Las incidencias se ordenan por severidad y se destacan
-con códigos de color (rojo para P1, amarillo para P2).
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.9\textwidth]{graphics/paware-alerts-list.png}
-    \caption{Listado de alertas autonómicas priorizadas visibles para el administrador.}
-    \label{fig:paima-alerts-list}
-\end{figure}
-
-\textbf{Detalle del incidente.} Al seleccionar una alerta, el administrador accede a
-una vista que consolida toda la evidencia asociada: métricas de Prometheus en el
-momento del evento, fragmentos de log de Loki, la recomendación estructurada
-producida por el modelo de IA y los controles para aprobar, rechazar o comentar la
-acción propuesta.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.85\textwidth]{graphics/paima-detail.png}
-    \caption{Screenshot de la vista de detalle de un incidente P1 en PAIMA.}
-    \label{fig:paima-incident-detail}
-\end{figure}
-
-\textbf{Asistente conversacional.} Antes de ejecutar cualquier acción sobre una alerta,
-el administrador puede abrir un chat contextual para interrogar a la IA sobre la
-naturaleza del error, solicitar explicaciones adicionales o explorar pasos manuales
-alternativos. Esta interacción emula una experiencia de operador asistido o
-``Copilot'' de infraestructura, reduciendo la incertidumbre antes de la toma de
-decisiones.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.9\textwidth]{graphics/paima-chat.png}
-    \caption{Interacción del administrador con el agente de IA para refinar el diagnóstico antes de ejecutar una acción sobre la alerta.}
-    \label{fig:paima-chat}
-\end{figure}
+La operación del ciclo MAPE-K se complementa con una interfaz de gestión de
+incidentes integrada en el frontend de PortalAsig, que permite al administrador
+visualizar alertas, consultar evidencia consolidada, interactuar con el asistente
+de IA y aprobar acciones de remediación. La descripción técnica de esta interfaz
+se presenta en el Capítulo~\ref{ch:pruebas}, dentro de la sección dedicada a la
+validación del sistema de autogestión del mantenimiento.
 
 \section{Adaptación del Frontend a la Arquitectura Distribuida}
 
@@ -797,10 +737,8 @@ actúa como proxy inverso y centraliza el punto de entrada del ecosistema.
 
 \begin{table}[h!]
 \centering
-\caption{Comparativa cualitativa: frontend monolítico vs. frontend adaptado}
-\label{tab:comparativa-frontend}
 \resizebox{\textwidth}{!}{%
-\renewcommand{\arraystretch}{1.4}
+\renewcommand{\arraystretch}{1.25}
 \setlength{\tabcolsep}{10pt}
 \begin{tabular}{>{\columncolor{gray!15}}p{3.2cm}p{5.5cm}p{5.5cm}}
 \toprule
@@ -816,6 +754,8 @@ Estructura & Carpetas planas, nombres genéricos. & Componentes por dominio, vis
 \bottomrule
 \end{tabular}%
 }
+\caption{\textit{Comparativa cualitativa: frontend monolítico vs. frontend adaptado}}
+\label{tab:comparativa-frontend}
 \end{table}
 
 La Tabla~\ref{tab:comparativa-frontend} resume las transformaciones principales.

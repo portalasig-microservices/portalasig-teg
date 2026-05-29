@@ -41,6 +41,16 @@ umbrales de aceptación.
 
 \section{Pruebas de Integración y Cobertura de Código}
 
+La validación del backend distribuido se estructuró en dos líneas complementarias:
+pruebas de integración que verifican el comportamiento real de cada microservicio
+sobre instancias de base de datos idénticas a las de producción, y mediciones de
+cobertura de código que cuantifican el grado de ejercitación de las rutas de
+negocio. Ambas actividades se integran en un pipeline de integración continua que
+ejecuta la suite completa en cada cambio del repositorio, bloqueando la fusión de
+código que no cumpla los umbrales establecidos. A continuación se describe la
+estrategia de pruebas sobre contenedores reales, seguida del análisis de cobertura
+obtenido con JaCoCo y la configuración del workflow automatizado.
+
 \subsection{Estrategia de Pruebas de Integración}
 
 Se priorizó la ejecución de pruebas de integración sobre bases de datos reales en
@@ -75,10 +85,8 @@ falla automáticamente si la cobertura global desciende por debajo del umbral
 establecido. Los resultados obtenidos se resumen en la Tabla
 \ref{tab:cobertura-jacoco}.
 
-\begin{table}[htbp]
+\begin{table}[ht!]
 \centering
-\caption{Cobertura de código por microservicio (líneas y ramas).}
-\label{tab:cobertura-jacoco}
 \rowcolors{2}{gray!10}{white}
 \begin{tabular}{lcc}
 \toprule
@@ -90,23 +98,34 @@ Notify & 78\% & 72\% \\
 PAIMA & 71\% & 65\% \\
 \bottomrule
 \end{tabular}
+\caption{\textit{Cobertura de código por microservicio (líneas y ramas)}}
+\label{tab:cobertura-jacoco}
 \end{table}
 
-La ejecución automatizada de la suite de pruebas y la verificación de cobertura se integran en un workflow de GitHub Actions que se dispara en cada pull request. La Figura~\ref{fig:github-actions-run} muestra la secuencia de pasos del pipeline para el servicio Site, incluyendo la compilación de dependencias, la ejecución de tests con Testcontainers y la generación del reporte JaCoCo.
+Las ramas principales de cada repositorio están protegidas mediante \textit{branch protection}, que exige que todos los checks de la pipeline pasen exitosamente antes de permitir la fusión del código. Cuando un colaborador abre un pull request, el workflow de GitHub Actions se dispara automáticamente y el botón de merge permanece deshabilitado mientras el check ``Build and Verify Services'' se encuentra en ejecución, mostrando el estado \textit{``Some checks haven't completed yet''} junto con la opción ``Enable auto-merge''. La Figura~\ref{fig:github-pr-blocked} ilustra esta condición de bloqueo en el pull request del servicio Site.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[draft,width=0.9\textwidth]{graphics/github-actions-run.png}
+    \includegraphics[width=0.9\textwidth]{graphics/github-pr-checks-blocked.png}
+    \caption{Pull request bloqueado mientras el workflow de GitHub Actions se encuentra en ejecución. El check ``Build and Verify Services'' aparece como requerido y el merge permanece deshabilitado hasta su finalización.}
+    \label{fig:github-pr-blocked}
+\end{figure}
+
+Durante el tiempo de bloqueo, el workflow ejecuta en secuencia la compilación de dependencias, el análisis de Checkstyle, las pruebas de integración con Testcontainers, la generación del reporte JaCoCo y la verificación del umbral mínimo de cobertura. La Figura~\ref{fig:github-actions-run} muestra el pipeline del servicio Site en ejecución, con los pasos iniciales completados y el paso intermedio activo.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/github-actions-run.png}
     \caption{Ejecución del workflow de GitHub Actions para el servicio Site, mostrando los pasos de compilación, pruebas de integración y verificación de cobertura.}
     \label{fig:github-actions-run}
 \end{figure}
 
-Las ramas principales de cada repositorio están protegidas mediante \textit{branch protection}, que exige que todos los checks de la pipeline pasen exitosamente antes de permitir la fusión del código. La Figura~\ref{fig:github-pr-checks} muestra un pull request en el repositorio del frontend donde los checks de estilo y los tests automatizados bloquean temporalmente la integración hasta que el workflow completo finaliza con éxito.
+Una vez que todos los pasos ---checkstyle, tests, JaCoCo y verificación de cobertura--- finalizan sin errores, el check se marca como \textit{``Required''} con resultado exitoso, el mensaje cambia a \textit{``All checks have passed''} y la integración queda habilitada. La Figura~\ref{fig:github-pr-checks} muestra el pull request del servicio Site tras la finalización exitosa del workflow, con el check validado y el merge disponible.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[draft,width=0.9\textwidth]{graphics/github-pr-checks.png}
-    \caption{Pull request en el repositorio del frontend con los checks de GitHub Actions pendientes de ejecución, ilustrando el mecanismo de protección de ramas.}
+    \includegraphics[width=0.9\textwidth]{graphics/github-pr-checks.png}
+    \caption{Pull request desbloqueado tras la finalización exitosa del workflow. El check ``Build and Verify Services'' aparece como requerido y exitoso, habilitando la opción de merge.}
     \label{fig:github-pr-checks}
 \end{figure}
 
@@ -150,20 +169,13 @@ identificó que la ejecución paralela de tests sobre el mismo contenedor
 podía generar condiciones de carrera cuando dos tests modificaban la misma
 tabla simultáneamente. La solución consistió en aislar cada test mediante
 \texttt{@Transactional} con rollback automático al finalizar, garantizando
-que cada test parte de un estado limpio sin depender del orden de ejecución. La Figura~\ref{fig:jacoco-report} presenta una vista consolidada de los reportes de cobertura generados por JaCoCo para cada microservicio.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.9\textwidth]{graphics/jacoco-report.png}
-    \caption{Vista resumida de los reportes de cobertura de código (JaCoCo) consolidados para los cuatro microservicios del ecosistema, mostrando porcentajes de líneas y ramas ejecutadas por suite de pruebas.}
-    \label{fig:jacoco-report}
-\end{figure}
+que cada test parte de un estado limpio sin depender del orden de ejecución.
 
 \textbf{Documentación de APIs.} Como parte del pipeline de integración continua, cada microservicio expone su documentación interactiva mediante Swagger UI, generada automáticamente a partir de las anotaciones presentes en los controladores REST. Esta interfaz viva describe los endpoints disponibles, los esquemas de request/response y los códigos de estado posibles, eliminando la necesidad de mantener manuales separados. La validez de la documentación se verifica visualmente en cada despliegue, constituyendo una evidencia complementaria de que la interfaz REST del servicio está correctamente especificada y accesible. La Figura~\ref{fig:swagger-ui} muestra el resultado correspondiente.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[draft,width=0.85\textwidth]{graphics/swagger-ui.png}
+    \includegraphics[width=0.85\textwidth]{graphics/swagger-ui.png}
     \caption{Interfaz Swagger UI del servicio Site, mostrando los endpoints REST documentados automáticamente.}
     \label{fig:swagger-ui}
 \end{figure}
@@ -282,7 +294,7 @@ aserta visualmente (URL, estado del botón, mensaje de bienvenida) y a nivel de 
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[draft,width=0.9\textwidth]{graphics/cypress-oauth2-flow.png}
+    \includegraphics[width=0.9\textwidth]{graphics/cypress-oauth2-flow.png}
     \caption{Secuencia de pasos del flujo de autenticación OAuth2/JWT validada
     mediante Cypress: obtención de token anónimo, login con credenciales,
     persistencia en cookies y refresco automático.}
@@ -303,7 +315,7 @@ guards validados incluyen \texttt{requiresAuth}, \texttt{requiresAnonymous},
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[draft,width=0.9\textwidth]{graphics/cypress-guards.png}
+    \includegraphics[width=0.9\textwidth]{graphics/cypress-guards.png}
     \caption{Validación de guards de navegación: intento de acceso a vista
     administrativa con rol de estudiante (izquierda) y redirección automática a
     \texttt{/home} (derecha).}
@@ -324,7 +336,7 @@ aislada y que el frontend no depende de un endpoint backend único. La Figura~\r
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[draft,width=0.9\textwidth]{graphics/cypress-multiaxios.png}
+    \includegraphics[width=0.9\textwidth]{graphics/cypress-multiaxios.png}
     \caption{Inspección de red durante flujo de creación de sitio: peticiones a
     UAA (autenticación), Site (contenido) y PAIMA (alertas) desde instancias
     Axios independientes.}
@@ -347,7 +359,7 @@ provocaba efectos colaterales en el store monolítico. La Figura~\ref{fig:cypres
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[draft,width=0.9\textwidth]{graphics/cypress-vuex.png}
+    \includegraphics[width=0.9\textwidth]{graphics/cypress-vuex.png}
     \caption{Estado del store Vuex modular durante flujo de selección de
     asignatura: el módulo \texttt{course} se actualiza sin modificar
     \texttt{site} ni \texttt{session}.}
@@ -500,7 +512,7 @@ parcialmente las ventajas de especialización en escenarios de baja concurrencia
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[draft,width=0.9\textwidth]{graphics/benchmarking-grafana.png}
+    \includegraphics[width=0.9\textwidth]{graphics/benchmarking-grafana.png}
     \caption{Dashboard de Grafana proyectado para la visualización de métricas durante la ejecución de benchmarks con k6.}
     \label{fig:benchmarking-grafana}
 \end{figure}
@@ -552,7 +564,7 @@ registrado en cada iteración fue el siguiente:
 
     \begin{figure}[h!]
         \centering
-        \includegraphics[draft,width=0.9\textwidth]{graphics/ca-frontend-degradado.png}
+        \includegraphics[width=0.9\textwidth]{graphics/ca-frontend-degradado.png}
         \caption{Portal de asignaturas en estado degradado tras la caída del servicio Site.
         El usuario mantiene la sesión activa (autenticación gestionada por UAA), pero
         el listado de sitios académicos muestra un indicador de error en lugar de
@@ -576,31 +588,116 @@ registrado en cada iteración fue el siguiente:
 
     \begin{figure}[h!]
         \centering
-        \includegraphics[draft,width=0.9\textwidth]{graphics/ca-frontend-recuperado.png}
+        \includegraphics[width=0.9\textwidth]{graphics/ca-frontend-recuperado.png}
         \caption{Portal de asignaturas tras la recuperación del servicio Site.
         El listado de sitios académicos carga correctamente, confirmando que el
         reinicio ejecutado por PAIMA restauró la funcionalidad completa.}
         \label{fig:ca-frontend-recuperado}
     \end{figure}
-\end{enumerate} (Figura~\ref{fig:paima-email-alert}).
+\end{enumerate}
+
+\subsection{Interfaz de Operación del Sistema de Autogestión}
+
+El experimento de caos descrito en la sección anterior se opera a través de la
+interfaz de gestión de incidentes implementada en el frontend de PortalAsig.
+Esta interfaz, denominada ``Alertas PAIMA'', se organiza en cuatro vistas que
+cubren el ciclo completo de atención de incidentes: un panel de control general,
+un listado de alertas por estado, una vista de detalle individual y un asistente
+conversacional. A continuación se presenta cada vista con la evidencia gráfica
+correspondiente.
+
+\textbf{Panel de control.} La vista principal presenta un resumen del estado del
+ecosistema: cantidad de alertas activas por severidad, servicios monitoreados en
+estado saludable vs. degradado, y gráficos de evolución temporal de incidentes.
+Este dashboard permite al administrador evaluar la situación global antes de
+adentrarse en casos específicos. La Figura~\ref{fig:paima-dashboard} muestra el
+panel de control durante la simulación de caos, con el servicio Site en estado
+degradado.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]{graphics/paware-email-alert.png}
+    \includegraphics[width=0.9\textwidth]{graphics/paima-dashboard.png}
+    \caption{Panel de control de PAIMA durante la simulación de caos, mostrando
+    el servicio Site en estado degradado.}
+    \label{fig:paima-dashboard}
+\end{figure}
+
+\textbf{Listado de alertas.} Esta vista divide las incidencias en dos pestañas:
+``Pendientes de Acción'' y ``Completadas / Gestionadas''. Cada fila muestra la
+prioridad (P1, P2, P3), el servicio afectado, la descripción del síntoma detectado
+y la fecha de generación. Las incidencias se ordenan por severidad y se destacan
+con códigos de color (rojo para P1, amarillo para P2). La Figura~\ref{fig:paima-alerts-list}
+registra la alerta generada tras la caída del servicio Site.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/paima-alerts-list.png}
+    \caption{Listado de alertas autonómicas priorizadas visibles para el administrador.}
+    \label{fig:paima-alerts-list}
+\end{figure}
+
+\textbf{Notificación por correo.} Paralelamente a la visualización en el panel,
+PAIMA invoca al servicio \texttt{ms-notify} para despachar una alerta por correo
+electrónico con formato institucional. La Figura~\ref{fig:paima-email-alert}
+muestra la notificación recibida por el administrador.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/paima-email-alert.png}
     \caption{Notificación de alerta crítica generada por el orquestador autonómico.}
     \label{fig:paima-email-alert}
-\end{figure} (Figura~\ref{fig:paima-dashboard-alert}).
+\end{figure}
+
+\textbf{Detalle del incidente.} Al seleccionar la alerta, el administrador accede a
+una vista que consolida toda la evidencia asociada: métricas de Prometheus en el
+momento del evento, fragmentos de log de Loki, la recomendación estructurada
+producida por el modelo de IA y los controles para aprobar, rechazar o comentar la
+acción propuesta. La Figura~\ref{fig:paima-incident-detail} ilustra la vista de
+detalle del incidente P1.
+
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]{graphics/paware-dashboard.png}
-    \caption{Alerta crítica visible en el portal administrativo con el asistente IA integrado.}
-    \label{fig:paima-dashboard-alert}
-\end{figure} (Figura~\ref{fig:paima-action-approve}).
+    \includegraphics[width=0.85\textwidth]{graphics/paima-incident-detail.png}
+    \caption{Vista de detalle de un incidente P1 en PAIMA, consolidando métricas,
+    logs y recomendación de la IA.}
+    \label{fig:paima-incident-detail}
+\end{figure}
+
+\textbf{Asistente conversacional.} Antes de ejecutar cualquier acción sobre la alerta,
+el administrador puede abrir un chat contextual para interrogar a la IA sobre la
+naturaleza del error, solicitar explicaciones adicionales o explorar pasos manuales
+alternativos. La Figura~\ref{fig:paima-chat} muestra la interacción con el asistente
+durante el experimento.
+
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]{graphics/paware-action-approve.png}
+    \includegraphics[width=0.9\textwidth]{graphics/paima-chat.png}
+    \caption{Interacción del administrador con el agente de IA para refinar el diagnóstico.}
+    \label{fig:paima-chat}
+\end{figure}
+
+\textbf{Aprobación de la acción.} Una vez revisada la evidencia y consultado el
+asistente, el administrador aprueba la acción de reinicio propuesta por PAIMA.
+La Figura~\ref{fig:paima-action-approve} muestra el momento de aprobación y la
+ejecución de la auto-reparación.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/paima-action-approve.png}
     \caption{Aprobación y ejecución de la acción de auto-reparación mediante el asistente IA.}
     \label{fig:paima-action-approve}
+\end{figure}
+
+\textbf{Alerta en el portal administrativo.} Tras la recuperación del servicio, el
+panel administrativo actualiza su estado y muestra la alerta como gestionada.
+La Figura~\ref{fig:paima-dashboard-alert} refleja el portal una vez normalizada
+la operación.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/paima-dashboard-alert.png}
+    \caption{Portal administrativo con alerta crítica gestionada y asistente IA integrado.}
+    \label{fig:paima-dashboard-alert}
 \end{figure}
 
 \subsection{Lecciones del Experimento}
@@ -630,10 +727,8 @@ microservicios.
 
 \begin{table}[h!]
 \centering
-\caption{Resumen comparativo de resultados de pruebas: monolito vs. microservicios.}
-\label{tab:resumen-pruebas}
 \resizebox{\textwidth}{!}{%
-\renewcommand{\arraystretch}{1.4}
+\renewcommand{\arraystretch}{1.25}
 \setlength{\tabcolsep}{10pt}
 \begin{tabular}{>{\columncolor{gray!15}}lp{4.5cm}p{4.5cm}}
 \toprule
@@ -648,6 +743,8 @@ Observabilidad durante incidentes & Logs locales consultables con \texttt{pm2}. 
 \bottomrule
 \end{tabular}%
 }
+\caption{\textit{Resumen comparativo de resultados de pruebas: monolito vs. microservicios}}
+\label{tab:resumen-pruebas}
 \end{table}
 
 \textbf{Análisis por dimensión.} En la dimensi\'{o}n de cobertura de c\'{o}digo,
