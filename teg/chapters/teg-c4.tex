@@ -92,6 +92,24 @@ PAIMA & 71\% & 65\% \\
 \end{tabular}
 \end{table}
 
+La ejecución automatizada de la suite de pruebas y la verificación de cobertura se integran en un workflow de GitHub Actions que se dispara en cada pull request. La Figura~\ref{fig:github-actions-run} muestra la secuencia de pasos del pipeline para el servicio Site, incluyendo la compilación de dependencias, la ejecución de tests con Testcontainers y la generación del reporte JaCoCo.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[draft,width=0.9\textwidth]{graphics/github-actions-run.png}
+    \caption{Ejecución del workflow de GitHub Actions para el servicio Site, mostrando los pasos de compilación, pruebas de integración y verificación de cobertura.}
+    \label{fig:github-actions-run}
+\end{figure}
+
+Las ramas principales de cada repositorio están protegidas mediante \textit{branch protection}, que exige que todos los checks de la pipeline pasen exitosamente antes de permitir la fusión del código. La Figura~\ref{fig:github-pr-checks} muestra un pull request en el repositorio del frontend donde los checks de estilo y los tests automatizados bloquean temporalmente la integración hasta que el workflow completo finaliza con éxito.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[draft,width=0.9\textwidth]{graphics/github-pr-checks.png}
+    \caption{Pull request en el repositorio del frontend con los checks de GitHub Actions pendientes de ejecución, ilustrando el mecanismo de protección de ramas.}
+    \label{fig:github-pr-checks}
+\end{figure}
+
 Se estableció un umbral mínimo del 70\% tanto para cobertura de líneas como de
 ramas en todos los microservicios. Cada servicio del ecosistema cumple este
 requisito. Los valores más elevados en UAA y Notify responden a la menor

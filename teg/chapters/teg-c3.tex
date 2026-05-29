@@ -104,7 +104,7 @@ mecanismos de validación automatizada.
 \begin{center}
     \begin{figure}[h!]
         \centering
-        \includegraphics[draft,width=0.85\textwidth]{graphics/modelo-datos-monolito.png}
+        \includegraphics[width=0.85\textwidth]{graphics/modelo-datos-monolito.png}
         \caption{Diagrama entidad-relación simplificado del modelo de datos monolítico, mostrando la tabla \texttt{site} como núcleo con sus 15+ relaciones hacia entidades dependientes.}
         \label{fig:modelo-datos-monolito}
     \end{figure}
@@ -284,16 +284,27 @@ convención de directorios.
 \begin{center}
     \begin{figure}[h!]
         \centering
-        \includegraphics[draft,width=0.7\textwidth]{graphics/flyway-migraciones.png}
+        \includegraphics[width=0.7\textwidth]{graphics/flyway-migraciones.png}
         \caption{Estructura de directorios de migraciones Flyway en un microservicio.}
         \label{fig:flyway-migraciones}
+    \end{figure}
+\end{center}
+
+La convenci\'{o}n de nomenclatura sigue el formato \texttt{V\{version\}\_\_\{descripci\'{o}n\}.sql}, donde cada archivo contiene sentencias \texttt{DDL} que construyen el esquema progresivamente. La Figura~\ref{fig:flyway-script-ejemplo} muestra un extracto de la migraci\'{o}n inicial del servicio Site, que define las tablas \texttt{course}, \texttt{course\_semester\_link}, \texttt{course\_career\_link} y \texttt{career}, incluyendo comentarios descriptivos en cada columna.
+
+\begin{center}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.85\textwidth]{graphics/flyway-script-ejemplo.png}
+        \caption{Extracto del script de migraci\'{o}n inicial \texttt{V1.0.0.00\_\_init.sql} del servicio Site, mostrando la definici\'{o}n de tablas con sentencias \texttt{CREATE TABLE} y comentarios de columnas.}
+        \label{fig:flyway-script-ejemplo}
     \end{figure}
 \end{center}
 
 \begin{center}
     \begin{figure}[h!]
         \centering
-        \includegraphics[draft,width=0.85\textwidth]{graphics/pom-herencia.png}
+        \includegraphics[width=0.85\textwidth]{graphics/pom-herencia.png}
         \caption{Diagrama de herencia de dependencias Maven.}
         \label{fig:pom-herencia}
     \end{figure}
@@ -501,8 +512,7 @@ dirección de investigación que integra MAPE-K con inteligencia artificial para
 gestión autónoma de microservicios \cite{esposito2025mapek}. PAIMA constituye una implementación práctica de este
 framework adaptada a las limitantes operativas del contexto de PortalAsig. PAIMA no opera sobre una infraestructura
 abstracta: sus conectores de monitoreo apuntan específicamente a las instancias de
-Prometheus y Loki desplegadas junto a los microservicios documentados en la
-\ref{sec:arquitectura-ms}, y sus acciones de remediación invocan directamente los contenedores
+Prometheus y Loki desplegadas junto a los microservicios documentados en la Secci\'{o}n~\ref{sec:arquitectura-ms}, y sus acciones de remediación invocan directamente los contenedores
 gestionados por Docker Compose descritos en la Sección~\ref{sec:despliegue}. En este sentido,
 PAIMA es un caso de uso directo de la arquitectura de microservicios: solo la
 existencia de un ecosistema distribuido e instrumentado hace posible su implementación.
@@ -540,7 +550,7 @@ servicio de autogestión.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[draft,width=0.85\textwidth]{graphics/paima-clases.png}
+    \includegraphics[width=0.85\textwidth]{graphics/paima-clases.png}
     \caption{Diagrama de clases de PAIMA mostrando los paquetes del ciclo MAPE-K.}
     \label{fig:paima-clases}
 \end{figure}
@@ -621,7 +631,7 @@ adentrarse en casos específicos.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[draft,width=0.9\textwidth]{graphics/paima-dashboard.png}
+    \includegraphics[width=0.9\textwidth]{graphics/paima-dashboard.png}
     \caption{Screenshot del panel de control de PAIMA.}
     \label{fig:paima-dashboard}
 \end{figure}
@@ -647,7 +657,7 @@ acción propuesta.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[draft,width=0.85\textwidth]{graphics/paima-incident-detail.png}
+    \includegraphics[width=0.85\textwidth]{graphics/paima-detail.png}
     \caption{Screenshot de la vista de detalle de un incidente P1 en PAIMA.}
     \label{fig:paima-incident-detail}
 \end{figure}
@@ -661,7 +671,7 @@ decisiones.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]{graphics/paware-chat.png}
+    \includegraphics[width=0.9\textwidth]{graphics/paima-chat.png}
     \caption{Interacción del administrador con el agente de IA para refinar el diagnóstico antes de ejecutar una acción sobre la alerta.}
     \label{fig:paima-chat}
 \end{figure}
