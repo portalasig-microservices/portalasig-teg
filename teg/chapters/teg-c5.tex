@@ -5,7 +5,7 @@
 
 El presente trabajo documentó la migración del backend monolítico de PortalAsig
 hacia una arquitectura de microservicios, la implementación de técnicas sistemáticas
-de mantenimiento de software sobre el nuevo ecosistema, y el diseño del servicio
+de mantenimiento de software sobre el nuevo ecosistema, y el diseño e implementación del servicio
 PAIMA como mecanismo de autogestión del mantenimiento asistido por inteligencia
 artificial. El hilo conductor que atraviesa los capítulos anteriores puede sintetizarse
 en tres transformaciones interdependientes: una transformación arquitectónica que
@@ -18,9 +18,11 @@ En la dimensión arquitectónica, se demostró que el monolito legacy de PortalA
 acumulaba seis años de deuda técnica en un único proceso Node.js donde un
 controlador de 3.629 líneas gestionaba quince dominios de negocio distintos, sin
 mecanismo de aislamiento de fallos ni pruebas automatizadas. La migración a
-microservicios descompuso este sistema en cuatro dominios acotados ---UAA, Site,
-Notify y PAIMA--- cada uno con su propia base de datos MySQL, su esquema de
-versionado independiente mediante Flyway y su ciclo de despliegue autónomo. La
+microservicios descompuso el backend en tres dominios acotados ---UAA, Site y
+Notify--- cada uno con su propia base de datos MySQL, su esquema de
+versionado independiente mediante Flyway y su ciclo de despliegue autónomo. Sobre
+este ecosistema se integró el servicio PAIMA como mecanismo de autogestión del
+mantenimiento. La
 Tabla \ref{tab:comparativa-monolito-ms} del Capítulo 3 evidenció que esta
 descomposición eliminó el acoplamiento referencial del modelo monolítico y habilitó
 el aislamiento de fallos, de modo que la caída de un servicio ya no compromete la
@@ -33,9 +35,10 @@ con JaCoCo en cada \textit{pull request}. Las reglas de protección de ramas blo
 fusión de código si cualquiera de estos checks falla, transformando la validación de
 un proceso manual y dependiente del conocimiento tácito en un mecanismo sistemático
 y reproducible. Los resultados documentados en el Capítulo 4 muestran coberturas de
-código entre el 50\% y el 60\% por microservicio, cifras inexistentes en el monolito
+líneas entre el 67\% y el 81\% por microservicio, con un umbral mínimo del 70\%
+validado automáticamente en cada pull request; cifras inexistentes en el monolito
 original. Asimismo, se diseñó una suite de pruebas end-to-end con Cypress que
-simula flujos completos de usuario sobre el frontend Vue.js, verificando que la
+simula flujos completos de usuario sobre el frontend Vue.js, verificando que las
 capas de presentación, aplicación y persistencia operen de forma coordinada.
 
 En la dimensión de autogestión, se implementó el servicio PAIMA como un caso de uso
@@ -119,7 +122,7 @@ servicio presenta mayor deuda técnica este mes?'', ``genera un resumen de los
 implementación para el endpoint de importación masiva de semestres que está
 pendiente''. El agente respondería generando fragmentos de código, diagramas de
 secuencia o planes de implementación basados en el conocimiento del dominio y del
-código existente, manteniendo siempre un ciclo de aprobación humana antes de
+código existente, manteniendo un ciclo de aprobación humana antes de
 cualquier modificación efectiva.
 
 Esta visión de PAIMA como agente semi-integrado ---semi porque opera con

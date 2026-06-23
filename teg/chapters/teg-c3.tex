@@ -94,7 +94,7 @@ diagnóstico en un proceso enteramente reactivo y dependiente del conocimiento t
 del administrador.
 
 En conjunto, estas deficiencias estructurales han generado un sistema cuya capacidad
-de adaptación es extremadamente limitada. Cualquier modificación requiere comprender la
+de adaptación es muy limitada. Cualquier modificación requiere comprender la
 totalidad del código, con un riesgo elevado de introducir fallos imprevistos. Esta
 situación, sumada a la ausencia de un equipo de desarrollo de tiempo completo y a la
 dependencia de colaboradores académicos temporales, exige un rediseño arquitectónico
@@ -154,10 +154,10 @@ Spring Cloud Config Server. Este componente resuelve las propiedades de cada
 microservicio desde un repositorio Git local, permitiendo versionar los cambios de
 configuración junto al código fuente y simplificando la rotación de credenciales. Los
 servicios obtienen su configuración al iniciarse mediante una única variable de
-entorno que apunta al \textit{Config Server}, reduciendo la complejidad del despliegue.
+entorno que apunta al \textbf{Config Server}, reduciendo la complejidad del despliegue.
 
 \textbf{Punto de entrada y comunicación.} El frontend de la aplicación, desarrollado
-en Vue.js, se sirve a través de \textit{Nginx}, que actúa como proxy inverso
+en Vue.js, se sirve a través de \textbf{Nginx}, que actúa como proxy inverso
 enrutando las peticiones del navegador hacia los microservicios correspondientes. La
 comunicación interna entre los servicios se realiza directamente a través de la red
 virtual de Docker Compose, utilizando el nombre del contenedor como host (por ejemplo,
@@ -188,7 +188,7 @@ conocimiento tácito previo. Se priorizaron herramientas consolidadas, ampliamen
 documentadas y alineadas con los estándares de la industria, evitando la adopción de
 tecnologías experimentales que pudieran convertirse en pasivos técnicos.
 
-\textbf{Lenguaje y framework.} Se seleccionaron \textit{Java 17} y \textbf{Spring Boot
+\textbf{Lenguaje y framework.} Se seleccionaron \textbf{Java 17} y \textbf{Spring Boot
 3} como base para todos los microservicios. Estas versiones correspondían a las
 \textit{Long Term Support} (LTS) más recientes disponibles al inicio del desarrollo de
 este trabajo, lo que garantizó soporte extendido, estabilidad y acceso a las mejoras de
@@ -202,11 +202,11 @@ de tipos en parámetros de métodos o acceso a propiedades inexistentes— que e
 suelen pasar inadvertidos hasta la ejecución en producción.
 
 \textbf{Gestión de dependencias y construcción.} Todos los proyectos se gestionan con
-\textit{Maven}, empleando un modelo de herencia de proyectos que garantiza consistencia
-entre los distintos nodos del ecosistema. Se evaluó \textit{Gradle} como alternativa
+\textbf{Maven}, empleando un modelo de herencia de proyectos que garantiza consistencia
+entre los distintos nodos del ecosistema. Se evaluó \textbf{Gradle} como alternativa
 de construcción; si bien ofrece tiempos de compilación inferiores y una sintaxis
 declarativa basada en Kotlin, la madurez del ecosistema de plugins para Spring Boot
-y la familiaridad del equipo con Maven determinaron la selección de este último.
+y la experiencia previa del autor con Maven determinaron la selección de este último.
 Se diseñó el módulo \texttt{portalasig-commons} como biblioteca compartida, estructurado
 en tres artefactos:
 
@@ -219,9 +219,9 @@ en tres artefactos:
     con soporte para \texttt{client\_credentials} y \texttt{bearer} tokens.
     \item \texttt{core-backend}: POM padre específico para microservicios backend, que
     hereda de \texttt{core-boot}, incluye \texttt{core-lib} y añade dependencias de
-    persistencia (JPA, Flyway, conector MySQL), observabilidad (Micrometer Prometheus,
-    \textit{appender} Loki) y utilidades de compilación (Lombok, MapStruct).
-    Se evaluó \textit{ModelMapper} como alternativa para el mapeo entidad-DTO,
+    persistencia (JPA, Flyway, conector MySQL), observabilidad (\textbf{Micrometer}, \textbf{Prometheus},
+    \textit{appender} Loki) y utilidades de compilación (\textbf{Lombok}, \textbf{MapStruct}).
+    Se evaluó \textbf{ModelMapper} como alternativa para el mapeo entidad-DTO,
     pero MapStruct fue seleccionado por su generación de código en tiempo de
     compilación y su menor overhead en tiempo de ejecución.
 \end{itemize}
@@ -233,43 +233,43 @@ los servicios modificando únicamente el artefacto común.
 \textbf{Base de datos.} Se evaluaron tres alternativas para el almacenamiento de datos:
 
 \begin{itemize}
-    \item \textit{PostgreSQL}: motor utilizado por el monolito original. Ofrece
+    \item \textbf{PostgreSQL}: motor utilizado por el monolito original. Ofrece
     características avanzadas como tipos de datos JSON nativos, consultas
     geoespaciales y un optimizador de consultas robusto. Sin embargo, su
     configuración y operación en entornos locales de desarrollo resultan más
     complejas para colaboradores académicos temporales.
-    \item \textit{MongoDB}: base de datos NoSQL orientada a documentos que ofrece
+    \item \textbf{MongoDB}: base de datos NoSQL orientada a documentos que ofrece
     flexibilidad de schema y escalabilidad horizontal. No obstante, su modelo de
     datos no relacional introduce una curva de aprendizaje adicional y complica
     las transacciones que involucran múltiples documentos, lo cual resulta
     innecesario para la carga transaccional típica de un sistema académico.
-    \item \textit{MySQL}: motor relacional maduro, con integración nativa en Spring
+    \item \textbf{MySQL}: motor relacional maduro, con integración nativa en Spring
     Boot a través del conector oficial \texttt{mysql-connector-j}, herramientas de
     administración accesibles y documentación extensa. Su simplicidad operativa en
     entornos locales la convierte en la opción más pragmática para el alcance de
     este proyecto.
 \end{itemize}
 
-Se seleccionó \textit{MySQL} como motor de base de datos para todos los
+Se seleccionó \textbf{MySQL} como motor de base de datos para todos los
 microservicios, manteniendo el esquema de una instancia aislada por servicio
 descrito en la Sección~\ref{sec:arquitectura-ms}. La integración con Spring Boot es inmediata mediante
 el conector oficial, y su operación no requiere configuraciones especializadas.
 
-\textbf{Documentación de APIs.} Se integró \textit{SpringDoc OpenAPI} en todos los
+\textbf{Documentación de APIs.} Se integró \textbf{SpringDoc OpenAPI} en todos los
 microservicios, lo que genera automáticamente una interfaz interactiva de documentación
-(\textit{Swagger UI}) a partir de las anotaciones presentes en los controladores REST.
+(\textbf{Swagger UI}) a partir de las anotaciones presentes en los controladores REST.
 Esta documentación viva se actualiza con cada cambio en el código, eliminando la
 necesidad de mantener manuales de API separados y facilitando que nuevos colaboradores
 comprendan los endpoints disponibles sin necesidad de leer el código fuente.
 
-\textbf{Persistencia y migraciones.} Se emplea \textit{JPA} (Java Persistence API) con
-\textit{Hibernate} como implementación, estándares de facto en el ecosistema Spring Boot.
+\textbf{Persistencia y migraciones.} Se emplea \textbf{JPA} (Java Persistence API) con
+\textbf{Hibernate} como implementación, estándares de facto en el ecosistema Spring Boot.
 Esta combinación permite definir las entidades del modelo de datos como clases Java
 anotadas y delegar la generación de consultas SQL al framework, reduciendo la cantidad
 de código SQL explícito que el colaborador debe escribir y abstrayendo las diferencias
 de dialecto entre motores de base de datos. La migración de datos se gestiona mediante
-\textit{Flyway}, que aplica scripts SQL versionados durante el arranque de cada
-servicio, garantizando que el schema de la base de datos esté siempre alineado con la
+\textbf{Flyway}, que aplica scripts SQL versionados durante el arranque de cada
+servicio, garantizando la coherencia entre el schema de la base de datos y la
 versión del código desplegado. Este enfoque elimina la necesidad de ejecutar migraciones
 manuales y permite reproducir el estado de la base de datos en cualquier entorno a
 partir del repositorio de código fuente \cite{flyway2024}. Los scripts se organizan en el directorio
@@ -312,7 +312,7 @@ describen las técnicas implementadas, seleccionadas bajo el criterio de simplic
 operativa: cada herramienta debe ser configurable mediante archivos que residen en el
 repositorio de código, sin requerir servidores adicionales ni infraestructura dedicada.
 
-Se integró \textit{Checkstyle} en el artefacto \texttt{core-boot} con el perfil
+Se integró \textbf{Checkstyle} en el artefacto \texttt{core-boot} con el perfil
 \texttt{google\_checks.xml}, ejecutándose durante la compilación de Maven en todos
 los microservicios. La compilación se interrumpe si el código incumple reglas de
 estilo, impidiendo que código inconsistente llegue al repositorio. Se optó por
@@ -320,7 +320,7 @@ Checkstyle sobre SpotBugs porque la prioridad del proyecto era garantizar la
 legibilidad y uniformidad del código fuente, aspectos críticos cuando múltiples
 colaboradores rotativos modifican el mismo código.
 
-Se configuró \textit{GitHub Actions} como pipeline de integración continua en cada
+Se configuró \textbf{GitHub Actions} como pipeline de integración continua en cada
 repositorio, ejecutando en secuencia: compilación, Checkstyle, pruebas de integración
 y generación del reporte de cobertura. Las ramas principales están protegidas
 mediante \textit{branch protection}, bloqueando el envío directo de código y
@@ -330,7 +330,7 @@ porque este último requiere un servidor propio y mantenimiento de infraestructu
 mientras que GitHub Actions se define mediante archivos YAML en el mismo repositorio
 y ejecuta sobre los servidores de GitHub sin costo adicional.
 
-Se incorporó \textit{JaCoCo} como plugin de Maven para medir la cobertura de líneas y
+Se incorporó \textbf{JaCoCo} como plugin de Maven para medir la cobertura de líneas y
 ramas durante la ejecución de los tests, generando un reporte HTML detallado por
 paquete, clase y método. Se configuró un umbral mínimo del setenta por ciento en el
 workflow de GitHub Actions, de forma que la compilación falla automáticamente si la
@@ -338,7 +338,7 @@ cobertura desciende por debajo del valor establecido. Se eligió JaCoCo sobre
 SonarQube porque este último requiere un servidor dedicado con base de datos propia,
 mientras que JaCoCo produce el reporte como parte del proceso de compilación.
 
-Las pruebas de integración se implementaron con \textit{Testcontainers}, que levanta
+Las pruebas de integración se implementaron con \textbf{Testcontainers}, que levanta
 contenedores Docker efímeros de MySQL 8 durante la fase de pruebas de Maven. La clase
 base \texttt{AbstractMysqlIntegrationTest} instancia la base de datos, ejecuta las
 migraciones Flyway y destruye el contenedor al finalizar, garantizando que las
@@ -346,14 +346,14 @@ pruebas validen el comportamiento real sobre un motor idéntico al de producció
 La evolución de la suite de integración, los escenarios cubiertos y las lecciones
 aprendidas en su construcción se documentan en el Capítulo \ref{ch:pruebas}.
 
-Para las pruebas end-to-end se empleó \textit{Cypress}, que ejecuta los tests
+Para las pruebas end-to-end se empleó \textbf{Cypress}, que ejecuta los tests
 dentro del mismo ciclo de vida del navegador, simulando flujos completos del usuario:
 inicio de sesión, navegación por sitios de asignatura y gestión de contenidos.
 Los tests realizan peticiones directas de login contra el servicio UAA para obtener
 el token JWT, inyectándolo en las peticiones subsecuentes \cite{cypress2024}.
 
-El stack de observabilidad se configuró con \textit{Prometheus} para métricas,
-\textit{Loki} para agregación de logs y \textit{Grafana} para visualización unificada \cite{prometheus2024,grafana2024}.
+El stack de observabilidad se configuró con \textbf{Prometheus} para métricas,
+\textbf{Loki} para agregación de logs y \textbf{Grafana} para visualización unificada \cite{prometheus2024,grafana2024}.
 Estas herramientas se definieron en el Marco Teórico (Sección 2.3.5) y se integraron
 en cada microservicio mediante el artefacto \texttt{core-lib}. \textbf{SpringDoc
 OpenAPI} genera documentación interactiva de los endpoints REST a partir de las
@@ -363,7 +363,7 @@ separados.
 \subsection{Despliegue, Gestión y Migración de Datos}\label{sec:despliegue}
 
 Para la gestión del ecosistema en entornos de desarrollo se seleccionó
-\textit{Docker Compose}, que permite describir todo el ecosistema ---bases de datos,
+\textbf{Docker Compose}, que permite describir todo el ecosistema ---bases de datos,
 microservicios, componentes de observabilidad y frontend--- en un único archivo
 declarativo y levantarlo mediante un comando único. Frente a alternativas como
 Kubernetes, Docker Compose ofrece simplicidad operativa para entornos sin
@@ -381,7 +381,7 @@ un schema aislado por servicio: UAA gestiona identidades y roles; Site administr
 cursos, semestres, participantes y contenidos académicos; y Notify registra eventos de
 correo. Esta redistribución
 elimina el acoplamiento referencial y permite que cada servicio evolucione su modelo
-de forma independiente mediante \textit{Flyway}.
+de forma independiente mediante \textbf{Flyway}.
 
 Para facilitar el desarrollo y las pruebas se diseñó el repositorio
 \texttt{portalasig-seeding}, que orquesta la carga de datos de prueba mediante
@@ -439,7 +439,7 @@ orquestación con Docker Compose, resolución de dependencias de red. \\
 \end{table}
 
 La Tabla \ref{tab:comparativa-monolito-ms} evidencia que la arquitectura de
-microservicios mejora sustancialmente las capacidades de despliegue, aislamiento,
+microservicios mejora las capacidades de despliegue, aislamiento,
 observabilidad y testing. Sin embargo, este beneficio no es gratuito: introduce una
 complejidad operativa que el equipo debe gestionar. En el contexto de PortalAsig,
 donde no existe un equipo de operaciones dedicado, esta complejidad se aborda de forma
@@ -597,7 +597,7 @@ recomendaciones de la IA.
 Cada acción, ya sea automática o de notificación, es registrada en la base de datos
 de PAIMA, manteniendo un historial completo.
 
-\subsection{Fase Knowledge: Registro de Incidentes y Feedback}
+\subsection{Fase Knowledge: Registro de Incidentes y Retroalimentación}
 
 Todo el estado, los planes propuestos por la IA y la evidencia de las fallas se
 almacenan en una base de datos relacional (tablas \texttt{paima\_alert} y

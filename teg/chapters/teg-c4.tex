@@ -129,9 +129,8 @@ Una vez que todos los pasos ---checkstyle, tests, JaCoCo y verificación de cobe
     \label{fig:github-pr-checks}
 \end{figure}
 
-Se estableció un umbral mínimo del 70\% tanto para cobertura de líneas como de
-ramas en todos los microservicios. Cada servicio del ecosistema cumple este
-requisito. Los valores más elevados en UAA y Notify responden a la menor
+Se estableció un umbral mínimo del 70\% para cobertura de líneas en todos los
+microservicios, valor que el ecosistema cumple o supera. Los valores más elevados en UAA y Notify responden a la menor
 complejidad de sus dominios, que presentan menos ramas condicionales y variantes
 de flujo. Site, al concentrar la lógica de negocio principal del portal, requirió
 un esfuerzo adicional de pruebas para alcanzar el umbral, incluyendo tests sobre
@@ -160,7 +159,7 @@ código base.
 pruebas de integración presentó desafíos iniciales relacionados con el tiempo
 de arranque y la gestión de recursos. Los primeros tests tardaban más de
 treinta segundos en levantar el contenedor MySQL, lo que ralentizaba
-significativamente el ciclo de retroalimentación del desarrollador. Se
+el ciclo de retroalimentación del desarrollador. Se
 optimizó este tiempo mediante el uso de imágenes base ligera
 (\texttt{mysql:8-debian}) y la configuración de un pool de contenedores
 reutilizables mediante la anotación
@@ -191,12 +190,12 @@ entre la interfaz, los servicios distribuidos y los mecanismos de autenticaci\'{
 
 Para la validación del sistema desde la perspectiva del usuario final se evaluaron
 diversas herramientas de automatización de pruebas de interfaz. Herramientas
-consolidadas basadas en controladores externos (\textit{WebDrivers}) como Selenium
+consolidadas basadas en controladores externos (\textit{WebDrivers}) como \textbf{Selenium}
 constituyen un estándar de la industria, pero suelen introducir inestabilidad
 (\textit{flakiness}) y tiempos de ejecución prolongados debido a la sincronización
 entre el driver y el navegador.
 
-Se seleccionó \textit{Cypress} porque se ejecuta dentro del mismo ciclo de vida del
+Se seleccionó \textbf{Cypress} porque se ejecuta dentro del mismo ciclo de vida del
 navegador, eliminando la capa de intermediación del WebDriver. Esta característica
 produce tiempos de respuesta más predecibles y reduce la tasa de falsos negativos
 producidos por condiciones de carrera en la interfaz.
@@ -205,8 +204,8 @@ Los flujos automatizados cubren las siguientes funcionalidades:
 
 \begin{enumerate}
     \item \textbf{Autenticación:} Inicio de sesión con credenciales válidas,
-    validación de token JWT almacenado en \texttt{localStorage}, redirección al
-    dashboard principal.
+    validación de la sesión persistida en la cookie \texttt{exchange\_session},
+    redirección al dashboard principal.
     \item \textbf{Navegación por sitios de asignatura:} Acceso a la lista de sitios,
     selección de un semestre activo, visualización de detalle de curso.
     \item \textbf{Gestión de contenidos:} Creación de un objetivo de aprendizaje,
@@ -251,13 +250,13 @@ correspondiente prueba de interfaz antes de ser considerada completa.
 
 \textbf{Gestión de la autenticación externalizada.} Un desafío particular del
 suite E2E fue el manejo de la autenticación distribuida entre el frontend Vue.js y
-el servicio UAA. Dado que el frontend redirige al usuario hacia UAA para obtener el
-token JWT y luego almacena el token en \texttt{localStorage}, los tests debían
-replicar este flujo completo sin depender de la interfaz de login de UAA, que
-puede cambiar de forma independiente. La solución consistió en implementar un
-comando personalizado de Cypress \texttt{cy.loginViaApi()} que realiza la petición
-\texttt{POST /oauth/token} directamente contra UAA, almacena el token en
-\texttt{localStorage} y refresca la página para que el frontend lo reconozca. Este
+el servicio UAA. El frontend persiste la sesión en la cookie \texttt{exchange\_session}
+mediante la biblioteca \textbf{js-cookie}, de modo que los tests debían replicar el
+flujo de login sin depender de la interfaz visual de autenticación, que puede
+cambiar de forma independiente. La solución consistió en implementar un comando
+personalizado de Cypress que realiza la petición de login directamente contra UAA
+y establece la cookie \texttt{exchange\_session} con el par de tokens, de modo que
+el frontend la reconozca al recargar la página. Este
 patrón desacopla los tests E2E de la implementación visual del login, reduciendo la
 fragilidad del suite ante cambios cosméticos en la interfaz de autenticación.
 
@@ -356,7 +355,7 @@ Para cuantificar el rendimiento del nuevo ecosistema bajo carga representativa s
 diseñó un plan de benchmarking que evalúa tres escenarios críticos: consultas
 intensivas de lectura (GET), operaciones de creación (POST) y flujos de
 autenticación. Cada escenario se ejecutará durante cinco minutos utilizando
-\textit{k6} como herramienta de generación de carga, configurada con cincuenta
+\textbf{k6} como herramienta de generación de carga, configurada con cincuenta
 usuarios virtuales concurrentes y un rampa de inicio progresivo de treinta segundos.
 
 \textbf{Configuración de los escenarios de carga.} Los tres escenarios se
@@ -443,12 +442,12 @@ persistentes, cargas de fondo). Por esta razón, cualquier comparación de rendi
 debe interpretarse como un análisis de diseño orientado por hipótesis, no como
 medición empírica absoluta. Asimismo, el ecosistema de microservicios introduce un
 overhead de red interna entre servicios que el monolito no tiene, lo que compensa
-parcialmente las ventajas de especialización en escenarios de baja concurrencia. La Figura~\ref{fig:benchmarking-grafana} muestra el resultado correspondiente.
+parcialmente las ventajas de especialización en escenarios de baja concurrencia. La Figura~\ref{fig:benchmarking-grafana} ilustra la capacidad de observabilidad del ecosistema mediante Grafana y Loki, mostrando los logs del servicio Site durante el arranque del entorno de pruebas.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[draft,width=0.9\textwidth]{graphics/benchmarking-grafana.png}
-    \caption{Dashboard de Grafana proyectado para la visualización de métricas durante la ejecución de benchmarks con k6.}
+    \includegraphics[width=0.9\textwidth]{graphics/benchmarking-grafana.png}
+    \caption{Exploración de logs con Grafana y Loki durante el arranque del ecosistema de microservicios.}
     \label{fig:benchmarking-grafana}
 \end{figure}
 
@@ -624,16 +623,10 @@ ejecución de la auto-reparación.
 \end{figure}
 
 \textbf{Alerta en el portal administrativo.} Tras la recuperación del servicio, el
-panel administrativo actualiza su estado y muestra la alerta como gestionada.
-La Figura~\ref{fig:paima-dashboard-alert} refleja el portal una vez normalizada
-la operación.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.9\textwidth]{graphics/paima-dashboard-alert.png}
-    \caption{Portal administrativo con alerta crítica gestionada y asistente IA integrado.}
-    \label{fig:paima-dashboard-alert}
-\end{figure}
+panel administrativo actualiza el estado de la alerta a ``Completada'' y el listado
+refleja que la acción de reinicio aprobada restableció la operación normal.
+Este cambio de estado confirma que el ciclo MAPE-K cerró correctamente: detección,
+diagnóstico, propuesta, aprobación humana y ejecución de la remediación.
 
 \subsection{Lecciones del Experimento}
 
