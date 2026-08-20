@@ -1,4 +1,5 @@
 \chapter{Marco Aplicativo}
+\label{ch:aplicativo}
 \pagestyle{fancy}
 
 La arquitectura monolítica de PortalAsig acumula seis años de modificaciones
@@ -64,7 +65,8 @@ explícitamente dieciocho relaciones con otras entidades del sistema. La elimina
 un sitio requiere la ejecución manual de dieciocho operaciones de borrado en cascada
 dentro de un hook del modelo, implementado mediante promesas anidadas. Si alguna de
 estas operaciones falla, el sistema queda en un estado de inconsistencia parcial, sin
-mecanismo de compensación automática.
+mecanismo de compensación automática. La Figura~\ref{fig:modelo-datos-monolito}
+ilustra esta centralidad de la entidad \texttt{Site} dentro del modelo monolítico.
 
 \textbf{Autenticación propietaria no estandarizada.} El sistema no emplea tokens JWT
 ni protocolos OAuth2. En su lugar, genera cadenas aleatorias que se almacenan en una
@@ -104,7 +106,7 @@ mecanismos de validación automatizada.
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.85\textwidth]{graphics/modelo-datos-monolito.png}
-    \caption{Diagrama entidad-relación simplificado del modelo de datos monolítico, mostrando la tabla \texttt{site} como núcleo con sus 15+ relaciones hacia entidades dependientes.}
+    \caption{Diagrama entidad-relación simplificado del modelo de datos monolítico, mostrando la tabla \texttt{site} como núcleo con sus dieciocho relaciones hacia entidades dependientes.}
     \label{fig:modelo-datos-monolito}
 \end{figure}
 
@@ -131,7 +133,11 @@ sistema:
     bibliográficas.
     \item \textbf{Servicio de Notificaciones (Notify):} Encargado del procesamiento
     asíncrono y despacho de correos electrónicos, desacoplando el envío de
-    notificaciones de las operaciones síncronas de los demás servicios.
+    notificaciones de las operaciones síncronas de los demás servicios. El
+    procesamiento asíncrono se materializa mediante \textbf{Apache Kafka}: los
+    servicios publican eventos de notificación en un tópico que Notify consume
+    para renderizar y despachar los correos, de modo que una indisponibilidad del
+    servicio de correo no se propaga a los flujos síncronos.
 \end{itemize}
 
 El ecosistema incluye además el servicio \textbf{PAIMA}, que opera como un nodo
@@ -165,7 +171,8 @@ virtual de Docker Compose, utilizando el nombre del contenedor como host (por ej
 recomendada en arquitecturas de microservicios para centralizar autenticación,
 enrutamiento y \textit{limitación de tasa de peticiones}, su implementación quedó
 fuera del alcance de este trabajo, priorizándose la funcionalidad central del ecosistema
-y del servicio de autogestión del mantenimiento.
+y del servicio de autogestión del mantenimiento. La Figura~\ref{fig:diagrama-arquitectura}
+presenta la vista completa del ecosistema resultante.
 
 \begin{figure}[h!]
     \centering
@@ -228,7 +235,8 @@ en tres artefactos:
 
 Esta estructura evita la duplicación de configuración y garantiza que cualquier
 mejora en la seguridad, la observabilidad o el manejo de errores se propague a todos
-los servicios modificando únicamente el artefacto común.
+los servicios modificando únicamente el artefacto común. La Figura~\ref{fig:pom-herencia}
+ilustra el modelo de herencia resultante entre los POM del ecosistema.
 
 \textbf{Base de datos.} Se evaluaron tres alternativas para el almacenamiento de datos:
 
@@ -332,9 +340,9 @@ y ejecuta sobre los servidores de GitHub sin costo adicional.
 
 Se incorporó \textbf{JaCoCo} como plugin de Maven para medir la cobertura de líneas y
 ramas durante la ejecución de los tests, generando un reporte HTML detallado por
-paquete, clase y método. Se configuró un umbral mínimo del setenta por ciento en el
+paquete, clase y método. Se configuró un umbral mínimo del setenta por ciento de líneas y sesenta por ciento de ramas en el
 workflow de GitHub Actions, de forma que la compilación falla automáticamente si la
-cobertura desciende por debajo del valor establecido. Se eligió JaCoCo sobre
+cobertura desciende por debajo de los valores establecidos. Se eligió JaCoCo sobre
 SonarQube porque este último requiere un servidor dedicado con base de datos propia,
 mientras que JaCoCo produce el reporte como parte del proceso de compilación.
 
@@ -354,11 +362,19 @@ el token JWT, inyectándolo en las peticiones subsecuentes \cite{cypress2024}.
 
 El stack de observabilidad se configuró con \textbf{Prometheus} para métricas,
 \textbf{Loki} para agregación de logs y \textbf{Grafana} para visualización unificada \cite{prometheus2024,grafana2024}.
-Estas herramientas se definieron en el Marco Teórico (Sección 2.3.5) y se integraron
+Estas herramientas se definieron en el Marco Teórico (Sección~\ref{sec:observabilidad-distribuida}) y se integraron
 en cada microservicio mediante el artefacto \texttt{core-lib}. \textbf{SpringDoc
 OpenAPI} genera documentación interactiva de los endpoints REST a partir de las
 anotaciones de los controladores, eliminando la necesidad de mantener manuales
-separados.
+separados. La Figura~\ref{fig:grafana-explore} muestra la exploración centralizada
+de logs del servicio Site mediante Grafana sobre los registros agregados por Loki.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/benchmarking-grafana.png}
+    \caption{Exploración de logs con Grafana y Loki durante el arranque del ecosistema de microservicios.}
+    \label{fig:grafana-explore}
+\end{figure}
 
 \subsection{Despliegue, Gestión y Migración de Datos}\label{sec:despliegue}
 
@@ -375,13 +391,23 @@ detención ordenada (\texttt{down}) y visualización de logs por servicio
 (\texttt{logs}).
 
 El monolito original utiliza una única base de datos PostgreSQL con un schema
-centralizado donde la tabla \texttt{site} actúa como núcleo con relaciones hacia más
-de quince entidades. En la arquitectura de microservicios se adoptó el principio de
+centralizado donde la tabla \texttt{site} actúa como núcleo con dieciocho relaciones
+hacia entidades dependientes. En la arquitectura de microservicios se adoptó el principio de
 un schema aislado por servicio: UAA gestiona identidades y roles; Site administra
 cursos, semestres, participantes y contenidos académicos; y Notify registra eventos de
 correo. Esta redistribución
-elimina el acoplamiento referencial y permite que cada servicio evolucione su modelo
-de forma independiente mediante \textbf{Flyway}.
+elimina el acoplamiento referencial entre dominios ---las referencias cruzadas entre
+servicios se convierten en referencias lógicas sin clave foránea--- y permite que cada
+servicio evolucione su modelo de forma independiente mediante \textbf{Flyway}. La
+Figura~\ref{fig:modelo-datos-distribuido} resume el modelo de datos distribuido
+resultante.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.95\textwidth]{graphics/modelo-datos-distribuido.png}
+    \caption{Modelo de datos distribuido del ecosistema: esquemas aislados por servicio, con claves foráneas reales dentro de cada dominio y referencias lógicas (sin clave foránea) entre dominios.}
+    \label{fig:modelo-datos-distribuido}
+\end{figure}
 
 Para facilitar el desarrollo y las pruebas se diseñó el repositorio
 \texttt{portalasig-seeding}, que orquesta la carga de datos de prueba mediante
@@ -514,18 +540,33 @@ existencia de un ecosistema distribuido e instrumentado hace posible su implemen
 
 PAIMA se implementó como un microservicio Spring Boot con un \textit{scheduler}
 periódico que ejecuta el ciclo MAPE-K definido en el Marco Teórico. La
-arquitectura de clases se organiza en cinco paquetes que reflejan las fases del
+arquitectura de clases se organiza en paquetes que reflejan las fases del
 ciclo: \texttt{monitor}, \texttt{analyze}, \texttt{plan}, \texttt{execute} y
 \texttt{knowledge}. Cada paquete encapsula las interfaces y servicios que
-permiten sustituir implementaciones sin afectar al resto del sistema —por
-ejemplo, el proveedor de IA puede cambiarse de un modelo local (como Llama
-u otro modelo ejecutado mediante Ollama) a uno remoto (como OpenAI o Gemini) modificando
-únicamente la clase que implementa \texttt{AwareAiProvider} y registrando el \textit{bean}
-correspondiente en la configuración del Config Server. La orquestación del
-ciclo completo la coordina la clase \texttt{AwareScheduler}, invocada mediante la
+permiten sustituir implementaciones sin afectar al resto del sistema. La
+Figura~\ref{fig:paima-clases} presenta el diagrama de clases resultante,
+organizado por las fases del ciclo.
+
+La integración con el proveedor de inteligencia artificial se abstrae mediante la
+interfaz \texttt{PaimaAiProvider}, que cuenta con tres implementaciones:
+\texttt{OpenAiCompatiblePaimaAiProvider}, para APIs remotas compatibles con
+OpenAI (OpenAI, Gemini u otros proveedores de esa familia);
+\texttt{OllamaPaimaAiProvider}, para modelos locales ejecutados mediante Ollama;
+y \texttt{RuleBasedPaimaAiProvider}, un mecanismo de fallback determinista basado
+en reglas que prioriza incidencias sin intervención de un modelo externo
+---prioridad P1 para servicios fuera de servicio y P2 para patrones de error en
+los registros o para objetivos de monitoreo caídos---. El proveedor activo se
+selecciona mediante el Config Server; ante una configuración ausente o no válida,
+el sistema degrada automáticamente al proveedor basado en reglas, de modo que el
+ciclo de autogestión conserva capacidad de análisis aun sin disponibilidad de un
+modelo de lenguaje. La orquestación del ciclo completo la coordina la clase
+\texttt{PaimaMapeScheduler}, invocada mediante la
 anotación \texttt{@Scheduled} de Spring con una frecuencia configurable a través
 del Config Server. Adicionalmente, PAIMA expone endpoints REST bajo el prefijo
-\texttt{/v1/alert} que permiten a la interfaz de usuario consultar alertas
+\texttt{/paima} ---\texttt{/paima/alerts} para la gestión de alertas,
+\texttt{/paima/mape} para la inspección del estado del ciclo y
+\texttt{/paima/llm/chat} para el asistente conversacional--- que permiten a la
+interfaz de usuario consultar alertas
 activas, registrar decisiones humanas y auditar el historial de incidentes.
 
 Un aspecto distintivo de la arquitectura es la persistencia del conocimiento
@@ -575,22 +616,28 @@ consumo (Ollama) o una API remota (OpenAI, Gemini)— sin modificar la lógica d
 orquestación. El modelo recibe el informe consolidado,
 identifica la causa probable del problema y responde con un plan de acción
 estructurado que incluye una prioridad (P1 crítica, P2 moderada, P3 informativa),
-un modo de ejecución (asistido o autónomo) y una estrategia concreta de
+un modo de ejecución (semi-asistido o autónomo) y una estrategia concreta de
 remediación, como reiniciar el servicio afectado, revisar el código fuente o
 notificar a los administradores del sistema.
 
 \subsection{Fase Execute: Automatización y Notificación}
 
 En la fase de ejecución, PAIMA procesa las acciones recomendadas por el modelo de
-IA. Las acciones pueden ser de dos tipos principales:
+IA. El modo de ejecución declarado en cada plan determina si la acción requiere
+aprobación humana previa (\textit{semi-asistido}) o si PAIMA la ejecuta
+directamente (\textit{autónomo}); en la configuración validada en este trabajo,
+las acciones de remediación sobre servicios operan en modo semi-asistido, de modo
+que toda intervención sobre el ecosistema cuenta con aprobación humana explícita.
+Las acciones pueden ser de dos tipos principales:
 \begin{itemize}
-    \item \textbf{Acciones Automáticas:} PAIMA puede ejecutar comandos
-directamente sobre el entorno Docker. Por ejemplo, para un reinicio de servicio
-(\texttt{AUTOMATED\_RESTART}), invoca el script \texttt{portalasig-cli} con el
+    \item \textbf{Acciones sobre el entorno:} PAIMA puede ejecutar comandos
+directamente sobre el entorno Docker. Por ejemplo, para un reinicio de servicio,
+invoca el script \texttt{portalasig-cli} con el
 comando \texttt{restart} para el microservicio objetivo.
     \item \textbf{Notificaciones:} Para acciones que requieren intervención humana
-o simplemente informar, PAIMA interactúa con el microservicio
-\texttt{ms-notify} para enviar alertas por correo electrónico a los
+o simplemente informar, PAIMA publica un evento de notificación en el tópico de
+\textbf{Apache Kafka} consumido por el microservicio
+\texttt{ms-notify}, que renderiza y despacha el correo electrónico a los
 administradores del sistema, incluyendo detalles del incidente y las
 recomendaciones de la IA.
 \end{itemize}
@@ -617,6 +664,7 @@ se presenta en el Capítulo~\ref{ch:pruebas}, dentro de la sección dedicada a l
 validación del sistema de autogestión del mantenimiento.
 
 \section{Adaptación del Frontend a la Arquitectura Distribuida}
+\label{sec:adaptacion-frontend}
 
 El frontend de PortalAsig, desarrollado originalmente en Vue.js~2 y rediseñado
 por Vásquez Balza \cite{teg_rafael}, operaba como cliente de un único backend
@@ -725,7 +773,7 @@ La migración de endpoints implicó mapear cada operación del frontend hacia el
 servicio correspondiente: autenticación y gestión de usuarios hacia UAA
 (\texttt{/v1/user/}, \texttt{/v1/auth/}), operaciones de sitios académicos hacia Site
 (\texttt{/v1/site/}, \texttt{/v1/semester/}), y alertas de mantenimiento hacia PAIMA
-(\texttt{/v1/paima/}). El router se configuró en modo \texttt{history}, eliminando el
+(\texttt{/paima/alerts}). El router se configuró en modo \texttt{history}, eliminando el
 prefijo \texttt{/\#/} de las URLs y produciendo rutas limpias compatibles con el proxy
 inverso de Nginx.
 

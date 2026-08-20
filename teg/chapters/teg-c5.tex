@@ -1,4 +1,5 @@
 \chapter{Conclusiones y Recomendaciones}
+\label{ch:conclusiones}
 \pagestyle{fancy}
 
 \section{Conclusiones}
@@ -16,7 +17,7 @@ autónomo.
 
 En la dimensión arquitectónica, se demostró que el monolito legacy de PortalAsig
 acumulaba seis años de deuda técnica en un único proceso Node.js donde un
-controlador de 3.629 líneas gestionaba quince dominios de negocio distintos, sin
+controlador de 3.629 líneas gestionaba dieciocho dominios de negocio distintos, sin
 mecanismo de aislamiento de fallos ni pruebas automatizadas. La migración a
 microservicios descompuso el backend en tres dominios acotados ---UAA, Site y
 Notify--- cada uno con su propia base de datos MySQL, su esquema de
@@ -24,7 +25,7 @@ versionado independiente mediante Flyway y su ciclo de despliegue autónomo. Sob
 este ecosistema se integró el servicio PAIMA como mecanismo de autogestión del
 mantenimiento. La
 Tabla \ref{tab:comparativa-monolito-ms} del Capítulo 3 evidenció que esta
-descomposición eliminó el acoplamiento referencial del modelo monolítico y habilitó
+descomposición eliminó el acoplamiento referencial entre dominios del modelo monolítico y habilitó
 el aislamiento de fallos, de modo que la caída de un servicio ya no compromete la
 estabilidad del ecosistema completo.
 
@@ -35,8 +36,8 @@ con JaCoCo en cada \textit{pull request}. Las reglas de protección de ramas blo
 fusión de código si cualquiera de estos checks falla, transformando la validación de
 un proceso manual y dependiente del conocimiento tácito en un mecanismo sistemático
 y reproducible. Los resultados documentados en el Capítulo 4 muestran coberturas de
-líneas entre el 67\% y el 81\% por microservicio, con un umbral mínimo del 70\%
-validado automáticamente en cada pull request; cifras inexistentes en el monolito
+líneas entre el 71\% y el 81\% por microservicio, con umbrales mínimos del 70\% de
+líneas y 60\% de ramas validados automáticamente en cada pull request; cifras inexistentes en el monolito
 original. Asimismo, se diseñó una suite de pruebas end-to-end con Cypress que
 simula flujos completos de usuario sobre el frontend Vue.js, verificando que las
 capas de presentación, aplicación y persistencia operen de forma coordinada.
@@ -67,21 +68,47 @@ distribución arquitectónica, observabilidad instrumentada e inteligencia artif
 Web 3.0--- no es una proyección teórica, sino una transformación operativa alcanzable
 en entornos con restricciones de personal y presupuesto.
 
+\section{Limitaciones}
+
+Las principales limitaciones del trabajo se concentran en los bordes operativos del
+ecosistema validado. En primer lugar, la frecuencia del ciclo de monitoreo de
+PAIMA ---cinco minutos en la configuración empleada--- acota el tiempo de
+detección de una incidencia: un servicio puede permanecer caído durante casi un
+ciclo completo antes de que se genere la alerta, un intervalo reducible mediante
+el Config Server pero inherentemente ligado a la naturaleza periódica del ciclo.
+En segundo lugar, la calidad del diagnóstico en las fases de Análisis y
+Planificación depende del proveedor de inteligencia artificial configurado: los
+proveedores remotos ofrecen mayor capacidad de razonamiento a costa de la
+conectividad externa, mientras que el proveedor local y el fallback determinista
+basado en reglas garantizan la continuidad operativa con diagnósticos menos
+detallados. En tercer lugar, la evaluación cuantitativa de rendimiento se
+circunscribió al diseño experimental reproducible documentado en el
+Capítulo~\ref{ch:pruebas}, dado que el monolito en producción no puede someterse
+a pruebas de carga sin afectar a sus usuarios, de modo que la comparación de
+rendimiento entre ambas arquitecturas queda acotada a las hipótesis y a los
+escenarios definidos. Finalmente, el frontend heredado opera sobre Vue.js~2,
+versión que alcanzó su fin de vida, y la validación del ecosistema se realizó
+sobre el entorno local de Docker Compose con datos anonimizados; la migración de
+los datos históricos de producción y la instrumentación de trazabilidad
+distribuida quedaron fuera del alcance de este trabajo.
+
 \section{Recomendaciones y Trabajo Futuro}
 
 A partir de los resultados obtenidos y las limitaciones observadas durante el
 desarrollo y la validación, se identifican las siguientes líneas de evolución para
 el ecosistema PortalAsig.
 
-\textbf{Soberanía tecnológica mediante modelos locales.} PAIMA actualmente delega
-las fases de Análisis y Planificación a proveedores de inteligencia artificial
-remotos (APIs compatibles con OpenAI). Como línea de trabajo futuro, se recomienda
-la integración de modelos de lenguaje ejecutados localmente mediante Ollama, lo que
-eliminaría la dependencia de conectividad externa y de costos por token, al tiempo
-que preservaría la confidencialidad de la telemetría operativa dentro de la
-infraestructura universitaria. Esta transición requeriría ajustar los \textit{prompts}
-y evaluar la calidad del razonamiento de modelos locales frente a los proveedores
-cloud actuales.
+\textbf{Soberanía tecnológica mediante modelos locales.} Si bien la arquitectura
+de PAIMA incorpora un proveedor basado en Ollama para la ejecución de modelos
+locales, la validación de este trabajo se realizó con proveedores de inteligencia
+artificial remotos (APIs compatibles con OpenAI) por su mayor capacidad de
+razonamiento. Como línea de evolución, se recomienda la evaluación sistemática de
+modelos de lenguaje ejecutados localmente, ajustando los \textit{prompts} sobre el
+historial de incidentes acumulado y midiendo la calidad del razonamiento frente a
+los proveedores remotos actuales. Esta transición eliminaría la dependencia de
+conectividad externa y de costos por token, al tiempo que preservaría la
+confidencialidad de la telemetría operativa dentro de la infraestructura
+universitaria.
 
 \textbf{Centralización del routing y la autenticación.} Se recomienda evaluar la
 introducción de un gateway ---ya sea una extensión de Nginx o un componente

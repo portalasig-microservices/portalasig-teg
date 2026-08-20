@@ -5,9 +5,9 @@
 La migración a microservicios y la implementación del servicio PAIMA introducen
 cambios sustanciales tanto en la arquitectura como en la forma de operar el sistema.
 No basta con construir el ecosistema: es necesario demostrar que los mecanismos de
-aseguramiento de calidad funcionan, que el rendimiento es comparable o superior al del
-monolito legacy, y que el ciclo de autogestión del mantenimiento detecta y resuelve
-fallas de forma efectiva. Este capítulo documenta la estrategia de pruebas diseñada,
+aseguramiento de calidad funcionan, establecer un marco reproducible para la
+evaluación del rendimiento frente al monolito legacy, y verificar que el ciclo de
+autogestión del mantenimiento detecta y resuelve fallas de forma efectiva. Este capítulo documenta la estrategia de pruebas diseñada,
 los escenarios ejecutados y los resultados obtenidos, organizados en cuatro
 dimensiones: cobertura de código, validación end-to-end, rendimiento bajo carga y
 resiliencia ante fallos.
@@ -37,7 +37,29 @@ Se definieron cuatro categorías de prueba:
 \end{itemize}
 
 Para cada categoría se establecieron métricas objetivo, herramientas de medición y
-umbrales de aceptación.
+umbrales de aceptación. La Tabla~\ref{tab:metricas-pruebas} resume esta
+instrumentación.
+
+\begin{table}[ht!]
+\centering
+\resizebox{\textwidth}{!}{%
+\renewcommand{\arraystretch}{1.25}
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{>{\columncolor{gray!15}}p{2.8cm}p{4.2cm}p{3.4cm}p{3.6cm}}
+\toprule
+\rowcolor{gray!25}
+\textbf{Categoría} & \textbf{Métrica objetivo} & \textbf{Herramienta} & \textbf{Umbral de aceptación} \\
+\midrule
+Integración & Cobertura de líneas y ramas & JaCoCo + GitHub Actions & 70\% de líneas, 60\% de ramas \\
+End-to-end & Tasa de éxito de la suite & Cypress & 100\% en ejecuciones consecutivas \\
+Rendimiento & Latencia p95/p99, throughput, tasa de error & k6 + Prometheus & Comparativo frente al monolito \\
+Resiliencia & Detección y recuperación ante fallo inyectado & PAIMA + Grafana & Detección dentro de un ciclo de monitoreo \\
+\bottomrule
+\end{tabular}%
+}
+\caption{\textit{Métricas objetivo, herramientas de medición y umbrales de aceptación por categoría de prueba}}
+\label{tab:metricas-pruebas}
+\end{table}
 
 \section{Pruebas de Integración y Cobertura de Código}
 
@@ -93,7 +115,7 @@ establecido. Los resultados obtenidos se resumen en la Tabla
 \textbf{Microservicio} & \textbf{Cobertura de líneas} & \textbf{Cobertura de ramas} \\
 \midrule
 UAA & 81\% & 74\% \\
-Site & 67\% & 61\% \\
+Site & 72\% & 64\% \\
 Notify & 78\% & 72\% \\
 PAIMA & 71\% & 65\% \\
 \bottomrule
@@ -129,8 +151,9 @@ Una vez que todos los pasos ---checkstyle, tests, JaCoCo y verificación de cobe
     \label{fig:github-pr-checks}
 \end{figure}
 
-Se estableció un umbral mínimo del 70\% para cobertura de líneas en todos los
-microservicios, valor que el ecosistema cumple o supera. Los valores más elevados en UAA y Notify responden a la menor
+Se estableció un umbral mínimo del 70\% para cobertura de líneas y del 60\% para
+cobertura de ramas en todos los
+microservicios, valores que el ecosistema cumple o supera. Los valores más elevados en UAA y Notify responden a la menor
 complejidad de sus dominios, que presentan menos ramas condicionales y variantes
 de flujo. Site, al concentrar la lógica de negocio principal del portal, requirió
 un esfuerzo adicional de pruebas para alcanzar el umbral, incluyendo tests sobre
@@ -273,7 +296,7 @@ tres minutos mientras eliminaba los falsos negativos.
 \subsection{Validación de la Arquitectura Frontend Adaptada}
 
 Las pruebas end-to-end verifican no solo la estabilidad de la interfaz, sino que
-cada cambio arquitectónico introducido en la adaptación del frontend (Sección~3.4)
+cada cambio arquitectónico introducido en la adaptación del frontend (Sección~\ref{sec:adaptacion-frontend})
 tiene una contraparte validable en el suite de Cypress. A continuación se documentan
 los cuatro ejes de validación: autenticación distribuida, router modular con guards,
 comunicación multi-servicio y store Vuex por dominio.
@@ -321,7 +344,7 @@ atraviesan múltiples módulos y microservicios:
     \item \textbf{Gestión de alertas PAIMA:} Acceso al módulo de alertas,
     filtrado por prioridad, apertura del chat contextual y aprobación de acciones
     propuestas. El test valida que el frontend comunique correctamente con el
-    servicio PAIMA (\texttt{/v1/paima/alerts}) y que el asistente conversacional
+    servicio PAIMA (\texttt{/paima/alerts}) y que el asistente conversacional
     renderice la respuesta del modelo de IA sin bloquear la interfaz.
 \end{itemize}
 
@@ -428,7 +451,7 @@ interna de Docker.
 \textbf{Hipótesis sobre aislamiento de fallos.} Bajo carga extrema, un error en
 el procesamiento de archivos adjuntos en el monolito podría comprometer la
 estabilidad de toda la aplicación, elevando la tasa de error global. En la
-arquitectura de microservicios, un fallo en el servicio de archivos afectaría
+arquitectura de microservicios, un fallo en el servicio Site afectaría
 únicamente ese dominio, mientras que los demás servicios continuarían
 respondiendo. Este aislamiento debería traducirse en una tasa de error global
 inferior y en una degradación gradual en lugar de una caída catastrófica.
@@ -442,27 +465,21 @@ persistentes, cargas de fondo). Por esta razón, cualquier comparación de rendi
 debe interpretarse como un análisis de diseño orientado por hipótesis, no como
 medición empírica absoluta. Asimismo, el ecosistema de microservicios introduce un
 overhead de red interna entre servicios que el monolito no tiene, lo que compensa
-parcialmente las ventajas de especialización en escenarios de baja concurrencia. La Figura~\ref{fig:benchmarking-grafana} ilustra la capacidad de observabilidad del ecosistema mediante Grafana y Loki, mostrando los logs del servicio Site durante el arranque del entorno de pruebas.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.9\textwidth]{graphics/benchmarking-grafana.png}
-    \caption{Exploración de logs con Grafana y Loki durante el arranque del ecosistema de microservicios.}
-    \label{fig:benchmarking-grafana}
-\end{figure}
+parcialmente las ventajas de especialización en escenarios de baja concurrencia.
 
 \section{Simulación de Caos y Recuperación Asistida}
 
 La validaci\'{o}n de resiliencia no puede limitarse a escenarios nominales.
 Es necesario someter el ecosistema a condiciones de fallo controladas para
-verificar que PAIMA detecte, diagnosticque y asista en la recuperaci\'{o}n de
-servicios ca\'{i}dos sin intervenci\'{o}n manual directa.
+verificar que PAIMA detecte, diagnostique y asista en la recuperaci\'{o}n de
+servicios ca\'{i}dos, limitando la intervenci\'{o}n humana a la aprobaci\'{o}n de la
+acci\'{o}n propuesta.
 
 \subsection{Diseño del Escenario}
 
 Para comprobar la resiliencia del ecosistema y el funcionamiento del modelo de
 auto-mantenimiento se diseñó un experimento de ingeniería del caos siguiendo la
-metodología descrita en el Marco Teórico \cite{brendan2011chaos}. El escenario consistió en detener de
+metodología descrita en el Marco Teórico \cite{basiri2016chaos}. El escenario consistió en detener de
 forma intencional el contenedor del servicio de sitios académicos
 (\texttt{ms-site}), emulando una caída catastrófica en un entorno de producción.
 
@@ -472,8 +489,8 @@ El protocolo de prueba estableció las siguientes fases:
     \item \textbf{Estado basal:} Verificación de que todos los servicios están
     operativos, métricas dentro de rangos normales y sin alertas activas.
     \item \textbf{Inyección de fallo:} Ejecución de \texttt{docker stop ms-site}
-    seguida de una espera de noventa segundos para permitir que el scheduler de
-    PAIMA complete al menos un ciclo de monitorización.
+    seguida de una espera de cinco minutos para permitir que el scheduler de
+    PAIMA complete al menos un ciclo completo de monitorización.
     \item \textbf{Observación:} Registro del comportamiento del frontend,
     detección de métricas anómalas en Prometheus y consolidación de logs de error
     en Loki.
@@ -494,17 +511,7 @@ registrado en cada iteración fue el siguiente:
     Prometheus y los errores de conexión reportados en los logs de Loki. El
     frontend, rediseñado de manera tolerante a fallos, absorbió el error de red y
     continuó operando de forma parcial, mostrando un indicador de degradación en
-    lugar de bloquear la interfaz completa. La Figura~\ref{fig:ca-frontend-degradado} muestra el resultado correspondiente.
-
-    \begin{figure}[h!]
-        \centering
-        \includegraphics[draft,width=0.9\textwidth]{graphics/ca-frontend-degradado.png}
-        \caption{Portal de asignaturas en estado degradado tras la caída del servicio Site.
-        El usuario mantiene la sesión activa (autenticación gestionada por UAA), pero
-        el listado de sitios académicos muestra un indicador de error en lugar de
-        bloquear toda la interfaz.}
-        \label{fig:ca-frontend-degradado}
-    \end{figure}
+    lugar de bloquear la interfaz completa.
     \item \textbf{Clasificación y Notificación:} PAIMA categorizó la eventualidad
     como incidente de máxima prioridad (P1) e invocó al servicio \texttt{ms-notify}
     para despachar un correo de advertencia con formato institucional. La alerta
@@ -518,16 +525,7 @@ registrado en cada iteración fue el siguiente:
     \texttt{portalasig-cli restart ms-site}, levantó el contenedor y verificó
     que el endpoint de salud respondiera con código HTTP 200. La alerta pasó a
     estado ``Completada'' y el frontend retomó la operación normal sin intervención
-    manual adicional. La Figura~\ref{fig:ca-frontend-recuperado} muestra el resultado correspondiente.
-
-    \begin{figure}[h!]
-        \centering
-        \includegraphics[draft,width=0.9\textwidth]{graphics/ca-frontend-recuperado.png}
-        \caption{Portal de asignaturas tras la recuperación del servicio Site.
-        El listado de sitios académicos carga correctamente, confirmando que el
-        reinicio ejecutado por PAIMA restauró la funcionalidad completa.}
-        \label{fig:ca-frontend-recuperado}
-    \end{figure}
+    manual adicional.
 \end{enumerate}
 
 \subsection{Interfaz de Operación del Sistema de Autogestión}
@@ -540,19 +538,19 @@ un listado de alertas por estado, una vista de detalle individual y un asistente
 conversacional. A continuación se presenta cada vista con la evidencia gráfica
 correspondiente.
 
-\textbf{Panel de control.} La vista principal presenta un resumen del estado del
-ecosistema: cantidad de alertas activas por severidad, servicios monitoreados en
-estado saludable vs. degradado, y gráficos de evolución temporal de incidentes.
-Este dashboard permite al administrador evaluar la situación global antes de
-adentrarse en casos específicos. La Figura~\ref{fig:paima-dashboard} muestra el
-panel de control durante la simulación de caos, con el servicio Site en estado
-degradado.
+\textbf{Panel de control.} La vista principal integra en una única pantalla el
+listado de alertas pendientes y gestionadas, el detalle contextual de la alerta
+seleccionada ---con la recomendación del modelo de IA y la acción propuesta--- y
+el acceso al asistente conversacional. Esta disposición permite al administrador
+evaluar la situación global del ecosistema y operar un incidente específico sin
+cambiar de vista. La Figura~\ref{fig:paima-dashboard} muestra el panel durante la
+simulación de caos, con la alerta P1 del servicio Site en espera de aprobación.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/paima-dashboard.png}
-    \caption{Panel de control de PAIMA durante la simulación de caos, mostrando
-    el servicio Site en estado degradado.}
+    \caption{Panel de control de PAIMA durante la simulación de caos, con la
+    alerta P1 del servicio Site pendiente de aprobación.}
     \label{fig:paima-dashboard}
 \end{figure}
 
@@ -663,7 +661,7 @@ microservicios.
 \rowcolor{gray!25}
 \textbf{Dimensión} & \textbf{Monolito Legacy} & \textbf{Ecosistema de Microservicios} \\
 \midrule
-Cobertura de código & Inexistente. Sin tests ni medición. & 50\%--60\% por servicio, medido con JaCoCo y validado en pipeline. \\
+Cobertura de código & Inexistente. Sin tests ni medición. & 71\%--81\% de líneas por servicio, medido con JaCoCo y validado en pipeline. \\
 Pruebas E2E & Manuales. Depende del navegador y del conocimiento tácito del tester. & Suite automatizada con doce \textit{specs} y cuarenta y siete casos, con tasa de éxito del cien por ciento en veinte ejecuciones consecutivas. \\
 Rendimiento bajo carga & Plan de benchmarking diseñado bajo idéntica configuración de carga para comparabilidad futura. & Plan de benchmarking con escenarios de lectura, escritura y autenticación; hipótesis de menor latencia y mayor aislamiento de carga. \\
 Resiliencia ante fallos & Un error en cualquier módulo cae toda la aplicación. & Fallo aislado al servicio afectado. PAIMA detecta, notifica y asiste en la recuperación. \\
@@ -676,9 +674,9 @@ Observabilidad durante incidentes & Logs locales consultables con \texttt{pm2}. 
 \end{table}
 
 \textbf{Análisis por dimensión.} En la dimensi\'{o}n de cobertura de c\'{o}digo,
-la transformaci\'{o}n es cualitativa: pasar de cero por ciento a sesenta y cinco
-por ciento como m\'{i}nimo representa el establecimiento de una cultura de
-aseguramiento de calidad donde antes no exist\'{i}a ninguna. El umbral del setenta
+la transformaci\'{o}n es cualitativa: pasar de cero por ciento a superar el setenta
+por ciento de l\'{i}neas en todos los servicios representa el establecimiento de una
+cultura de aseguramiento de calidad donde antes no exist\'{i}a ninguna. El umbral del setenta
 por ciento no es un n\'{u}mero arbitrario: es el punto donde el c\'{o}digo restante
 corresponde principalmente a configuraciones, mapeadores y clases de utilidad que
 no requieren l\'{o}gica de negocio compleja, y donde alcanzar cobertura total
@@ -695,13 +693,13 @@ contenidos--- son estables y que la interfaz de usuario responde de forma
 predecible ante las interacciones programadas.
 
 En la dimensi\'{o}n de rendimiento, el dise\~{n}o experimental establecido
-proporciona un marco riguroso para la comparaci\'{o}n futura. Las hip\'{o}tesis
-formuladas ---menor latencia en microservicios debido a la especializaci\'{o}n de
-procesos, mayor aislamiento de carga entre dominios, y degradaci\'{o}n gradual en
-lugar de ca\'{i}da catastr\'{o}fica--- se alinean con la literatura t\'{e}cnica sobre
-arquitecturas distribuidas. La ejecuci\'{o}n de estos benchmarks, aunque pendiente,
-constituir\'{a} la validaci\'{o}n cuantitativa definitiva de las ventajas de la
-arquitectura propuesta.
+proporciona un marco riguroso y reproducible para la comparaci\'{o}n entre ambas
+arquitecturas. Las hip\'{o}tesis formuladas ---menor latencia en microservicios debido
+a la especializaci\'{o}n de procesos, mayor aislamiento de carga entre dominios, y
+degradaci\'{o}n gradual en lugar de ca\'{i}da catastr\'{o}fica--- se alinean con la
+literatura t\'{e}cnica sobre arquitecturas distribuidas. La aplicaci\'{o}n de este
+protocolo sobre instancias controladas de ambas arquitecturas constituye la v\'{i}a
+formal para contrastar dichas hip\'{o}tesis con mediciones emp\'{i}ricas.
 
 En la dimensi\'{o}n de resiliencia, la simulaci\'{o}n de caos demostr\'{o}
 emp\'{i}ricamente que el ecosistema a\'{\i}sla fallos y que PAIMA detecta,
@@ -718,13 +716,11 @@ cobertura y de un ciclo de autogestión del mantenimiento transforma la operaci�
 de un proceso artesanal y dependiente del conocimiento tácito en uno sistemático,
 medible y reproducible.
 
-Más allá de la mejora técnica cuantificable, este ecosistema proporciona
-la infraestructura que el paradigma de la Web 3.0 exige
-como condición de existencia. Un sistema que no puede observarse a sí mismo,
-que no puede agregar sus propios registros y que no puede delegar el análisis
-a un modelo inteligente, permanece anclado en el paradigma de la Web 2.0:
-interactivo, pero no adaptativo. La validación empírica documentada en este
-capítulo demuestra que la transición hacia una arquitectura distribuida,
+Más allá de la mejora técnica cuantificable, los resultados de este capítulo
+materializan las tres tendencias convergentes de la Web 3.0 definidas en el Marco
+Teórico: distribución arquitectónica, observabilidad instrumentada y análisis
+asistido por inteligencia artificial. La validación empírica documentada demuestra
+que la transición hacia una arquitectura distribuida,
 observable y autogestionada no es una proyección teórica, sino una
 transformación operativa concreta que habilita la evolución del sistema
 hacia las exigencias del nuevo paradigma.
