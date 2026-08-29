@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Presentación — Título del Trabajo</title>
+<style>
+/* ==========================================================================
+   PORTALASIG SLIDES — framework de presentaciones HTML estático
+   · 1 solo archivo, sin dependencias, offline
+   · Láminas 1280×720 (16:9), escalado automático a la ventana
+   · Exportable a PDF desde el navegador (cada lámina = 1 página)
+   · Tema editable vía variables CSS (abajo)
+   ========================================================================== */
+:root{
+  --w: 1280px;
+  --h: 720px;
+
+  /* ---- Paleta: inspirada en PortalAsig FE (Bootstrap Yeti) ---- */
+  --bg:        #ffffff;
+  --ink:       #222222;
+  --muted:     #6f7b84;
+  --accent:    #008cba;  /* primario Yeti */
+  --accent-2:  #e99002;  /* naranja warning Yeti */
+  --soft:      #ecf5f9;
+  --line:      #d8ecf2;
+  --good:      #43ac6a;  /* success Yeti */
+  --bad:       #f04124;  /* danger Yeti */
+  --code-bg:   #1c2b33;
+  --code-ink:  #d8ecf2;
+
+  --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Cascadia Code", "JetBrains Mono", Consolas, "Courier New", monospace;
+
+  --pad: 64px;
+  --pad-top: 48px;
+  --radius: 14px;
+}
+
+*{ box-sizing: border-box; }
+html, body{ height: 100%; }
+body{
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: #0d1219;               /* telón de fondo en modo pantalla */
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------ lámina */
+.slide{
+  display: none;
+  width: var(--w);
+  height: var(--h);
+  padding: var(--pad-top) var(--pad);
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  flex-direction: column;
+  box-shadow: 0 18px 60px rgba(0,0,0,.5);
+}
+.slide.is-active{ display: flex; }
+
+/* Encabezado estándar de lámina de contenido */
+.slide__head{ margin-bottom: 24px; flex: none; }
+.slide__head h2{ font-size: 40px; margin: 6px 0 0; letter-spacing: -.01em; line-height: 1.12; }
+.slide__head::after{
+  content: ""; display: block; height: 4px; width: 84px;
+  background: var(--accent); border-radius: 2px; margin-top: 14px;
+}
+.slide__body{ flex: 1; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+
+.kicker{
+  text-transform: uppercase; letter-spacing: .14em;
+  font-size: 14px; font-weight: 700; color: var(--accent);
+}
+.lead{ font-size: 24px; line-height: 1.45; color: var(--ink); margin: 0; }
+.muted{ color: var(--muted); }
+.small{ font-size: 16px; }
+.accent{ color: var(--accent); }
+.center{ flex: 1; display: grid; place-items: center; }
+
+/* ------------------------------------------------------------------ listas */
+ul.bullets{ font-size: 24px; line-height: 1.45; margin: 0; padding-left: 1.2em; }
+ul.bullets li{ margin: 10px 0; }
+ul.bullets li::marker{ color: var(--accent); }
+ul.bullets ul{ font-size: 20px; color: var(--muted); margin-top: 8px; }
+
+ul.check, ul.x, ul.arrow{ list-style: none; padding: 0; margin: 0; font-size: 22px; line-height: 1.4; }
+ul.check li, ul.x li, ul.arrow li{ position: relative; padding-left: 36px; margin: 12px 0; }
+ul.check li::before{ content: "✓"; position: absolute; left: 0; color: var(--good); font-weight: 800; }
+ul.x li::before{ content: "✗"; position: absolute; left: 0; color: var(--bad); font-weight: 800; }
+ul.arrow li::before{ content: "→"; position: absolute; left: 0; color: var(--accent); font-weight: 800; }
+
+/* --------------------------------------------------------------- columnas */
+.cols{ display: grid; grid-template-columns: 1fr 1fr; gap: 36px; flex: 1; min-height: 0; align-content: start; }
+.cols.cols-3{ grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+.cols > *{ min-width: 0; }
+
+/* ---------------------------------------------------------------- tarjetas */
+.card{
+  background: var(--bg); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 22px 24px;
+}
+.card h3{ margin: 0 0 10px; font-size: 22px; color: var(--accent); }
+.card p{ margin: 0; font-size: 18px; line-height: 1.45; color: var(--muted); }
+.card--soft{ background: var(--soft); border-color: transparent; }
+.card--good{ border-top: 5px solid var(--good); }
+.card--good h3{ color: var(--good); }
+.card--bad{ border-top: 5px solid var(--bad); }
+.card--bad h3{ color: var(--bad); }
+
+.tag, .chip{
+  display: inline-block; background: var(--soft); border: 1px solid var(--line);
+  color: var(--muted); border-radius: 999px; padding: 5px 14px;
+  font-size: 15px; font-weight: 600;
+}
+kbd{
+  background: var(--ink); color: #fff; border-radius: 6px;
+  padding: 3px 11px; font-family: var(--font-mono); font-size: .82em;
+}
+
+/* ----------------------------------------------------------------- figuras */
+.figure{
+  background: var(--soft); border: 1.5px dashed var(--line);
+  border-radius: var(--radius); display: grid; place-items: center;
+  color: var(--muted); font-size: 17px; text-align: center;
+  min-height: 300px; padding: 18px;
+}
+.figure img{ max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+figure{ margin: 0; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+figcaption{ font-size: 15px; color: var(--muted); text-align: center; }
+
+.media{ display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; flex: 1; align-items: center; min-height: 0; }
+.media.media-left{ grid-template-columns: .95fr 1.05fr; }
+.media.media-left > .txt{ order: 2; }
+/* imágenes verticales en layout media: tope de alto para no desbordar la lámina */
+.media .figure img{ max-height: 430px; width: auto; }
+
+/* ------------------------------------------------------------------- código */
+pre.code{
+  margin: 0; flex: 1; overflow: auto;
+  background: var(--code-bg); color: var(--code-ink);
+  border-radius: 12px; padding: 22px 26px;
+  font-family: var(--font-mono); font-size: 18px; line-height: 1.55;
+}
+code.ic{
+  background: var(--soft); border: 1px solid var(--line); border-radius: 6px;
+  padding: 1px 8px; font-family: var(--font-mono); font-size: .85em; color: var(--accent);
+}
+
+/* ------------------------------------------------------------------- tablas */
+table.tbl{ width: 100%; border-collapse: collapse; font-size: 20px; }
+table.tbl th{
+  background: var(--accent); color: #fff; text-align: left;
+  padding: 12px 16px; font-size: 18px;
+}
+table.tbl td{ padding: 12px 16px; border-bottom: 1px solid var(--line); }
+table.tbl tr:nth-child(even) td{ background: var(--soft); }
+
+/* --------------------------------------------------------------- fragments */
+.fragment{ opacity: 0; transform: translateY(10px); transition: opacity .25s, transform .25s; }
+.fragment.is-in{ opacity: 1; transform: none; }
+aside.notes{ display: none; }
+
+/* ============================================================ L A Y O U T S */
+
+/* 1 · Portada */
+.slide--title{ justify-content: center; }
+.slide--title::before{
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 16px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+}
+.slide--title h1{ font-size: 56px; line-height: 1.08; margin: 16px 0 12px; letter-spacing: -.015em; max-width: 1000px; }
+.slide--title .subtitle{ font-size: 26px; color: var(--muted); max-width: 940px; line-height: 1.35; margin: 0; }
+.slide--title .meta{ margin-top: 54px; display: flex; gap: 52px; font-size: 17px; }
+.slide--title .meta b{
+  display: block; color: var(--accent); text-transform: uppercase;
+  font-size: 12.5px; letter-spacing: .12em; margin-bottom: 6px;
+}
+.logo-slot{
+  position: absolute; top: 44px; right: 56px; width: 116px; height: 116px;
+  border: 1.5px dashed var(--line); border-radius: 12px;
+  display: grid; place-items: center; color: var(--muted); font-size: 13px;
+}
+
+/* 2 · Separador de sección */
+.slide--section{
+  justify-content: center; color: #fff;
+  background: linear-gradient(135deg, var(--accent), #045e77);
+}
+.slide--section .kicker{ color: var(--accent-2); }
+.slide--section .num{ font-size: 150px; font-weight: 800; line-height: .95; opacity: .22; }
+.slide--section h2{ font-size: 52px; margin: 10px 0 0; letter-spacing: -.01em; }
+.slide--section p{ font-size: 22px; opacity: .8; max-width: 900px; }
+
+/* 3 · Agenda */
+ol.agenda{ list-style: none; padding: 0; margin: 0; counter-reset: item; font-size: 25px; }
+ol.agenda li{
+  counter-increment: item; display: flex; gap: 20px; align-items: baseline;
+  padding: 15px 4px; border-bottom: 1px solid var(--line);
+}
+ol.agenda li::before{
+  content: counter(item, decimal-leading-zero);
+  color: var(--accent); font-weight: 800; font-size: 19px;
+}
+
+/* 4 · Cita */
+.slide--quote{ justify-content: center; }
+.slide--quote blockquote{ font-size: 38px; line-height: 1.35; font-weight: 550; margin: 0; max-width: 1020px; }
+.slide--quote blockquote::before{
+  content: "\201C"; display: block; font-size: 110px; line-height: .35;
+  color: var(--accent); margin-bottom: 22px; font-family: Georgia, serif;
+}
+.slide--quote .attrib{ margin-top: 28px; color: var(--muted); font-size: 19px; }
+
+/* 5 · KPIs / estadísticas */
+.kpis{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.kpis.kpis-3{ grid-template-columns: repeat(3, 1fr); }
+.kpi{ background: var(--soft); border-radius: var(--radius); padding: 26px 20px; text-align: center; }
+.kpi b{ display: block; font-size: 52px; color: var(--accent); letter-spacing: -.02em; }
+.kpi span{ font-size: 17px; color: var(--muted); }
+
+/* 6 · Comparación VS */
+.vs{ display: grid; grid-template-columns: 1fr auto 1fr; gap: 22px; flex: 1; align-items: stretch; min-height: 0; }
+.vs__badge{
+  align-self: center; width: 64px; height: 64px; border-radius: 50%;
+  background: var(--accent-2); color: var(--ink);
+  display: grid; place-items: center; font-weight: 800; font-size: 20px;
+}
+
+/* 7 · Línea de tiempo */
+.timeline{ display: flex; gap: 28px; margin-top: 74px; flex: 1; align-content: flex-start; }
+.tl-item{ flex: 1; position: relative; padding-top: 32px; }
+.tl-item::before{
+  content: ""; position: absolute; top: 0; left: 0; width: 16px; height: 16px;
+  border-radius: 50%; background: var(--accent); border: 3px solid var(--soft);
+}
+.tl-item::after{
+  content: ""; position: absolute; top: 8px; left: 20px; right: -30px; height: 2px;
+  background: var(--line);
+}
+.tl-item:last-child::after{ display: none; }
+.tl-year{ font-size: 21px; font-weight: 800; color: var(--accent); }
+.tl-item p{ font-size: 17px; color: var(--muted); margin: 8px 0 0; line-height: 1.4; }
+
+/* 8 · Imagen a pantalla completa */
+.slide--image-full{ padding: 0; }
+.slide--image-full .bg{
+  position: absolute; inset: 0; background-size: cover; background-position: center;
+  background: linear-gradient(135deg, #03414f, #008cba 55%, #e99002 130%);
+}
+.slide--image-full .scrim{
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 35%, rgba(9,15,23,.9));
+}
+.slide--image-full .caption{ position: absolute; left: var(--pad); right: var(--pad); bottom: 46px; color: #fff; }
+.slide--image-full .caption h2{ font-size: 40px; margin: 0 0 8px; }
+.slide--image-full .caption p{ font-size: 20px; margin: 0; opacity: .85; }
+
+/* 9 · Cierre */
+.slide--closing{
+  justify-content: center; color: #fff;
+  background: linear-gradient(135deg, var(--accent), #045e77);
+}
+.slide--closing h2{ font-size: 66px; margin: 0 0 10px; letter-spacing: -.015em; }
+.slide--closing .sub{ font-size: 26px; opacity: .85; margin: 0 0 40px; }
+.slide--closing .row{ display: flex; gap: 14px; flex-wrap: wrap; }
+.slide--closing .chip{ background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.25); color: #fff; font-size: 17px; }
+
+/* --------------------------------------------------------------- HUD (UI) */
+.hud__bar{ position: fixed; top: 0; left: 0; height: 4px; background: var(--accent); width: 0; z-index: 30; transition: width .2s; }
+.hud__foot, .hud__count{
+  position: fixed; bottom: 12px; z-index: 30;
+  color: #fff; opacity: .55; font-size: 13px; letter-spacing: .04em;
+}
+.hud__foot{ left: 18px; }
+.hud__count{ right: 18px; font-variant-numeric: tabular-nums; }
+
+.notes-panel{
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  background: rgba(13,18,25,.96); color: #e5e7eb;
+  padding: 16px 24px; font-size: 16px; line-height: 1.5;
+  border-top: 2px solid var(--accent);
+  transform: translateY(102%); transition: transform .2s;
+  max-height: 34vh; overflow: auto;
+}
+body.show-notes .notes-panel{ transform: none; }
+
+/* ------------------------------------------------------------- vista índice */
+body.overview{ display: block; overflow: auto; }
+body.overview #deck{
+  display: grid; grid-template-columns: repeat(4, auto);
+  gap: 18px; padding: 26px; justify-content: center;
+}
+body.overview .slide{ display: flex !important; cursor: pointer; box-shadow: 0 4px 18px rgba(0,0,0,.4); }
+body.overview .slide.is-active{ outline: 3px solid var(--accent-2); }
+body.overview .fragment{ opacity: 1 !important; transform: none !important; }
+
+/* Vista de impresión en pantalla (?print) */
+body.print-view{ display: block; overflow: auto; background: #666; }
+body.print-view .slide{ display: flex !important; zoom: 1 !important; box-shadow: none; margin: 10px auto; }
+body.print-view .fragment{ opacity: 1 !important; transform: none !important; }
+body.print-view .hud, body.print-view .notes-panel{ display: none !important; }
+
+/* --------------------------------------------------------------- impresión */
+@page{ size: 1280px 720px; margin: 0; }
+@media print{
+  html, body{ background: #fff !important; }
+  body{ display: block; overflow: visible; }
+  #deck{ display: block !important; }
+  .slide{
+    display: flex !important; zoom: 1 !important;
+    box-shadow: none; margin: 0;
+    page-break-after: always; break-after: page;
+  }
+  .slide:last-child{ page-break-after: auto; break-after: auto; }
+  .hud, .notes-panel{ display: none !important; }
+  .fragment{ opacity: 1 !important; transform: none !important; }
+  *{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body data-footer="Título corto de la presentación">
+
+<main id="deck">
+
+  <!-- 1 · PORTADA -->
+  <section class="slide slide--title">
+    <div class="logo-slot">LOGO</div>
+    <p class="kicker">Universidad · Facultad · Escuela</p>
+    <h1>Título de la Presentación del Trabajo</h1>
+    <p class="subtitle">Subtítulo descriptivo que resume en una línea el aporte central del trabajo.</p>
+    <div class="meta">
+      <div><b>Autor</b>Nombre Apellido</div>
+      <div><b>Tutor</b>Prof. Nombre Apellido</div>
+      <div><b>Fecha</b>Mes AAAA</div>
+    </div>
+    <aside class="notes">Saludar, presentarse, agradecer al jurado. 30 segundos máximo.</aside>
+  </section>
+
+  <!-- 2 · GUÍA RÁPIDA (borrar en la versión final) -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Guía rápida</p>
+      <h2>Controles del visor</h2>
+    </div>
+    <div class="slide__body">
+      <ul class="bullets">
+        <li><kbd>→</kbd> <kbd>Espacio</kbd> avanzar · <kbd>←</kbd> retroceder · <kbd>Inicio</kbd>/<kbd>Fin</kbd> saltar</li>
+        <li><kbd>O</kbd> vista índice (todas las láminas) · <kbd>Esc</kbd> salir del índice</li>
+        <li><kbd>N</kbd> mostrar/ocultar notas del expositor</li>
+        <li><kbd>F</kbd> pantalla completa · <kbd>Ctrl</kbd>+<kbd>P</kbd> exportar a PDF</li>
+        <li class="fragment">Los elementos con <span class="tag">.fragment</span> aparecen de a uno (como este).</li>
+      </ul>
+      <p class="muted small">Esta lámina es de ayuda: elimínala en la versión final. Ancla directa: <code class="ic">#/5</code> en la URL.</p>
+    </div>
+  </section>
+
+  <!-- 3 · AGENDA -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Agenda</p>
+      <h2>Contenido de la presentación</h2>
+    </div>
+    <div class="slide__body">
+      <ol class="agenda">
+        <li>Contexto y planteamiento del problema</li>
+        <li>Objetivos y alcance</li>
+        <li>Marco conceptual y metodología</li>
+        <li>Solución propuesta y resultados</li>
+        <li>Conclusiones y trabajo futuro</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 4 · SEPARADOR DE SECCIÓN -->
+  <section class="slide slide--section">
+    <p class="kicker">Sección</p>
+    <div class="num">01</div>
+    <h2>Contexto y problema</h2>
+    <p>Frase opcional que adelanta la idea central de la sección.</p>
+    <aside class="notes">Usar los separadores para respirar y cambiar de ritmo.</aside>
+  </section>
+
+  <!-- 5 · CONTENIDO + FRAGMENTS -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Layout: contenido</p>
+      <h2>Bullets con revelado progresivo</h2>
+    </div>
+    <div class="slide__body">
+      <ul class="bullets">
+        <li class="fragment">Una idea por lámina: máximo 5–6 líneas de texto.</li>
+        <li class="fragment">Frases cortas; el detalle lo da el expositor, no la lámina.</li>
+        <li class="fragment">Datos clave en <span class="accent"><b>negrita y color</b></span> para anclar la mirada.
+          <ul>
+            <li>Sub-bullet de apoyo, más pequeño y en gris.</li>
+          </ul>
+        </li>
+        <li class="fragment">Todo lo que se muestra debe mencionarse al exponer.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 6 · DOS COLUMNAS -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Layout: dos columnas</p>
+      <h2>Texto a la izquierda, apoyo a la derecha</h2>
+    </div>
+    <div class="slide__body">
+      <div class="cols">
+        <div>
+          <p class="lead">Columna principal con la narrativa.</p>
+          <ul class="bullets" style="font-size:21px; margin-top:14px">
+            <li>Argumento uno, breve.</li>
+            <li>Argumento dos, breve.</li>
+            <li>Argumento tres, breve.</li>
+          </ul>
+        </div>
+        <div class="card card--soft">
+          <h3>Dato destacado</h3>
+          <p>Tarjeta de apoyo para cifras, definiciones o recordatorios que refuercen la columna principal.</p>
+          <p style="margin-top:14px"><span class="tag">etiqueta</span> <span class="tag">otra</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · TRES TARJETAS -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Layout: tarjetas</p>
+      <h2>Tres conceptos en paralelo</h2>
+    </div>
+    <div class="slide__body">
+      <div class="cols cols-3">
+        <div class="card">
+          <h3>Concepto A</h3>
+          <p>Definición en dos líneas. Ideal para pilares, principios o fases.</p>
+        </div>
+        <div class="card">
+          <h3>Concepto B</h3>
+          <p>Definición en dos líneas. Mantener la misma longitud en cada tarjeta.</p>
+        </div>
+        <div class="card">
+          <h3>Concepto C</h3>
+          <p>Definición en dos líneas. La simetría visual comunica orden.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · TEXTO + FIGURA (derecha) -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Layout: media</p>
+      <h2>Explicación con figura a la derecha</h2>
+    </div>
+    <div class="slide__body">
+      <div class="media">
+        <div class="txt">
+          <ul class="check">
+            <li>Listas con <b>✓</b> para logros o ventajas.</li>
+            <li>Usa <code class="ic">ul.x</code> para limitaciones.</li>
+            <li>La figura se referencia al hablar: “como se aprecia…”.</li>
+          </ul>
+        </div>
+        <figure>
+          <div class="figure" style="min-height:360px">FIGURA<br><span class="small">reemplazar por &lt;img src="…"&gt;</span></div>
+          <figcaption>Fig. 1 · Leyenda descriptiva de la figura.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 · TEXTO + FIGURA (izquierda) -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Layout: media (invertido)</p>
+      <h2>Figura a la izquierda, texto a la derecha</h2>
+    </div>
+    <div class="slide__body">
+      <div class="media media-left">
+        <div class="txt">
+          <ul class="arrow">
+            <li>Alternar el lado de la figura da dinamismo.</li>
+            <li>Mantener la alineación con la lámina anterior.</li>
+          </ul>
+        </div>
+        <figure>
+          <div class="figure" style="min-height:360px">FIGURA</div>
+          <figcaption>Fig. 2 · Otra leyenda.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 · IMAGEN FULL-BLEED -->
+  <section class="slide slide--image-full">
+    <div class="bg"><!-- reemplazar por inline style="background-image:url('foto.jpg')" --></div>
+    <div class="scrim"></div>
+    <div class="caption">
+      <h2>Imagen de impacto</h2>
+      <p>Una sola frase. Ideal para abrir o cerrar un bloque emocional.</p>
+    </div>
+  </section>
+
+  <!-- 11 · CÓDIGO -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Layout: código</p>
+      <h2>Fragmento de código o configuración</h2>
+    </div>
+    <div class="slide__body">
+<pre class="code"><code>services:
+  api:
+    image: registry.example.com/api:1.4.2
+    replicas: 3
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s</code></pre>
+      <p class="muted small">Mostrar solo lo esencial: 8–12 líneas con fuente grande.</p>
+    </div>
+  </section>
+
+  <!-- 12 · TABLA -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Layout: tabla</p>
+      <h2>Comparativa de alternativas</h2>
+    </div>
+    <div class="slide__body">
+      <table class="tbl">
+        <tr><th>Criterio</th><th>Opción A</th><th>Opción B</th><th>Opción C</th></tr>
+        <tr><td>Madurez</td><td>Alta</td><td>Media</td><td>Alta</td></tr>
+        <tr><td>Curva de aprendizaje</td><td>Baja</td><td>Alta</td><td>Media</td></tr>
+        <tr><td>Ecosistema</td><td>Amplio</td><td>Medio</td><td>Amplio</td></tr>
+        <tr><td><b>Decisión</b></td><td>—</td><td>—</td><td><b class="accent">✔ Seleccionada</b></td></tr>
+      </table>
+      <p class="muted small">Resaltar la fila/columna de la decisión con el color de acento.</p>
+    </div>
+  </section>
+
+  <!-- 13 · CITA -->
+  <section class="slide slide--quote">
+    <blockquote>
+      Las citas textuales del marco teórico tienen más fuerza solas, en fuente grande, que perdidas entre bullets.
+    </blockquote>
+    <p class="attrib">— Apellido, N. (AAAA). <i>Título de la obra</i>.</p>
+  </section>
+
+  <!-- 14 · KPIs -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Layout: métricas</p>
+      <h2>Resultados en cifras</h2>
+    </div>
+    <div class="slide__body">
+      <div class="kpis">
+        <div class="kpi"><b>87%</b><span>Indicador principal</span></div>
+        <div class="kpi"><b>3.2×</b><span>Mejora obtenida</span></div>
+        <div class="kpi"><b>120</b><span>Casos de prueba</span></div>
+        <div class="kpi"><b>99.9%</b><span>Disponibilidad</span></div>
+      </div>
+      <p class="lead" style="font-size:21px">Una frase que interprete las cifras: qué significan para el problema planteado.</p>
+    </div>
+  </section>
+
+  <!-- 15 · COMPARACIÓN VS -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Layout: comparación</p>
+      <h2>Antes y después del cambio</h2>
+    </div>
+    <div class="slide__body">
+      <div class="vs">
+        <div class="card card--bad">
+          <h3>Situación inicial</h3>
+          <ul class="x" style="font-size:19px">
+            <li>Debilidad uno del estado previo.</li>
+            <li>Debilidad dos del estado previo.</li>
+            <li>Debilidad tres del estado previo.</li>
+          </ul>
+        </div>
+        <div class="vs__badge">VS</div>
+        <div class="card card--good">
+          <h3>Situación propuesta</h3>
+          <ul class="check" style="font-size:19px">
+            <li>Fortaleza uno de la propuesta.</li>
+            <li>Fortaleza dos de la propuesta.</li>
+            <li>Fortaleza tres de la propuesta.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 16 · LÍNEA DE TIEMPO -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Layout: timeline</p>
+      <h2>Evolución histórica</h2>
+    </div>
+    <div class="slide__body">
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">2013</div>
+          <p>Hito fundacional del sistema o del área de estudio.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2016</div>
+          <p>Primera gran evolución tecnológica.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2020</div>
+          <p>Modernización parcial y nuevos requerimientos.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2024</div>
+          <p>Estado actual y motivación de este trabajo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 17 · DIAGRAMA CENTRADO -->
+  <section class="slide">
+    <div class="slide__head">
+      <p class="kicker">Layout: diagrama</p>
+      <h2>Arquitectura / modelo propuesto</h2>
+    </div>
+    <div class="slide__body">
+      <figure style="flex:1">
+        <div class="figure" style="height:100%; min-height:420px">DIAGRAMA PRINCIPAL<br><span class="small">exportar desde draw.io / Excalidraw como PNG o SVG</span></div>
+        <figcaption>Fig. 3 · Vista general de la solución.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 18 · CIERRE -->
+  <section class="slide slide--closing">
+    <h2>¡Gracias!</h2>
+    <p class="sub">Preguntas y comentarios del jurado</p>
+    <div class="row">
+      <span class="chip">Nombre Apellido</span>
+      <span class="chip">correo@ucv.edu.ve</span>
+      <span class="chip">Repositorio del proyecto</span>
+    </div>
+    <aside class="notes">Cerrar con una frase que retome el aporte central del trabajo.</aside>
+  </section>
+
+</main>
+
+<div class="hud" aria-hidden="true">
+  <div class="hud__bar" id="hudBar"></div>
+  <div class="hud__foot" id="hudFoot"></div>
+  <div class="hud__count" id="hudCount"></div>
+</div>
+<div class="notes-panel" id="notesPanel"></div>
+
+<script>
+/* ==========================================================================
+   Motor del visor: navegación, escala, fragments, índice, notas, impresión
+   ========================================================================== */
+(function () {
+  "use strict";
+  var body   = document.body;
+  var deck   = document.getElementById("deck");
+  var slides = Array.prototype.slice.call(deck.querySelectorAll(".slide"));
+  var bar    = document.getElementById("hudBar");
+  var count  = document.getElementById("hudCount");
+  var foot   = document.getElementById("hudFoot");
+  var notesP = document.getElementById("notesPanel");
+  var OV_COLS = 4;
+
+  var i = 0;    // índice de lámina actual
+  var f = 0;    // fragments revelados en la lámina actual
+
+  foot.textContent = body.getAttribute("data-footer") || "";
+
+  function frags(slide) {
+    return Array.prototype.slice.call(slide.querySelectorAll(".fragment"));
+  }
+
+  function fit() {
+    var z;
+    if (body.classList.contains("overview")) {
+      var cellW = (window.innerWidth - 52 - (OV_COLS - 1) * 18) / OV_COLS;
+      z = cellW / 1280;
+    } else {
+      z = Math.min(window.innerWidth / 1280, window.innerHeight / 720) * 0.96;
+    }
+    slides.forEach(function (s) { s.style.zoom = z; });
+  }
+
+  function updateHud() {
+    bar.style.width = ((i + 1) / slides.length * 100) + "%";
+    count.textContent = (i + 1) + " / " + slides.length;
+    var n = slides[i].querySelector("aside.notes");
+    notesP.innerHTML = n
+      ? "<b>Notas " + (i + 1) + ":</b> " + n.innerHTML
+      : "<span style='opacity:.5'>Sin notas en esta lámina</span>";
+  }
+
+  function show(n, revealAll) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle("is-active", k === i); });
+    var fr = frags(slides[i]);
+    fr.forEach(function (el) { el.classList.remove("is-in"); });
+    f = 0;
+    if (revealAll) {
+      fr.forEach(function (el) { el.classList.add("is-in"); });
+      f = fr.length;
+    }
+    updateHud();
+  }
+
+  function next() {
+    var fr = frags(slides[i]);
+    if (f < fr.length) { fr[f].classList.add("is-in"); f++; updateHud(); }
+    else if (i < slides.length - 1) show(i + 1);
+  }
+
+  function prev() {
+    if (f > 0) {
+      f--;
+      frags(slides[i])[f].classList.remove("is-in");
+      updateHud();
+    } else if (i > 0) show(i - 1, true);
+  }
+
+  function toggleOverview(on) {
+    var want = (typeof on === "boolean") ? on : !body.classList.contains("overview");
+    body.classList.toggle("overview", want);
+    fit();
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    switch (e.key) {
+      case "ArrowRight": case " ": case "PageDown":
+        e.preventDefault();
+        if (body.classList.contains("overview")) toggleOverview(false);
+        next(); break;
+      case "ArrowLeft": case "PageUp":
+        e.preventDefault();
+        if (body.classList.contains("overview")) toggleOverview(false);
+        prev(); break;
+      case "Home": e.preventDefault(); show(0); break;
+      case "End":  e.preventDefault(); show(slides.length - 1, true); break;
+      case "o": case "O": toggleOverview(); break;
+      case "Escape": toggleOverview(false); body.classList.remove("show-notes"); break;
+      case "n": case "N":
+        body.classList.toggle("show-notes"); updateHud(); break;
+      case "f": case "F":
+        if (document.fullscreenElement) document.exitFullscreen();
+        else document.documentElement.requestFullscreen();
+        break;
+    }
+  });
+
+  deck.addEventListener("click", function (e) {
+    if (!body.classList.contains("overview")) return;
+    var s = e.target.closest(".slide");
+    if (!s) return;
+    toggleOverview(false);
+    show(slides.indexOf(s), true);
+  });
+
+  window.addEventListener("resize", fit);
+  window.addEventListener("beforeprint", function () {
+    slides.forEach(function (s) { s.style.zoom = ""; });
+  });
+  window.addEventListener("afterprint", fit);
+
+  // Estado inicial: #/N en la URL (ancla manual), o 1; la URL permanece limpia
+  var m = (location.hash || "").match(/^#\/(\d+)$/);
+  show(m ? parseInt(m[1], 10) - 1 : 0);
+  if (m && history.replaceState) history.replaceState(null, "", location.pathname + location.search);
+  fit();
+
+  // ?print → vista apilada para revisar todas las láminas en pantalla
+  if (new URLSearchParams(location.search).has("print")) {
+    body.classList.add("print-view");
+  }
+})();
+</script>
+</body>
+</html>
