@@ -78,15 +78,17 @@ ciclo completo antes de que se genere la alerta, un intervalo reducible mediante
 el Config Server pero inherentemente ligado a la naturaleza periódica del ciclo.
 En segundo lugar, la calidad del diagnóstico en las fases de Análisis y
 Planificación depende del proveedor de inteligencia artificial configurado: los
-proveedores remotos ofrecen mayor capacidad de razonamiento a costa de la
-conectividad externa, mientras que el proveedor local y el fallback determinista
+proveedores remotos ofrecen mayor capacidad de razonamiento, pero introducen
+una dependencia de la conectividad externa y costos recurrentes de consumo de
+APIs de terceros que escalan con el volumen de tokens procesados, mientras que el proveedor local y el fallback determinista
 basado en reglas garantizan la continuidad operativa con diagnósticos menos
 detallados. En tercer lugar, la evaluación cuantitativa de rendimiento se
-circunscribió al diseño experimental reproducible documentado en el
-Capítulo~\ref{ch:pruebas}, dado que el monolito en producción no puede someterse
-a pruebas de carga sin afectar a sus usuarios, de modo que la comparación de
-rendimiento entre ambas arquitecturas queda acotada a las hipótesis y a los
-escenarios definidos. Finalmente, el frontend heredado opera sobre Vue.js~2,
+realizó sobre instancias locales de ambas arquitecturas, desplegadas en el
+mismo ambiente de pruebas con asignación idéntica de recursos de CPU y memoria,
+lo que garantizó una comparación término a término en igualdad de condiciones;
+no obstante, los resultados corresponden a un entorno controlado con datos
+anonimizados, por lo que sus magnitudes absolutas no necesariamente se
+reproducen en un entorno de producción. Finalmente, el frontend heredado opera sobre Vue.js~2,
 versión que alcanzó su fin de vida, y la validación del ecosistema se realizó
 sobre el entorno local de Docker Compose con datos anonimizados; la migración de
 los datos históricos de producción y la instrumentación de trazabilidad

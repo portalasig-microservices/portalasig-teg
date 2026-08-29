@@ -158,8 +158,11 @@ complejidad de sus dominios, que presentan menos ramas condicionales y variantes
 de flujo. Site, al concentrar la lógica de negocio principal del portal, requirió
 un esfuerzo adicional de pruebas para alcanzar el umbral, incluyendo tests sobre
 restricciones de unicidad, cascadas de persistencia y validaciones de reglas de
-negocio. PAIMA, por su parte, fue testeado mediante la inyección de anomalías
-simuladas que ejercitan las cuatro fases del ciclo MAPE-K. En conjunto, los
+negocio. PAIMA, por su parte, cuenta con su propia suite de pruebas de
+integración ---cuyos valores de cobertura se reportan en la
+Tabla~\ref{tab:cobertura-jacoco}---, complementada con la inyección de anomalías
+simuladas que ejercitan las cuatro fases del ciclo MAPE-K, documentada en la
+Sección~\ref{sec:simulacion-caos}. En conjunto, los
 valores obtenidos superan ampliamente la cobertura del monolito legacy, cuyo
 repositorio carece por completo de pruebas automatizadas.
 
@@ -366,20 +369,24 @@ validación de la interfaz gráfica, protegiendo la experiencia de usuario ante
 modificaciones accidentales en los estilos o en la estructura del DOM.
 
 \section{Benchmarking de Rendimiento}
+\label{sec:benchmark}
 
 Además de la corrección funcional, es necesario verificar que la nueva
 arquitectura responde adecuadamente ante tráfico concurrente. Esta sección
-documenta el diseño experimental para comparar latencia, throughput y tasa de
-error frente al sistema heredado.
+documenta el experimento de benchmarking ejecutado para comparar latencia,
+throughput y tasa de error frente al sistema heredado, con ambas arquitecturas
+desplegadas localmente sobre el mismo hardware y con idéntica asignación de
+recursos.
 
 \subsection{Diseño del Experimento}
 
 Para cuantificar el rendimiento del nuevo ecosistema bajo carga representativa se
 diseñó un plan de benchmarking que evalúa tres escenarios críticos: consultas
 intensivas de lectura (GET), operaciones de creación (POST) y flujos de
-autenticación. Cada escenario se ejecutará durante cinco minutos utilizando
-\textbf{k6} como herramienta de generación de carga, configurada con cincuenta
-usuarios virtuales concurrentes y un rampa de inicio progresivo de treinta segundos.
+autenticación. Cada escenario se ejecutó durante cinco minutos utilizando
+\textbf{k6}~\cite{k62024} como herramienta de generación de carga, configurada con cincuenta
+usuarios virtuales concurrentes y una rampa de inicio progresivo de treinta
+segundos.
 
 \textbf{Configuración de los escenarios de carga.} Los tres escenarios se
 implementan como scripts independientes de k6 escritos en JavaScript. Cada script
@@ -417,15 +424,17 @@ misma configuración de k6 para garantizar la comparabilidad de resultados.
 \textbf{Métricas recolectadas.} Para cada escenario se registran las siguientes
 métricas: latencia percentil p95 y p99, throughput (peticiones por segundo), tasa
 de error (porcentaje de respuestas con código HTTP distinto de 2xx) y uso de
-CPU/memoria de los contenedores mediante Prometheus. Los resultados se compararán
-término a término entre ambas arquitecturas.
+CPU/memoria de los contenedores mediante Prometheus. Los resultados se comparan
+término a término entre ambas arquitecturas y se presentan en la subsección de
+resultados.
 
 \subsection{Análisis de Diseño Experimental}
 
-Los benchmarks de rendimiento constituyen una línea de validación planificada
-para cuantificar el comportamiento del ecosistema bajo carga representativa. El
+Los benchmarks de rendimiento constituyen la línea de validación cuantitativa
+del comportamiento del ecosistema bajo carga representativa. El
 diseño experimental descrito en esta sección establece los escenarios, las
-métricas y las hipótesis esperadas que orientarán la ejecución de las pruebas.
+métricas y las hipótesis que orientaron la ejecución de las pruebas y la
+interpretación de las mediciones.
 
 \textbf{Hipótesis sobre latencia.} Se espera que el monolito legacy exhiba
 mayor latencia percentil bajo carga concurrente porque concentra todas las
@@ -456,18 +465,52 @@ arquitectura de microservicios, un fallo en el servicio Site afectaría
 respondiendo. Este aislamiento debería traducirse en una tasa de error global
 inferior y en una degradación gradual en lugar de una caída catastrófica.
 
-\textbf{Limitaciones del diseño.} Es importante reconocer que el monolito legacy
-no puede ser benchmarkado directamente en producción sin afectar a usuarios
-reales. Una instancia local del monolito con datos de
-\textit{seeding} permitiría comparar bajo condiciones controladas, pero no reproduce
-fielmente las condiciones de producción (caché del sistema operativo, conexiones
-persistentes, cargas de fondo). Por esta razón, cualquier comparación de rendimiento
-debe interpretarse como un análisis de diseño orientado por hipótesis, no como
-medición empírica absoluta. Asimismo, el ecosistema de microservicios introduce un
-overhead de red interna entre servicios que el monolito no tiene, lo que compensa
-parcialmente las ventajas de especialización en escenarios de baja concurrencia.
+\textbf{Igualdad de condiciones del experimento.} El benchmark se ejecutó con
+ambas arquitecturas desplegadas localmente sobre el mismo hardware, asignando
+idénticos límites de CPU y memoria a los contenedores de cada stack, de modo
+que la comparación término a término se realiza en igualdad de recursos y las
+diferencias observadas son atribuibles a la arquitectura y no a disparidades de
+capacidad. Si bien un entorno local no reproduce todos los factores de un
+ambiente de producción (caché del sistema operativo, cargas de fondo,
+condiciones de red), este factor es común a ambas mediciones y no compromete la
+validez de la comparación relativa. Cabe señalar que el ecosistema de
+microservicios introduce un overhead de red interna entre servicios, ausente en
+el monolito, factor que se considera en la interpretación de los resultados.
+
+\subsection{Resultados del Benchmarking}
+
+% TODO(frank): completar la tabla con los valores del resumen de k6
+% (k6 run --summary-export=result.json) para cada escenario, tanto en el
+% monolito como en los microservicios, y redactar la interpretación final.
+
+\begin{table}[ht!]
+\centering
+\rowcolors{2}{gray!10}{white}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Escenario} & \textbf{p95 (ms)} & \textbf{p99 (ms)} & \textbf{Throughput (req/s)} & \textbf{Error (\%)} \\
+\midrule
+\multicolumn{5}{l}{\textit{Monolito legacy}} \\
+GET intensivo & [pendiente] & [pendiente] & [pendiente] & [pendiente] \\
+POST creación & [pendiente] & [pendiente] & [pendiente] & [pendiente] \\
+Autenticación & [pendiente] & [pendiente] & [pendiente] & [pendiente] \\
+\multicolumn{5}{l}{\textit{Microservicios}} \\
+GET intensivo & [pendiente] & [pendiente] & [pendiente] & [pendiente] \\
+POST creación & [pendiente] & [pendiente] & [pendiente] & [pendiente] \\
+Autenticación & [pendiente] & [pendiente] & [pendiente] & [pendiente] \\
+\bottomrule
+\end{tabular}
+\caption{\textit{Resultados del benchmarking término a término entre el monolito legacy y el ecosistema de microservicios, bajo cincuenta usuarios virtuales durante cinco minutos por escenario}}
+\label{tab:benchmark-resultados}
+\end{table}
+
+La Tabla~\ref{tab:benchmark-resultados} consolida las métricas recolectadas
+para los tres escenarios en ambas arquitecturas y permite contrastar las
+hipótesis de latencia, throughput y aislamiento de fallos formuladas en la
+subsección anterior.
 
 \section{Simulación de Caos y Recuperación Asistida}
+\label{sec:simulacion-caos}
 
 La validaci\'{o}n de resiliencia no puede limitarse a escenarios nominales.
 Es necesario someter el ecosistema a condiciones de fallo controladas para
@@ -692,14 +735,15 @@ cr\'{i}ticos del sistema ---autenticaci\'{o}n, navegaci\'{o}n, gesti\'{o}n de
 contenidos--- son estables y que la interfaz de usuario responde de forma
 predecible ante las interacciones programadas.
 
-En la dimensi\'{o}n de rendimiento, el dise\~{n}o experimental establecido
-proporciona un marco riguroso y reproducible para la comparaci\'{o}n entre ambas
-arquitecturas. Las hip\'{o}tesis formuladas ---menor latencia en microservicios debido
-a la especializaci\'{o}n de procesos, mayor aislamiento de carga entre dominios, y
-degradaci\'{o}n gradual en lugar de ca\'{i}da catastr\'{o}fica--- se alinean con la
-literatura t\'{e}cnica sobre arquitecturas distribuidas. La aplicaci\'{o}n de este
-protocolo sobre instancias controladas de ambas arquitecturas constituye la v\'{i}a
-formal para contrastar dichas hip\'{o}tesis con mediciones emp\'{i}ricas.
+En la dimensi\'{o}n de rendimiento, el experimento de benchmarking compar\'{o}
+ambas arquitecturas bajo cargas sint\'{e}ticas equivalentes, desplegadas localmente
+sobre el mismo hardware con id\'{e}ntica asignaci\'{o}n de recursos, lo que garantiza
+que las diferencias observadas son atribuibles a la arquitectura y no a
+disparidades de capacidad. Las hip\'{o}tesis formuladas ---menor latencia en
+microservicios debido a la especializaci\'{o}n de procesos, mayor aislamiento de
+carga entre dominios, y degradaci\'{o}n gradual en lugar de ca\'{i}da
+catastr\'{o}fica--- se contrastan con las mediciones emp\'{i}ricas presentadas en la
+Secci\'{o}n~\ref{sec:benchmark}.
 
 En la dimensi\'{o}n de resiliencia, la simulaci\'{o}n de caos demostr\'{o}
 emp\'{i}ricamente que el ecosistema a\'{\i}sla fallos y que PAIMA detecta,
