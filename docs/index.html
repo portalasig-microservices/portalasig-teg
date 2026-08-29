@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEG — PortalAsig · Br. Frank Ponte Delgado</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background:#f4f6f8; color:#222; min-height:100vh;
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .card {
+    background:#fff; max-width:820px; width:100%;
+    border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,.10);
+    overflow:hidden;
+  }
+  header {
+    background:#008cba; color:#fff; padding:34px 40px 28px;
+  }
+  header .ucv { font-size:.85rem; opacity:.85; letter-spacing:.06em; text-transform:uppercase; }
+  header h1 { font-size:1.55rem; line-height:1.35; font-weight:600; margin:10px 0 6px; }
+  header .tipo { font-size:.95rem; opacity:.9; }
+  main { padding:30px 40px 36px; }
+  .meta { display:flex; flex-wrap:wrap; gap:24px; margin-bottom:22px; }
+  .meta div { font-size:.95rem; }
+  .meta b { display:block; color:#008cba; font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; margin-bottom:2px; }
+  p.resumen { font-size:.98rem; line-height:1.65; color:#444; margin-bottom:28px; }
+  .actions { display:flex; flex-wrap:wrap; gap:14px; }
+  a.btn {
+    display:inline-block; padding:13px 26px; border-radius:6px;
+    text-decoration:none; font-weight:600; font-size:.98rem; transition:filter .15s;
+  }
+  a.btn:hover { filter:brightness(1.12); }
+  a.primary { background:#008cba; color:#fff; }
+  a.warn { background:#e99002; color:#fff; }
+  a.ghost { background:#e7ecef; color:#333; }
+  footer { padding:16px 40px 22px; font-size:.8rem; color:#888; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <header>
+      <div class="ucv">Universidad Central de Venezuela · Facultad de Ciencias</div>
+      <h1>Diseño e implementación de un modelo de mantenimiento asistido por IA para una arquitectura de microservicios en el sistema PortalAsig</h1>
+      <div class="tipo">Trabajo Especial de Grado — Ingeniería de Computación</div>
+    </header>
+    <main>
+      <div class="meta">
+        <div><b>Autor</b>Br. Frank Ángel Ponte Delgado</div>
+        <div><b>Tutor</b>Prof. Walter Hernández</div>
+        <div><b>Año</b>2026</div>
+      </div>
+      <p class="resumen">
+        Migración del monolito legacy de PortalAsig hacia un ecosistema de microservicios
+        (Spring Boot, Docker, OAuth2/JWT) con PAIMA: un servicio de autogestión MAPE-K que
+        delega las fases de análisis y planificación del mantenimiento a un modelo de
+        inteligencia artificial, con validación mediante pruebas de integración, E2E,
+        benchmarking de rendimiento e inyección de anomalías.
+      </p>
+      <div class="actions">
+        <a class="btn primary" href="tesis-portalasig.pdf">📄 Descargar tesis (PDF)</a>
+        <a class="btn warn" href="https://portalasig-microservices.github.io/portalasig-defensa/">🎞️ Presentación de defensa</a>
+        <a class="btn ghost" href="https://github.com/portalasig-microservices/portalasig-teg">⌥ Código fuente</a>
+      </div>
+    </main>
+    <footer>Publicado con GitHub Pages · Repositorio público portalasig-microservices/portalasig-teg</footer>
+  </div>
+</body>
+</html>
