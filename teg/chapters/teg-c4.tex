@@ -574,13 +574,21 @@ cinco veces más CPU por autenticación, un costo que la arquitectura absorbe
 aislándolo en un servicio especializado que puede escalar de forma
 independiente sin afectar los demás dominios.
 
-\textbf{Síntesis.} En conjunto, los resultados respaldan las hipótesis
+\textbf{Síntesis.} En conjunto, los resultados respaldan las hipótesis de
 diseño: la arquitectura de microservicios mejora de forma significativa la
 lectura concurrente, iguala la escritura con mayor robustez ante errores y
 concentra en un servicio aislado el costo ---deliberado--- de la verificación
 segura de credenciales, todo ello sin una sola respuesta errónea atribuible a
 fallas de la plataforma en más de 390 mil peticiones ejecutadas contra el
-ecosistema.
+ecosistema. La Figura~\ref{fig:benchmarking-grafana} muestra el panel de
+Grafana durante una de las corridas de carga sobre el servicio Site.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graphics/benchmarking-grafana.png}
+    \caption{\textit{Panel de observabilidad de Grafana durante la ejecución del benchmark sobre el servicio Site: se aprecian el throughput sostenido de aproximadamente 300 peticiones por segundo, la latencia media del endpoint de lectura y la ausencia de respuestas de error (2xx al cien por ciento) bajo cincuenta usuarios virtuales}}
+    \label{fig:benchmarking-grafana}
+\end{figure}
 
 \section{Simulación de Caos y Recuperación Asistida}
 \label{sec:simulacion-caos}
