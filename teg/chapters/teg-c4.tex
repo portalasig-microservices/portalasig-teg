@@ -278,11 +278,14 @@ durante la prueba, acelerando la ejecución y reduciendo la fragilidad del suite
 
 La suite completa de Cypress consta de doce \textit{specs} que agrupan un total de
 cincuenta y dos casos de prueba. La ejecución sobre el entorno Docker Compose
-local tiene una duración promedio de un minuto y dieciséis segundos, con una tasa
-de éxito del cien por ciento en las últimas veinte ejecuciones consecutivas. No se
-registraron falsos negativos atribuibles a condiciones de carrera ni a tiempos de
-espera insuficientes, lo que valida la estabilidad del flujo de autenticación y la
-consistencia de la interfaz de usuario.
+local tiene una duración promedio de un minuto y dieciséis segundos. De veinte
+ejecuciones consecutivas registradas, dieciocho finalizaron con el cien por
+ciento de los casos exitosos; las dos restantes presentaron una única falla en la
+utilidad de captura de pantalla del navegador (\textit{timeout} de
+\texttt{cy.screenshot}), sin que fallara ninguna aserción funcional de la
+aplicación. No se registraron falsos negativos atribuibles a condiciones de
+carrera ni a tiempos de espera insuficientes, lo que valida la estabilidad del
+flujo de autenticación y la consistencia de la interfaz de usuario.
 
 \textbf{Evolución de la suite.} La suite de Cypress no se construyó de forma
 estática: creció orgánicamente a medida que se identificaban flujos críticos del
@@ -377,7 +380,8 @@ atraviesan múltiples módulos y microservicios:
 \textbf{Resultados de estabilidad.} La suite de Cypress se ejecutó veinte veces de
 forma consecutiva sobre el entorno Docker Compose completo, incluyendo el contenedor
 \texttt{frontend}. La duración promedio fue de un minuto
-y dieciséis segundos, con una tasa de éxito del cien por ciento. No se registraron
+y dieciséis segundos, con dieciocho ejecuciones completamente exitosas y dos con
+una falla aislada de la utilidad de captura del navegador. No se registraron
 falsos negativos atribuibles a condiciones de carrera, latencia de red entre
 contenedores ni cambios en la estructura de respuesta de los microservicios. Esta
 estabilidad demuestra que la adaptación del frontend ---múltiples instancias Axios,
