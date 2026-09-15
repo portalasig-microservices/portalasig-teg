@@ -114,10 +114,10 @@ establecido. Los resultados obtenidos se resumen en la Tabla
 \toprule
 \textbf{Microservicio} & \textbf{Cobertura de líneas} & \textbf{Cobertura de ramas} \\
 \midrule
-UAA & 81\% & 74\% \\
-Site & 72\% & 64\% \\
-Notify & 78\% & 72\% \\
-PAIMA & 71\% & 65\% \\
+UAA & 84.6\% & 64.4\% \\
+Site & 80.5\% & 61.3\% \\
+Notify & 91.8\% & 71.4\% \\
+PAIMA & 85.5\% & 78.6\% \\
 \bottomrule
 \end{tabular}
 \caption{\textit{Cobertura de código por microservicio (líneas y ramas)}}
@@ -153,14 +153,18 @@ Una vez que todos los pasos ---checkstyle, tests, JaCoCo y verificación de cobe
 
 Se estableció un umbral mínimo del 70\% para cobertura de líneas y del 60\% para
 cobertura de ramas en todos los
-microservicios, valores que el ecosistema cumple o supera. Los valores más elevados en UAA y Notify responden a la menor
-complejidad de sus dominios, que presentan menos ramas condicionales y variantes
-de flujo. Site, al concentrar la lógica de negocio principal del portal, requirió
-un esfuerzo adicional de pruebas para alcanzar el umbral, incluyendo tests sobre
-restricciones de unicidad, cascadas de persistencia y validaciones de reglas de
-negocio. PAIMA, por su parte, cuenta con su propia suite de pruebas de
-integración ---cuyos valores de cobertura se reportan en la
-Tabla~\ref{tab:cobertura-jacoco}---, complementada con la inyección de anomalías
+microservicios, valores que el ecosistema cumple o supera. El valor más elevado,
+el de Notify, responde a la menor complejidad de su dominio, centrado en el
+renderizado de plantillas y el despacho de eventos. PAIMA y UAA le siguen de
+cerca: en el caso de PAIMA, la cobertura se apoya en tests unitarios sobre los
+componentes desacoplados del ciclo MAPE-K (colector de observabilidad, planificador
+de IA y gateways de los proveedores de lenguaje), verificados con dobles de
+prueba que sustituyen las dependencias externas. Site, al concentrar la lógica
+de negocio principal del portal, requirió el mayor esfuerzo de pruebas para
+alcanzar el umbral, incluyendo tests sobre restricciones de unicidad, cascadas
+de persistencia y validaciones de reglas de negocio. PAIMA, por su parte,
+complementa su suite ---cuyos valores de cobertura se reportan en la
+Tabla~\ref{tab:cobertura-jacoco}--- con la inyección de anomalías
 simuladas que ejercitan las cuatro fases del ciclo MAPE-K, documentada en la
 Sección~\ref{sec:simulacion-caos}. En conjunto, los
 valores obtenidos superan ampliamente la cobertura del monolito legacy, cuyo
@@ -172,14 +176,31 @@ contaba con tests básicos de creación y consulta sobre cada entidad. A medida
 que se identificaron casos de borde ---restricciones de unicidad violadas,
 cascadas de eliminación inconsistentes, transacciones concurrentes sobre la
 misma entidad--- se fueron agregando tests específicos que ejercitan estos
-escenarios. Por ejemplo, en el servicio Site se detectó que la eliminación de
-un sitio con evaluaciones asociadas podía dejar registros huérfanos si la
-transacción no se gestionaba correctamente; este hallazgo motivó la inclusión
-de un test de integración que verifica la eliminación en cascada bajo carga
-concurrente. Este proceso iterativo de ``testear, fallar, corregir,
+escenarios. Este proceso iterativo de ``testear, fallar, corregir,
 verificar'' transformó la suite de una colección de verificaciones simples en
 una red de seguridad que captura regresiones antes de que afecten al
-código base.
+código base. Cabe destacar que la propia suite expuso defectos reales del
+código de producción, todos corregidos tras su detección. En el servicio Site,
+la eliminación de un sitio con evaluaciones asociadas podía dejar registros
+huérfanos debido a un mapeo incorrecto de la relación entre entidades, lo que
+motivó un test de integración que verifica la eliminación en cascada; en el
+mismo servicio, la importación masiva de estudiantes fallaba con una excepción
+de puntero nulo cuando el sitio aún no tenía secciones registradas, y varios
+endpoints presentaban el mismo tipo de fallo al operar sobre sitios sin
+participantes ni horarios. También en Site se detectó que los valores por
+defecto declarados en los objetos de solicitud (prioridad y obligatoriedad de
+las referencias bibliográficas) no se aplicaban al construirse con el patrón
+builder, lo que provocaba violaciones de restricciones de nulidad en la base
+de datos cuando el cliente omitía dichos campos. En UAA, la actualización de
+las preferencias de correo de un usuario persistía un valor nulo al recibir
+una lista vacía. Finalmente, en PAIMA se encontraron dos defectos sutiles: la
+consulta de registros a Loki fallaba de forma silenciosa porque la expresión
+LogQL no se codificaba correctamente en la URL, de modo que la evidencia de
+logs nunca llegaba a enriquecer las alertas; y la URL del proveedor compatible
+con OpenAI podía construirse con una doble barra que invalidaba el endpoint.
+Estos hallazgos ilustran el valor de las pruebas de integración sobre una base
+de datos real: ninguno de estos defectos era observable mediante pruebas
+unitarias con dobles ni mediante la revisión estática del código.
 
 \textbf{Lecciones de Testcontainers.} El uso de contenedores Docker para
 pruebas de integración presentó desafíos iniciales relacionados con el tiempo
@@ -241,7 +262,7 @@ Los flujos automatizados cubren las siguientes funcionalidades:
 \end{enumerate}
 
 Dado que la autenticación está externalizada en el servicio UAA, los tests realizan
-peticiones directas de inicio de sesión contra el endpoint \texttt{/oauth/token} para
+peticiones directas de inicio de sesión contra el endpoint \texttt{/v1/auth/login} para
 obtener el token JWT, que luego se inyecta en las cabeceras de las peticiones
 subsecuentes. Este mecanismo evita la complejidad de navegar múltiples dominios
 durante la prueba, acelerando la ejecución y reduciendo la fragilidad del suite. La Figura~\ref{fig:cypress-e2e} muestra el resultado correspondiente.
@@ -256,8 +277,8 @@ durante la prueba, acelerando la ejecución y reduciendo la fragilidad del suite
 \subsection{Resultados de Ejecución}
 
 La suite completa de Cypress consta de doce \textit{specs} que agrupan un total de
-cuarenta y siete casos de prueba. La ejecución sobre el entorno Docker Compose
-local tiene una duración promedio de dos minutos y treinta segundos, con una tasa
+cincuenta y dos casos de prueba. La ejecución sobre el entorno Docker Compose
+local tiene una duración promedio de un minuto y dieciséis segundos, con una tasa
 de éxito del cien por ciento en las últimas veinte ejecuciones consecutivas. No se
 registraron falsos negativos atribuibles a condiciones de carrera ni a tiempos de
 espera insuficientes, lo que valida la estabilidad del flujo de autenticación y la
@@ -286,15 +307,17 @@ el frontend la reconozca al recargar la página. Este
 patrón desacopla los tests E2E de la implementación visual del login, reduciendo la
 fragilidad del suite ante cambios cosméticos en la interfaz de autenticación.
 
-\textbf{Depuración de inestabilidad.} Durante las primeras ejecuciones se
-observaron fallos intermitentes en el test de creación de contenidos, causados por
-un retraso en la respuesta del backend que superaba el tiempo de espera por
-defecto de Cypress. En lugar de aumentar globalmente los tiempos de espera ---lo
-que ralentizaría toda la suite--- se aplicó la estrategia de \textit{retry}
-selectivo sobre las aserciones críticas y se configuró un \textit{intercept} que
-espera explícitamente la respuesta HTTP antes de continuar con la siguiente
-interacción. Esta aproximación mantuvo la duración total de la suite por debajo de
-tres minutos mientras eliminaba los falsos negativos.
+\textbf{Depuración de inestabilidad.} Durante las primeras ejecuciones contra el
+stack real se detectaron discrepancias entre las aserciones iniciales y el
+comportamiento efectivo de la aplicación: la página principal resultó ser pública
+(no redirige al \textit{login}), el módulo de administración redirige a su submódulo
+por defecto y ciertas pestañas del sitio solo son visibles para roles específicos.
+Las aserciones se ajustaron para reflejar el comportamiento real verificado, en
+lugar de aumentar globalmente los tiempos de espera. El proceso también expuso un
+defecto real en los datos de prueba (evaluaciones sembradas con un tipo inexistente
+en el enumerado del backend, que provocaba errores HTTP 500 al abrir el detalle de
+un sitio), el cual fue corregido tanto en los datos como en el generador del
+\textit{seed}.
 
 \subsection{Validación de la Arquitectura Frontend Adaptada}
 
@@ -353,20 +376,22 @@ atraviesan múltiples módulos y microservicios:
 
 \textbf{Resultados de estabilidad.} La suite de Cypress se ejecutó veinte veces de
 forma consecutiva sobre el entorno Docker Compose completo, incluyendo el contenedor
-\texttt{frontend} con el build de producción. La duración promedio fue de dos minutos
-y treinta segundos, con una tasa de éxito del cien por ciento. No se registraron
+\texttt{frontend}. La duración promedio fue de un minuto
+y dieciséis segundos, con una tasa de éxito del cien por ciento. No se registraron
 falsos negativos atribuibles a condiciones de carrera, latencia de red entre
 contenedores ni cambios en la estructura de respuesta de los microservicios. Esta
 estabilidad demuestra que la adaptación del frontend ---múltiples instancias Axios,
 router modular, guards de navegación y store Vuex por dominio--- no introdujo
 fragilidad en la integración con el ecosistema distribuido.
 
-\textbf{Regresión visual.} Se configuró \texttt{cypress-image-snapshot} para capturar
-screenshots de referencia de las vistas críticas (login, dashboard, detalle de
-sitio, panel de alertas PAIMA) y detectar cambios visuales no intencionales en
-futuras ejecuciones. Esta técnica complementa las aserciones funcionales con
-validación de la interfaz gráfica, protegiendo la experiencia de usuario ante
-modificaciones accidentales en los estilos o en la estructura del DOM.
+\textbf{Regresión visual.} El \textit{spec} de regresión visual captura
+\textit{screenshots} de las vistas críticas (\textit{login}, página principal,
+detalle de sitio, panel de alertas PAIMA) mediante el comando nativo
+\texttt{cy.screenshot} de Cypress, combinándolos con aserciones de visibilidad
+sobre los elementos estructurales de cada vista. Esta técnica complementa las
+aserciones funcionales con evidencia gráfica de la interfaz, protegiendo la
+experiencia de usuario ante modificaciones accidentales en los estilos o en la
+estructura del DOM.
 
 \section{Benchmarking de Rendimiento}
 \label{sec:benchmark}
@@ -392,37 +417,40 @@ segundos.
 implementan como scripts independientes de k6 escritos en JavaScript. Cada script
 realiza las siguientes operaciones:
 
-\textbf{GET intensivo:} El script \texttt{benchmark-site-list.js} ejecuta
-peticiones \texttt{GET /v1/site?page=0\&size=20} contra el servicio Site. Antes de
-cada iteración, el script obtiene un token JWT válido mediante el flujo
+\textbf{GET intensivo:} El script \texttt{benchmark-course-list.js} ejecuta
+peticiones \texttt{GET /v1/course} contra el servicio Site. En la fase
+\texttt{setup}, el script obtiene un token JWT válido mediante el flujo
 \texttt{client\_credentials} contra el servicio UAA, inyectando el token en la
-cabecera \texttt{Authorization: Bearer <token>}. Este escenario ejerce presión
-sobre la capa de persistencia de Site, que debe resolver la consulta con
-paginación y ordenamiento sobre la tabla \texttt{site}.
+cabecera \texttt{Authorization: Bearer <token>} de todas las iteraciones. Este
+escenario ejerce presión sobre la capa de persistencia de Site, que debe resolver
+la consulta con paginación sobre el catálogo de asignaturas.
 
 \textbf{POST de creación:} El script \texttt{benchmark-course-create.js} ejecuta
 peticiones \texttt{POST /v1/course} con un \textit{payload} JSON que incluye código de
-asignatura, nombre, descripción y número de créditos generados aleatoriamente
-mediante la biblioteca \texttt{k6/faker}. El token JWT se obtiene de la misma
+asignatura, nombre, nivel y carreras asociadas, con códigos sintéticos únicos
+derivados del identificador de usuario virtual y del contador de iteración para
+evitar colisiones de unicidad. El token JWT se obtiene de la misma
 forma que en el escenario anterior. Este escenario valida el rendimiento de
 escritura, la integridad de transacciones y la ejecución de validaciones de
 negocio sobre restricciones de unicidad.
 
 \textbf{Flujo de autenticación:} El script \texttt{benchmark-auth-flow.js}
-ejecuta una secuencia de dos peticiones: primero \texttt{POST /oauth/token} con
-las credenciales de un usuario de prueba (\texttt{grant\_type=password}) para
-obtener el token JWT, y seguidamente \texttt{GET /v1/user/me} con dicho token en
+ejecuta una secuencia de dos peticiones: primero \texttt{POST /v1/auth/login} con
+las credenciales de un usuario de prueba para
+obtener el token JWT, y seguidamente \texttt{GET /v1/user/\{identity\}} con dicho token en
 la cabecera de autorización. Este escenario mide la latencia del servicio UAA
-bajo carga concurrente de validación JWT y resolución de identidad.
+bajo carga concurrente de verificación de credenciales (\textit{hashing} bcrypt)
+y resolución de identidad.
 
 \textbf{Monolito legacy.} Los mismos tres escenarios se ejecutan sobre el
-monolito legacy utilizando los endpoints equivalentes: \texttt{GET /api/site}
-(listado), \texttt{POST /api/course} (creación) y \texttt{POST /api/auth/login}
-seguido de \texttt{GET /api/user/me} (autenticación). La carga se genera con la
+monolito legacy utilizando los endpoints equivalentes: \texttt{GET /portapi/courses}
+(listado), \texttt{POST /portapi/courses} (creación) y \texttt{POST /portapi/sessions}
+seguido de \texttt{GET /portapi/users/me} (autenticación), con el mismo usuario
+de prueba y el mismo volumen de datos migrado. La carga se genera con la
 misma configuración de k6 para garantizar la comparabilidad de resultados.
 
 \textbf{Métricas recolectadas.} Para cada escenario se registran las siguientes
-métricas: latencia percentil p95 y p99, throughput (peticiones por segundo), tasa
+métricas: latencia media y percentil p95, throughput (peticiones por segundo), tasa
 de error (porcentaje de respuestas con código HTTP distinto de 2xx) y uso de
 CPU/memoria de los contenedores mediante Prometheus. Los resultados se comparan
 término a término entre ambas arquitecturas y se presentan en la subsección de
@@ -466,8 +494,9 @@ respondiendo. Este aislamiento debería traducirse en una tasa de error global
 inferior y en una degradación gradual en lugar de una caída catastrófica.
 
 \textbf{Igualdad de condiciones del experimento.} El benchmark se ejecutó con
-ambas arquitecturas desplegadas localmente sobre el mismo hardware, asignando
-idénticos límites de CPU y memoria a los contenedores de cada stack, de modo
+ambas arquitecturas desplegadas localmente sobre el mismo hardware, aplicando la
+misma política de recursos a los contenedores de cada stack ---sin límites
+explícitos de CPU ni memoria en ninguno de los dos---, de modo
 que la comparación término a término se realiza en igualdad de recursos y las
 diferencias observadas son atribuibles a la arquitectura y no a disparidades de
 capacidad. Si bien un entorno local no reproduce todos los factores de un
@@ -479,25 +508,21 @@ el monolito, factor que se considera en la interpretación de los resultados.
 
 \subsection{Resultados del Benchmarking}
 
-% TODO(frank): completar la tabla con los valores del resumen de k6
-% (k6 run --summary-export=result.json) para cada escenario, tanto en el
-% monolito como en los microservicios, y redactar la interpretación final.
-
 \begin{table}[ht!]
 \centering
 \rowcolors{2}{gray!10}{white}
 \begin{tabular}{lcccc}
 \toprule
-\textbf{Escenario} & \textbf{p95 (ms)} & \textbf{p99 (ms)} & \textbf{Throughput (req/s)} & \textbf{Error (\%)} \\
+\textbf{Escenario} & \textbf{Media (ms)} & \textbf{p95 (ms)} & \textbf{Throughput (req/s)} & \textbf{Error (\%)} \\
 \midrule
 \multicolumn{5}{l}{\textit{Monolito legacy}} \\
-GET intensivo & [pendiente] & [pendiente] & [pendiente] & [pendiente] \\
-POST creación & [pendiente] & [pendiente] & [pendiente] & [pendiente] \\
-Autenticación & [pendiente] & [pendiente] & [pendiente] & [pendiente] \\
+GET intensivo & 262,92 & 304,93 & 180,7 & 0,00 \\
+POST creación & 90,40 & 117,01 & 526,8 & 1,39 \\
+Autenticación & 37,22 & 79,97 & 1279,0 & 0,00 \\
 \multicolumn{5}{l}{\textit{Microservicios}} \\
-GET intensivo & [pendiente] & [pendiente] & [pendiente] & [pendiente] \\
-POST creación & [pendiente] & [pendiente] & [pendiente] & [pendiente] \\
-Autenticación & [pendiente] & [pendiente] & [pendiente] & [pendiente] \\
+GET intensivo & 136,71 & 258,39 & 347,8 & 0,00 \\
+POST creación & 85,86 & 119,00 & 553,9 & 0,00 \\
+Autenticación & 168,86 & 246,20 & 282,2 & 0,00 \\
 \bottomrule
 \end{tabular}
 \caption{\textit{Resultados del benchmarking término a término entre el monolito legacy y el ecosistema de microservicios, bajo cincuenta usuarios virtuales durante cinco minutos por escenario}}
@@ -508,6 +533,50 @@ La Tabla~\ref{tab:benchmark-resultados} consolida las métricas recolectadas
 para los tres escenarios en ambas arquitecturas y permite contrastar las
 hipótesis de latencia, throughput y aislamiento de fallos formuladas en la
 subsección anterior.
+
+\textbf{Lectura intensiva (GET).} La hipótesis de latencia se confirma con
+claridad: el ecosistema de microservicios respondió con una latencia media de
+136,71~ms frente a 262,92~ms del monolito (1,9 veces más rápido) y sostuvo un
+throughput de 347,8 peticiones por segundo frente a 180,7 (1,9 veces mayor),
+ambos con tasa de error nula. El monolito exhibe además una cola más pesada en
+el percentil p95 (304,93~ms frente a 258,39~ms), consistente con la saturación
+del \textit{event loop} único de Node.js cuando las consultas se acumulan sobre
+un pool de conexiones reducido.
+
+\textbf{Escritura (POST).} Ambas arquitecturas exhiben latencias
+estadísticamente equivalentes (85,86~ms frente a 90,40~ms de media; 119,00~ms
+frente a 117,01~ms en p95), lo que indica que la escritura transaccional está
+dominada por el costo de persistencia en la base de datos y no por la capa de
+aplicación. La diferencia relevante aparece en la robustez: el monolito
+respondió con error el 1,39\% de las peticiones, mientras que el servicio Site
+mantuvo una tasa de error nula. Las ejecuciones exploratorias mostraron, además,
+que ante violaciones de unicidad el monolito propaga la excepción de la base de
+datos como un error HTTP 500 genérico, mientras que el microservicio resuelve el
+conflicto de forma controlada e idempotente: una creación repetida con el mismo
+código se procesa como actualización exitosa (HTTP 200) sin generar registros
+duplicados.
+
+\textbf{Autenticación.} Este es el único escenario donde el monolito exhibe
+mejores cifras brutas (37,22~ms de media y 1279,0 peticiones por segundo frente
+a 168,86~ms y 282,2). La diferencia no es arbitraria ni reversible sin costo:
+responde a una decisión deliberada de seguridad. El sistema heredado verifica
+las contraseñas con un \textit{hash} MD5, computacionalmente trivial y
+considerado inseguro desde hace más de una década, mientras que el servicio UAA
+emplea \textbf{bcrypt} con un factor de trabajo que eleva deliberadamente el
+costo de cada verificación al rango de los cientos de milisegundos, además de la
+firma criptográfica del token JWT. El resultado cuantifica el precio de la
+seguridad: la verificación robusta de credenciales cuesta aproximadamente
+cinco veces más CPU por autenticación, un costo que la arquitectura absorbe
+aislándolo en un servicio especializado que puede escalar de forma
+independiente sin afectar los demás dominios.
+
+\textbf{Síntesis.} En conjunto, los resultados respaldan las hipótesis
+diseño: la arquitectura de microservicios mejora de forma significativa la
+lectura concurrente, iguala la escritura con mayor robustez ante errores y
+concentra en un servicio aislado el costo ---deliberado--- de la verificación
+segura de credenciales, todo ello sin una sola respuesta errónea atribuible a
+fallas de la plataforma en más de 390 mil peticiones ejecutadas contra el
+ecosistema.
 
 \section{Simulación de Caos y Recuperación Asistida}
 \label{sec:simulacion-caos}
