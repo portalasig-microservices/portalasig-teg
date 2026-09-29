@@ -64,6 +64,15 @@ body{
 }
 .slide.is-active{ display: flex; }
 
+/* Transición suave entre láminas (solo pantalla; nunca en impresión/PDF) */
+@media screen{
+  .slide.is-active{ animation: slideFade .35s ease-out; }
+  @keyframes slideFade{
+    from{ opacity: 0; transform: translateY(10px); }
+    to{ opacity: 1; transform: none; }
+  }
+}
+
 /* Encabezado estándar de lámina de contenido */
 .slide__head{ margin-bottom: 24px; flex: none; }
 .slide__head h2{ font-size: 40px; margin: 6px 0 0; letter-spacing: -.01em; line-height: 1.12; }
