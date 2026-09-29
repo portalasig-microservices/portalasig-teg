@@ -1,57 +1,80 @@
-% Acta del Veredicto (pagina 2, despues de la portada).
-% Formato basado en la Escuela de Computacion (ref: references/Rafael_V___TEG.pdf).
-\setcounter{page}{2}
+% Acta del veredicto: versión escaneada con las firmas del jurado
+% (defensa: 25 de septiembre de 2026). Se inserta a página completa.
+% La versión tipográfica original se conserva comentada al final de este archivo.
+\thispagestyle{empty}
+\begin{tikzpicture}[remember picture, overlay]
+    \node[inner sep=0pt] at (current page.center)
+        {\includegraphics[width=\paperwidth, height=\paperheight]{acta-firmada}};
+\end{tikzpicture}
+\newpage
 
-\begin{center}
-    \includegraphics[width=0.18\textwidth]{graphics/ucv-logo.png}\\
-    \vspace{0.3cm}
-    Universidad Central de Venezuela\\
-    Facultad de Ciencias\\
-    Escuela de Computaci\'{o}n
-
-    \vspace{0.9cm}
-
-    {\huge ACTA DEL VEREDICTO}
-\end{center}
-
-\vspace{0.5cm}
-
-Quienes suscriben, miembros del Jurado designado por el Consejo de la
-Escuela de Computaci\'{o}n, para examinar el Trabajo Especial de Grado
-presentado por el Bachiller Frank \'{A}ngel Ponte Delgado, C.I.: 23.950.509,
-titulado: ``Dise\~{n}o e implementaci\'{o}n de un modelo de mantenimiento
-asistido por inteligencia artificial para una arquitectura de microservicios
-en el sistema \emph{PortalAsig}'', a los fines de cumplir con el requisito
-legal para optar por el t\'{i}tulo de Licenciado en Computaci\'{o}n, dejan
-constancia de lo siguiente:
-
-Le\'{i}do el trabajo por cada uno de los Miembros del Jurado, se fij\'{o} el
-d\'{i}a 25 de septiembre de 2026 a las 11:00 horas para que su autor lo
-defendiera en forma p\'{u}blica y presencial en las instalaciones de la
-Escuela de Computaci\'{o}n de la Facultad de Ciencias de la Universidad
-Central de Venezuela, mediante una presentaci\'{o}n oral de su contenido,
-luego de lo cual respondi\'{o} las preguntas formuladas, todo ello conforme
-a lo dispuesto en la Ley de Universidades y dem\'{a}s normativas vigentes de
-la Universidad Central de Venezuela. Finalizada la defensa p\'{u}blica del
-Trabajo Especial de Grado, el Jurado decidi\'{o} aprobarlo.
-
-En fe de lo cual se levanta la presente Acta, en Caracas a los veinticinco
-(25) d\'{i}as del mes de septiembre del a\~{n}o dos mil veintis\'{e}is (2026)
-dej\'{a}ndose tambi\'{e}n constancia de que actu\'{o} como coordinador del
-Jurado el Profesor Tutor Walter Hern\'{a}ndez.
-
-\vspace{1cm}
-
-\begin{center}
-    \rule{6cm}{0.4pt}\\[0.15cm]
-    Prof. Walter Hern\'{a}ndez\\
-    Tutor
-
-    \vspace{1.2cm}
-
-    \begin{tabular}{cc}
-        \rule{5.5cm}{0.4pt} & \rule{5.5cm}{0.4pt}\\[0.15cm]
-        Prof. Francisco Moreno & Prof. Mois\'{e}s Berenguer\\
-        Jurado Principal & Jurado Principal\\
-    \end{tabular}
-\end{center}
+% ----------------------------------------------------------------------
+% VERSIÓN TIPOGRÁFICA ORIGINAL (sin firmas) — conservada como referencia.
+% Si se requiere regenerar el acta sin el escaneo, descomentar el bloque
+% siguiente y comentar el bloque tikz de arriba.
+% ----------------------------------------------------------------------
+%\thispagestyle{empty}
+%
+%\begin{center}
+%
+%\vspace*{0.3cm}
+%
+%\includegraphics[width=0.16\textwidth]{ucv-logo}\\[0.35cm]
+%
+%{\normalsize Universidad Central de Venezuela}\\
+%{\normalsize Facultad de Ciencias}\\
+%{\normalsize Escuela de Computación}\\[0.9cm]
+%
+%{\LARGE\scshape Acta del Veredicto}\\[0.9cm]
+%
+%\end{center}
+%
+%\noindent Quienes suscriben, miembros del Jurado designado por el Consejo de la
+%Escuela de Computación, para examinar el Trabajo Especial de Grado presentado
+%por el Bachiller \textbf{Frank Ángel Ponte Delgado}, C.I.: 23.950.509,
+%titulado: \textit{``Diseño e implementación de un modelo de mantenimiento
+%asistido por inteligencia artificial para una arquitectura de microservicios
+%en el sistema PortalAsig''}, a los fines de cumplir con el requisito legal
+%para optar por el título de Licenciado en Computación, dejan constancia de lo
+%siguiente:
+%
+%\vspace{0.45cm}
+%
+%\noindent Leído el trabajo por cada uno de los Miembros del Jurado, se fijó el
+%día 25 de septiembre de 2026 a las 11:00 horas para que su autor lo defendiera
+%en forma pública y presencial en las instalaciones de la Escuela de
+%Computación de la Facultad de Ciencias de la Universidad Central de Venezuela,
+%mediante una presentación oral de su contenido, luego de lo cual respondió las
+%preguntas formuladas, todo ello conforme a lo dispuesto en la Ley de
+%Universidades y demás normativas vigentes de la Universidad Central de
+%Venezuela. Finalizada la defensa pública del Trabajo Especial de Grado, el
+%Jurado decidió \textbf{aprobarlo}.
+%
+%\vspace{0.45cm}
+%
+%\noindent En fe de lo cual se levanta la presente Acta, en Caracas a los
+%veinticinco (25) días del mes de septiembre del año dos mil veintiséis (2026)
+%dejándose también constancia de que actuó como coordinador del Jurado el
+%Profesor Tutor Walter Hernández.
+%
+%\vspace{1.4cm}
+%
+%\begin{center}
+%\begin{tabular}{c}
+%\rule{6.5cm}{0.4pt}\\[0.1cm]
+%Prof. Walter Hernández\\
+%Tutor
+%\end{tabular}
+%
+%\vspace{1.1cm}
+%
+%\begin{tabular}{c@{\hspace{2cm}}c}
+%\rule{5.5cm}{0.4pt} & \rule{5.5cm}{0.4pt}\\[0.1cm]
+%Prof. Francisco Moreno & Prof. Moisés Berenguer\\
+%Jurado Principal & Jurado Principal
+%\end{tabular}
+%\end{center}
+%
+%\vfill
+%
+%\newpage
